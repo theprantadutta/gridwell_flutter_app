@@ -1,0 +1,13 @@
+name: Sunflower Head
+source: original
+---
+...o..o...
+..oooooo..
+.ookkkkoo.
+ookkkkkkoo
+.okkkkkko.
+ookkkkkkoo
+.ookkkkoo.
+..oooooo..
+...o..o...
+..........

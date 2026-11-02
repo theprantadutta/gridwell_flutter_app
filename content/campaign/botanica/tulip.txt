@@ -1,0 +1,8 @@
+name: Tulip
+source: original
+---
+r.r.r
+rrrrr
+.rrr.
+..k..
+.kkk.

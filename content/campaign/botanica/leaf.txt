@@ -1,0 +1,8 @@
+name: Leaf
+source: original
+---
+.kkk.
+kkkkk
+kkkk.
+.kk..
+.k...

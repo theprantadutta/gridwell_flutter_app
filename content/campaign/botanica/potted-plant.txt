@@ -1,0 +1,13 @@
+name: Potted Plant
+source: original
+---
+....kk....
+..k.kk.k..
+.kk.kk.kk.
+.kkkkkkkk.
+..kkkkkk..
+....kk....
+....kk....
+.rrrrrrrr.
+..rrrrrr..
+..rrrrrr..

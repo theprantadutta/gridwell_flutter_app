@@ -1,0 +1,13 @@
+name: Apple
+source: original
+---
+.....kk...
+....k.....
+..rrrrrr..
+.r.rrrrrr.
+rrrrrrrrrr
+rrrrrrrrrr
+rrrrrrrrrr
+.rrrrrrrr.
+.rrrrrrrr.
+..rr..rr..

@@ -1,0 +1,8 @@
+name: Toadstool
+source: original
+---
+.rrr.
+rrrrr
+rrrrr
+..s..
+.sss.

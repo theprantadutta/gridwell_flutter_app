@@ -29,3 +29,39 @@ coastline,27,coastline-octopus,"Octopus",10,10,9,8,0.340,0.540,67.81,false
 coastline,28,coastline-lifebuoy,"Lifebuoy",10,10,3,6,0.480,0.560,40.16,true
 coastline,29,coastline-lobster,"Lobster",15,15,6,13,0.120,0.387,70.38,false
 coastline,30,coastline-anchor-large,"Anchor",20,20,9,18,0.090,0.280,85.47,false
+botanica,1,botanica-toadstool,"Toadstool",5,5,1,0,1.000,0.680,7.68,false
+botanica,2,botanica-sprout,"Sprout",5,5,1,0,1.000,0.640,8.64,false
+botanica,3,botanica-tulip,"Tulip",5,5,1,0,1.000,0.600,9.60,false
+botanica,4,botanica-cherries,"Cherries",5,5,1,0,1.000,0.520,11.52,false
+botanica,5,botanica-acorn,"Acorn",5,5,2,2,0.840,0.600,19.77,false
+botanica,6,botanica-sunflower-head,"Sunflower Head",10,10,2,2,0.840,0.600,21.37,false
+botanica,7,botanica-strawberry,"Strawberry",10,10,2,4,0.840,0.640,23.07,false
+botanica,8,botanica-pineapple,"Pineapple",10,10,2,2,0.800,0.520,24.29,false
+botanica,9,botanica-watering-can,"Watering Can",10,10,2,4,0.820,0.510,26.69,false
+botanica,10,botanica-leaf,"Leaf",5,5,2,1,0.840,0.600,18.43,true
+botanica,11,botanica-mushrooms,"Mushrooms",10,10,2,5,0.700,0.560,29.83,false
+botanica,12,botanica-apple,"Apple",10,10,3,6,0.770,0.660,30.51,false
+botanica,13,botanica-clover,"Four-Leaf Clover",10,10,3,6,0.760,0.620,31.72,false
+botanica,14,botanica-pumpkin,"Pumpkin",15,15,2,10,0.800,0.564,36.55,false
+botanica,15,botanica-potted-plant,"Potted Plant",10,10,2,6,0.540,0.500,36.60,false
+botanica,16,botanica-watermelon,"Watermelon",15,10,2,3,0.913,0.573,22.57,true
+botanica,17,botanica-pear,"Pear",10,10,3,7,0.720,0.500,36.93,false
+botanica,18,botanica-beet,"Beet",10,10,3,6,0.600,0.460,37.64,false
+botanica,19,botanica-cactus,"Cactus",10,10,3,6,0.410,0.380,40.47,false
+botanica,20,botanica-corn,"Corn",15,13,3,10,0.477,0.364,45.78,false
+botanica,21,botanica-bonsai,"Bonsai",15,15,3,11,0.564,0.396,46.32,false
+botanica,22,botanica-carrot,"Carrot",10,10,3,6,0.750,0.240,28.61,true
+botanica,23,botanica-pine,"Pine Tree",15,15,3,10,0.511,0.404,46.53,false
+botanica,24,botanica-sunflower,"Sunflower",15,15,4,10,0.458,0.364,50.40,false
+botanica,25,botanica-apple-tree,"Apple Tree",20,20,3,13,0.677,0.555,51.08,false
+botanica,26,botanica-daisy,"Daisy",15,15,3,12,0.413,0.476,53.35,false
+botanica,27,botanica-oak-leaf,"Oak Leaf",15,15,4,12,0.422,0.444,55.88,false
+botanica,28,botanica-window-box,"Window Box",20,12,2,9,0.800,0.471,36.39,true
+botanica,29,botanica-lotus,"Lotus",20,20,4,14,0.645,0.565,56.48,false
+botanica,30,botanica-greenhouse,"Greenhouse",20,20,6,12,0.685,0.383,58.55,false
+botanica,31,botanica-rose,"Rose",15,15,5,11,0.316,0.382,59.22,false
+botanica,32,botanica-monstera,"Monstera Leaf",20,20,4,14,0.497,0.515,61.37,false
+botanica,33,botanica-fern,"Fern",15,15,6,12,0.253,0.249,62.41,false
+botanica,34,botanica-grapes,"Grapes",15,15,3,10,0.502,0.280,43.76,true
+botanica,35,botanica-vase,"Vase of Tulips",20,20,4,16,0.338,0.338,63.16,false
+botanica,36,botanica-wheelbarrow,"Wheelbarrow",20,20,8,15,0.487,0.343,73.53,false

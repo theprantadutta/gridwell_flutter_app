@@ -1,0 +1,13 @@
+name: Mushrooms
+source: original
+---
+...rrr....
+..rrrrr...
+.rr.r.rr..
+.rrrrrrr..
+...ss..rr.
+...ss.rrrr
+...ss..ss.
+..ssss.ss.
+..ssss.ss.
+kkkkkkkkkk

@@ -1,0 +1,8 @@
+name: Cherries
+source: original
+---
+.kkk.
+.k.k.
+rr.rr
+rr.rr
+.....

@@ -1,0 +1,13 @@
+name: Four-Leaf Clover
+source: original
+---
+.kk...kk..
+kkkk.kkkk.
+kkkkkkkkk.
+.kkkkkkk..
+..kkkkk...
+.kkkkkkk..
+kkkkkkkkk.
+kkkk.kkkk.
+.kk..kk...
+.....k....

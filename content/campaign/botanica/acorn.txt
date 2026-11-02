@@ -1,0 +1,8 @@
+name: Acorn
+source: original
+---
+.kkk.
+kkkkk
+.ooo.
+.ooo.
+..o..

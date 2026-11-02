@@ -1,0 +1,13 @@
+name: Strawberry
+source: original
+---
+...k..k...
+..kkkkkk..
+.rrrrrrrr.
+rrrr.rrrrr
+r.rrrrr.rr
+rrrr.rrrrr
+.rr.rrrrr.
+.rrrrr.rr.
+..rrrrrr..
+....rr....
