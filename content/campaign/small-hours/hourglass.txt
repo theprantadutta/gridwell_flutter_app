@@ -1,0 +1,13 @@
+name: Hourglass
+source: original
+---
+kkkkkkkkkk
+.k......k.
+.koooooo.k
+..koooo.k.
+...kook...
+...k..k...
+..k.oo.k..
+.k.oooo.k.
+.koooooo.k
+kkkkkkkkkk

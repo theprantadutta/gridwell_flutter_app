@@ -1,0 +1,14 @@
+name: Armchair
+source: original
+---
+..rrrrrrrrrrr..
+.rrrrrrrrrrrrr.
+.rrrrrrrrrrrrr.
+.rrrrrrrrrrrrr.
+rrr.rrrrrrr.rrr
+rrr.rrrrrrr.rrr
+rrrrrrrrrrrrrrr
+rrrrrrrrrrrrrrr
+rrrrrrrrrrrrrrr
+.k...........k.
+.k...........k.

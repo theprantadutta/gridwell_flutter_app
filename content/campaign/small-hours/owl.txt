@@ -1,0 +1,13 @@
+name: Owl
+source: original
+---
+.k......k.
+.kk....kk.
+.kkkkkkkk.
+kk..kk..kk
+k.o.kk.o.k
+kk..kk..kk
+.kkkookkk.
+.kk.kk.kk.
+.kkkkkkkk.
+..o.oo.o..

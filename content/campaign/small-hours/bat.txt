@@ -1,0 +1,13 @@
+name: Bat
+source: original
+---
+..........
+k.k....k.k
+kkk....kkk
+kkkk..kkkk
+kkkkkkkkkk
+.kkkkkkkk.
+..kk..kk..
+...k..k...
+..........
+..........

@@ -1,0 +1,13 @@
+name: Lantern
+source: original
+---
+....kk....
+...k..k...
+..kkkkkk..
+..k.oo.k..
+..kooook..
+..kooook..
+..k.oo.k..
+..kkkkkk..
+...kkkk...
+..........

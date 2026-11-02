@@ -1,0 +1,13 @@
+name: Heart
+source: original
+---
+..........
+.rrr..rrr.
+rrrrrrrrrr
+rrrrrrrrrr
+rrrrrrrrrr
+.rrrrrrrr.
+..rrrrrr..
+...rrrr...
+....rr....
+..........

@@ -1,0 +1,13 @@
+name: Crown
+source: original
+---
+o...oo...o
+oo..oo..oo
+ooo.oo.ooo
+oooooooooo
+oooorroooo
+oooooooooo
+.oooooooo.
+.kkkkkkkk.
+..........
+..........

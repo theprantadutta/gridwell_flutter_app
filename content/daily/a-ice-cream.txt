@@ -1,0 +1,13 @@
+name: Ice Cream Cone
+source: original
+---
+...rrrr...
+..rrrrrr..
+.rrrrrrrr.
+.rrrrrrrr.
+oooooooooo
+.oooooooo.
+..oooooo..
+..oooooo..
+...oooo...
+....oo....

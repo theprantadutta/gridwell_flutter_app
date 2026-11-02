@@ -1,0 +1,8 @@
+name: Teacup
+source: original
+---
+.....
+rrrr.
+rrr.r
+rrrr.
+kkkkk

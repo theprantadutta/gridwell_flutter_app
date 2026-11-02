@@ -1,0 +1,14 @@
+name: Igloo
+source: original
+---
+.....sssss.....
+...sssssssss...
+..sssssssssss..
+.sss.sssss.sss.
+.sssssssssssss.
+sssss.sss.sssss
+sssssssssssssss
+sssss.....sssss
+sssss.....sssss
+sssss.....sssss
+iiiiiiiiiiiiiii

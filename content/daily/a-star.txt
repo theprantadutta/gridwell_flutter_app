@@ -1,0 +1,13 @@
+name: Star
+source: original
+---
+....oo....
+....oo....
+...oooo...
+oooooooooo
+.oooooooo.
+..oooooo..
+..oooooo..
+.oooooooo.
+.ooo..ooo.
+.oo....oo.

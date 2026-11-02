@@ -1,0 +1,23 @@
+name: Delivery Truck
+source: original
+---
+....................
+....................
+iiiiiiiiiiiii.......
+iiiiiiiiiiiii.......
+iisssssssssii.......
+iisssssssssii.......
+iiiiiiiiiiiiirrrrrrr
+iiiiiiiiiiiiirr....r
+iiiiiiiiiiiiirr....r
+iiiiiiiiiiiiirr....r
+iiiiiiiiiiiiirrrrrrr
+iiiiiiiiiiiiirrrrrrr
+iiiiiiiiiiiiirrrrrrr
+iiiiiiiiiiiiirrrrrrr
+kkkkkkkkkkkkkkkkkkkk
+.kkkkkk......kkkkkk.
+.kk..kk......kk..kk.
+.kk..kk......kk..kk.
+.kkkkkk......kkkkkk.
+..kkkk........kkkk..

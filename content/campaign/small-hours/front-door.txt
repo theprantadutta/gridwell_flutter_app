@@ -1,0 +1,13 @@
+name: Front Door
+source: original
+---
+..kkkkkk..
+.kkkkkkkk.
+.kk.kk.kk.
+.kk.kk.kk.
+.kkkkkkkk.
+.kkkkkkok.
+.kk.kk.kk.
+.kk.kk.kk.
+.kkkkkkkk.
+ssssssssss

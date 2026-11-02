@@ -1,0 +1,13 @@
+name: Gift
+source: original
+---
+..rr..rr..
+...rrrr...
+oooorroooo
+oooorroooo
+.ooorrooo.
+.ooorrooo.
+.ooorrooo.
+.ooorrooo.
+.ooorrooo.
+..........

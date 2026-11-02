@@ -1,0 +1,16 @@
+name: Bed
+source: original
+---
+kk..................
+kk................kk
+kk....rr..........kk
+kk...rrro.........kk
+kk.ssssooo........kk
+kkssssssoo........kk
+kkiiiiiiiiiiiiiiiikk
+kkiiiiiiiiiiiiiiiikk
+kkiiriiriiriiriiiikk
+kkiiiiiiiiiiiiiiiikk
+kkkkkkkkkkkkkkkkkkkk
+kk................kk
+kk................kk

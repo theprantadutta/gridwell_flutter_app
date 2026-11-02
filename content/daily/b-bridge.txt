@@ -1,0 +1,13 @@
+name: Stone Bridge
+source: original
+---
+kkkkkkkkkkkkkkk
+k.k.k.k.k.k.k.k
+sssssssssssssss
+sssssssssssssss
+ss...sssss...ss
+s.....sss.....s
+s.....sss.....s
+s.....sss.....s
+iiiiiiiiiiiiiii
+i.iii.iii.iii.i

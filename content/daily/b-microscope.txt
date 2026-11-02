@@ -1,0 +1,17 @@
+name: Microscope
+source: original
+---
+....kkkk.......
+.....ss........
+.....ss...kkk..
+.....ss...kkk..
+.....ss....kk..
+....kkkk...kk..
+.....kk....kk..
+..rrrrrrrrrkk..
+..rrrrrrrrrkk..
+.....oo....kk..
+....oooo...kk..
+.......kkkkkk..
+.....kkkkkkkkk.
+....kkkkkkkkkkk

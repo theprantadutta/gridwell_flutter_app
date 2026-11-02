@@ -1,0 +1,23 @@
+name: Grandfather Clock
+source: original
+---
+...kkkk...
+..kkkkkk..
+.kkkkkkkk.
+.kk....kk.
+kk..k...kk
+kk..k...kk
+kk..kkk.kk
+.kk....kk.
+.kkkkkkkk.
+..kkkkkk..
+..k....k..
+..k.oo.k..
+..k.oo.k..
+..k..k.k..
+..k..k.k..
+..k.oook..
+..k.oook..
+..k....k..
+..kkkkkk..
+.kkkkkkkk.

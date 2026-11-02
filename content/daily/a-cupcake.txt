@@ -1,0 +1,13 @@
+name: Cupcake
+source: original
+---
+....r.....
+...ssss...
+..ssssss..
+.ssssssss.
+ssssssssss
+.oooooooo.
+.oo.oo.oo.
+.oooooooo.
+..oooooo..
+..oooooo..

@@ -1,0 +1,15 @@
+name: Gift Box
+source: original
+---
+...rrr...rrr...
+..rr.rr.rr.rr..
+...rrrrrrrrr...
+iiiiiirrriiiiii
+iiiiiirrriiiiii
+.iiiiirrriiiii.
+.ii.iirrrii.ii.
+.iiiiirrriiiii.
+.iiiiirrriiiii.
+.ii.iirrrii.ii.
+.iiiiirrriiiii.
+.iiiiirrriiiii.

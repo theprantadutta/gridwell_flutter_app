@@ -1,0 +1,13 @@
+name: Bell
+source: original
+---
+....oo....
+...oooo...
+..oooooo..
+..oooooo..
+..oooooo..
+.oooooooo.
+.oooooooo.
+oooooooooo
+....kk....
+..........

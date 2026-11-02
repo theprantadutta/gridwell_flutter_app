@@ -1,0 +1,12 @@
+name: Bow Tie
+source: original
+---
+rr...........rr
+r.rr.......rr.r
+rrrr.r...r.rrrr
+rr.rrrkkkrrr.rr
+rrrrrrkkkrrrrrr
+rr.rrrkkkrrr.rr
+rrrr.r...r.rrrr
+r.rr.......rr.r
+rr...........rr

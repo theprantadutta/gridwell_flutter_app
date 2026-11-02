@@ -1,0 +1,14 @@
+name: Sun and Cloud
+source: original
+---
+....o..o..o....
+.....ooooo.....
+..o.ooooooo.o..
+....ooooooo....
+...oooooossss..
+..oooossssssss.
+.ooo.sssssssss.
+....ssssssssss.
+..sssssssssssss
+.ssssssssssssss
+..ssssssssssss.

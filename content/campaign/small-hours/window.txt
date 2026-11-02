@@ -1,0 +1,16 @@
+name: Window at Night
+source: original
+---
+kkkkkkkkkkkkkkk
+k......k......k
+k.oo...k...o..k
+k.o....k..ooo.k
+k.oo...k...o..k
+k......k......k
+kkkkkkkkkkkkkkk
+k......k......k
+k......k......k
+k......k......k
+k......k......k
+kkkkkkkkkkkkkkk
+sssssssssssssss

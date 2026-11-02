@@ -1,0 +1,18 @@
+name: Teddy Bear
+source: original
+---
+.ooo.......ooo.
+oo.ooooooooo.oo
+.ooooooooooooo.
+..oo.ooooo.oo..
+..ooooooooooo..
+..oooo.k.oooo..
+...ooookoooo...
+....ooooooo....
+..ooooooooooo..
+.ooo.ooooo.ooo.
+.ooo.ooooo.ooo.
+....ooooooo....
+...ooo...ooo...
+..oooo...oooo..
+..oooo...oooo..

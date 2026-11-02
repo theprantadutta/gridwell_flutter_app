@@ -1,0 +1,13 @@
+name: Smiley
+source: original
+---
+..oooooo..
+.oooooooo.
+oo.oooo.oo
+oo.oooo.oo
+oooooooooo
+o.oooooo.o
+oo.oooo.oo
+.oo....oo.
+..oooooo..
+..........

@@ -1,0 +1,13 @@
+name: Drum
+source: original
+---
+..........
+.ssssssss.
+ssssssssss
+rrrrrrrrrr
+r.r.r.r.rr
+rrrrrrrrrr
+ssssssssss
+.ssssssss.
+..........
+..........

@@ -1,0 +1,11 @@
+name: Viking Helmet
+source: original
+---
+kk...........kk
+kk...........kk
+kkk..sssss..kkk
+.kkssssssssskk.
+..sssssssssss..
+..sssssssssss..
+.ooooooooooooo.
+.ooooooooooooo.

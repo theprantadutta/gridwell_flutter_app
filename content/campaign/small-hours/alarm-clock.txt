@@ -1,0 +1,13 @@
+name: Alarm Clock
+source: original
+---
+.rr....rr.
+rrrkkkkrrr
+rrkkkkkkrr
+.kk....kk.
+kk..k...kk
+kk..k...kk
+kk..kkk.kk
+.kk....kk.
+..kkkkkk..
+.kk....kk.

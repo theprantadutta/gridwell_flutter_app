@@ -1,0 +1,14 @@
+name: Handbag
+source: original
+---
+.....kkkkk.....
+....kk...kk....
+....k.....k....
+..rrrrrrrrrrr..
+.rrrrrrrrrrrrr.
+.rrrrrooorrrrr.
+.rrrrr.o.rrrrr.
+.rrrrrrrrrrrrr.
+.rrrrrrrrrrrrr.
+.rrrrrrrrrrrrr.
+..rrrrrrrrrrr..

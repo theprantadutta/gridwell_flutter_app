@@ -1,0 +1,13 @@
+name: Radio
+source: original
+---
+.....ooooo.....
+....ooooooo....
+..ooooooooooo..
+.oosssssssssoo.
+.oosssssssssoo.
+.oosssssssssoo.
+.ooooooooooooo.
+.ooo.ooooo.ooo.
+.ooooooooooooo.
+..k.........k..

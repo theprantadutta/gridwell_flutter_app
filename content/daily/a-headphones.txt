@@ -1,0 +1,13 @@
+name: Headphones
+source: original
+---
+..kkkkkk..
+.kkkkkkkk.
+kk......kk
+k........k
+k........k
+rr......rr
+rrr....rrr
+rrr....rrr
+rrr....rrr
+rrr....rrr

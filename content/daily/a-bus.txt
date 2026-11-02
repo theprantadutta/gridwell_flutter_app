@@ -1,0 +1,13 @@
+name: Bus
+source: original
+---
+iiiiiiiiii
+iiiiiiiiii
+i..i..i..i
+i..i..i..i
+iiiiiiiiii
+iiiiiiiiii
+.kk....kk.
+.kk....kk.
+..........
+..........

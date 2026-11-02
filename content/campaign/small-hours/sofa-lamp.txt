@@ -1,0 +1,17 @@
+name: Sofa and Lamp
+source: original
+---
+..ooooo.............
+.ooooooo............
+ooooooooo...........
+...kkk..............
+....k...............
+....k..rrrrrrrrrrrr.
+....k..rrrrrrrrrrrr.
+....k..rrrrrrrrrrrr.
+....k.rrrrrrrrrrrrrr
+....k.rr.rrrrrrrr.rr
+....k.rrrrrrrrrrrrrr
+....k.rrrrrrrrrrrrrr
+...kkk.k..........k.
+..kkkkkk..........k.

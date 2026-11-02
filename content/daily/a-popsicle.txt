@@ -1,0 +1,13 @@
+name: Popsicle
+source: original
+---
+..rrrrrr..
+.rrrrrrrr.
+.rrrrrrrr.
+.rr.rrrrr.
+.rrrrrrrr.
+.rrrrrrrr.
+.rrrrrrrr.
+....oo....
+....oo....
+....oo....

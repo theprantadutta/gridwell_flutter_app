@@ -1,0 +1,10 @@
+name: Magnet
+source: original
+---
+ss......ss
+rr......rr
+rr......rr
+rr......rr
+rrr....rrr
+.rrrrrrrr.
+..rrrrrr..

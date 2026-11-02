@@ -1,0 +1,13 @@
+name: Donut
+source: original
+---
+..rrrrrr..
+.rrrrrrrr.
+oooooooooo
+ooo....ooo
+oo......oo
+oo......oo
+ooo....ooo
+oooooooooo
+.oooooooo.
+..oooooo..

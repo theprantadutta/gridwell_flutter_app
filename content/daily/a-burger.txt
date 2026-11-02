@@ -1,0 +1,13 @@
+name: Burger
+source: original
+---
+..oooooo..
+.oooooooo.
+oooooooooo
+rrrrrrrrrr
+kkkkkkkkkk
+oooooooooo
+kkkkkkkkkk
+oooooooooo
+.oooooooo.
+..........

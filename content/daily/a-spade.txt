@@ -1,0 +1,13 @@
+name: Spade
+source: original
+---
+....kk....
+...kkkk...
+..kkkkkk..
+.kkkkkkkk.
+kkkkkkkkkk
+kkkkkkkkkk
+.kkk..kkk.
+.kk.kk.kk.
+....kk....
+...kkkk...

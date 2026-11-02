@@ -1,0 +1,16 @@
+name: Ghost
+source: original
+---
+.....sssss.....
+...sssssssss...
+..sssssssssss..
+.sss..sss..sss.
+.sss..sss..sss.
+.sssssssssssss.
+.sssss...sssss.
+.ssssss.ssssss.
+.sssssssssssss.
+.sssssssssssss.
+.sssssssssssss.
+.ss.ss.ss.ss.ss
+.s..s..s..s..s.

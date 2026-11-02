@@ -1,0 +1,16 @@
+name: Laptop
+source: original
+---
+..sssssssssss..
+..s.........s..
+..s.kkkkk...s..
+..s.........s..
+..s.kkk.kk..s..
+..s.........s..
+..s.kkkk....s..
+..s.........s..
+..sssssssssss..
+.sssssssssssss.
+sssssssssssssss
+ssssss...ssssss
+sssssssssssssss

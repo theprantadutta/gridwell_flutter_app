@@ -1,0 +1,23 @@
+name: Bookshelf
+source: original
+---
+kkkkkkkkkkkkkkkkkkkk
+k..................k
+k.rr.ii.o.ss.rr.kk.k
+k.rr.ii.o.ss.rr.kk.k
+k.rr.ii.ooss.rr.kk.k
+k.rr.ii.ooss.rr.kk.k
+kkkkkkkkkkkkkkkkkkkk
+k..................k
+k...ii.rr.kk.oo....k
+k.o.ii.rr.kk.oo.ss.k
+k.o.ii.rr.kk.oo.ss.k
+k.o.ii.rr.kk.oo.ss.k
+kkkkkkkkkkkkkkkkkkkk
+k..................k
+k.ss.....oo.ii.rr..k
+k.ss.kk..oo.ii.rr..k
+k.ss.kk..oo.ii.rr..k
+k.ss.kk..oo.ii.rr..k
+kkkkkkkkkkkkkkkkkkkk
+kk................kk

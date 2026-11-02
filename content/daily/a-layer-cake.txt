@@ -1,0 +1,13 @@
+name: Slice of Cake
+source: original
+---
+........oo
+......oooo
+....oooooo
+..oooooooo
+rrrrrrrrrr
+oooooooooo
+rrrrrrrrrr
+oooooooooo
+..........
+..........

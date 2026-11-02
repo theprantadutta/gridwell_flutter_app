@@ -1,0 +1,16 @@
+name: Jigsaw Piece
+source: original
+---
+......ooo......
+.....ooooo.....
+.....ooooo.....
+..ooooooooooo..
+..ooooooooooo..
+....ooooooooooo
+....ooooooooooo
+....ooooooooooo
+..ooooooooooo..
+..ooooooooooo..
+..ooooooooooo..
+..oooo...oooo..
+..ooo.....ooo..

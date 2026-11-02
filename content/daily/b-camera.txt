@@ -1,0 +1,15 @@
+name: Camera
+source: original
+---
+..kkk.....rrr..
+.kkkkkkkkkkkkk.
+kkkkkkkkkkkkkkk
+kkkkk.....kkkkk
+kkkk..sss..kkkk
+kkk..sssss..kkk
+kkk..ss.ss..kkk
+kkk..sssss..kkk
+kkkk..sss..kkkk
+kkkkk.....kkkkk
+kkkkkkkkkkkkkkk
+.kkkkkkkkkkkkk.

@@ -1,0 +1,14 @@
+name: Rainbow
+source: original
+---
+....rrrrrrr....
+..rrrrrrrrrrr..
+.rrooooooooorr.
+rroooiiiiiooorr
+rrooiiiiiiioorr
+rrooii...iioorr
+rrooi.....ioorr
+rroo.......oorr
+rroo.......oorr
+sss.........sss
+ssss.......ssss

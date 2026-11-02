@@ -1,0 +1,13 @@
+name: Cheese
+source: original
+---
+......oooo
+....oooooo
+..oooooooo
+oooooooooo
+oo.ooooo.o
+oooo.ooooo
+o.oooooo.o
+oooooooooo
+..........
+..........

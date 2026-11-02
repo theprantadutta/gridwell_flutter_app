@@ -1,0 +1,13 @@
+name: House
+source: original
+---
+....rr....
+...rrrr...
+..rrrrrr..
+.rrrrrrrr.
+rrrrrrrrrr
+.ssssssss.
+.s..ss..s.
+.s..ss..s.
+.sssskkss.
+.sssskkss.

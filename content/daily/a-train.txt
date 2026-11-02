@@ -1,0 +1,13 @@
+name: Train
+source: original
+---
+..........
+.kk..kkkk.
+.kk..k..k.
+kkkkkk..k.
+kkkkkkkkkk
+kkkkkkkkkk
+rrrrrrrrrr
+.kk.kk.kk.
+.kk.kk.kk.
+..........

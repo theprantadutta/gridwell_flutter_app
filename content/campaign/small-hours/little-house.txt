@@ -1,0 +1,8 @@
+name: Little House
+source: original
+---
+..k..
+.kkk.
+kkkkk
+k.k.k
+kkkkk

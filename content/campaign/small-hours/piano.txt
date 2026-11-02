@@ -1,0 +1,19 @@
+name: Upright Piano
+source: original
+---
+..o..............o..
+.kkk.............kkk
+.kkkkkkkkkkkkkkkkkk.
+kkkkkkkkkkkkkkkkkkkk
+kk......kkkk......kk
+kk......kkkk......kk
+kk......kkkk......kk
+kkkkkkkkkkkkkkkkkkkk
+kkkkkkkkkkkkkkkkkkkk
+kssssssssssssssssssk
+kkkkkkkkkkkkkkkkkkkk
+.kk..............kk.
+.kk..............kk.
+.kk.....kkkk.....kk.
+.kk..............kk.
+kkkk............kkkk

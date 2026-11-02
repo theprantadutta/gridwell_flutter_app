@@ -1,0 +1,14 @@
+name: Gazebo
+source: original
+---
+.......k.......
+......rrr......
+....rrrrrrr....
+..rrrrrrrrrrr..
+rrrrrrrrrrrrrrr
+.s...s...s...s.
+.s...s...s...s.
+.s...s...s...s.
+.s...s...s...s.
+sssssssssssssss
+.sssssssssssss.

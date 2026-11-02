@@ -1,0 +1,8 @@
+name: Candle
+source: original
+---
+..o..
+.sss.
+.sss.
+.sss.
+kkkkk

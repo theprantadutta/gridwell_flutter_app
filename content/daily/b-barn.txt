@@ -1,0 +1,16 @@
+name: Barn
+source: original
+---
+......rrr......
+....rrrrrrr....
+..rrrrrrrrrrr..
+rrrrrrrrrrrrrrr
+.rrrrr.r.rrrrr.
+.rrrrrr.rrrrrr.
+.rrrrrrrrrrrrr.
+.rrrsssssssrrr.
+.rrrsss.sssrrr.
+.rrrsss.sssrrr.
+.rrrsss.sssrrr.
+.rrrsss.sssrrr.
+ooooooooooooooo

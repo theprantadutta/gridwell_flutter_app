@@ -1,0 +1,13 @@
+name: Car
+source: original
+---
+..........
+...rrrr...
+..rr.r.rr.
+.rrrrrrrr.
+rrrrrrrrrr
+rrrrrrrrrr
+.kk....kk.
+.kk....kk.
+..........
+..........

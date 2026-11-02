@@ -1,0 +1,18 @@
+name: Castle
+source: original
+---
+.r...........r.
+.k...........k.
+s.s.........s.s
+sss.s.sss.s.sss
+sssssssssssssss
+sss.sssssss.sss
+sssssssssssssss
+ssssss.s.ssssss
+sssssssssssssss
+ssssss...ssssss
+sssss.....sssss
+sssss.....sssss
+sssss.....sssss
+iiiiii...iiiiii
+iiiiiiiiiiiiiii

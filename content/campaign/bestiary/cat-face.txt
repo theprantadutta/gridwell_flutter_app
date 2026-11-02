@@ -1,4 +1,4 @@
-name: Cat
+name: Kitten
 source: original
 ---
 k...k

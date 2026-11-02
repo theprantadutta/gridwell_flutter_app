@@ -1,0 +1,15 @@
+name: Skull
+source: original
+---
+....sssssss....
+..sssssssssss..
+.sssssssssssss.
+.sssssssssssss.
+sss...sss...sss
+sss...sss...sss
+ssss.sssss.ssss
+.ssssss.ssssss.
+..sssss.sssss..
+...sssssssss...
+...s.s.s.s.s...
+...sssssssss...

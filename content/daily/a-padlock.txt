@@ -1,0 +1,13 @@
+name: Padlock
+source: original
+---
+...kkkk...
+..kk..kk..
+..k....k..
+..k....k..
+.oooooooo.
+.oooooooo.
+.oooo.ooo.
+.oooo.ooo.
+.oooooooo.
+.oooooooo.

@@ -1,0 +1,10 @@
+name: Pyramids
+source: original
+---
+.....o.....rrr.
+....ooo....rrr.
+...ooooo...rrr.
+..ooooooo..o...
+.ooooooooo.ooo.
+oooooooooooooo.
+sssssssssssssss

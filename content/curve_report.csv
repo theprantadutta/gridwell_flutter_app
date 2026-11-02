@@ -74,7 +74,7 @@ bestiary,6,bestiary-butterfly,"Butterfly",10,10,3,3,0.800,0.710,24.56,false
 bestiary,7,bestiary-hedgehog,"Hedgehog",10,10,3,3,0.900,0.600,24.70,false
 bestiary,8,bestiary-sheep,"Sheep",15,11,2,6,0.891,0.667,25.21,false
 bestiary,9,bestiary-raccoon,"Raccoon",15,10,3,5,0.827,0.753,26.59,false
-bestiary,10,bestiary-cat-face,"Cat",5,5,2,2,0.840,0.720,16.89,true
+bestiary,10,bestiary-cat-face,"Kitten",5,5,2,2,0.840,0.720,16.89,true
 bestiary,11,bestiary-lion,"Lion",15,13,3,6,0.877,0.795,26.63,false
 bestiary,12,bestiary-bear,"Bear",15,12,2,9,0.900,0.750,27.31,false
 bestiary,13,bestiary-panda,"Panda",15,12,3,8,0.911,0.828,27.33,false
@@ -86,7 +86,7 @@ bestiary,18,bestiary-mouse,"Mouse",10,10,2,6,0.800,0.560,28.66,false
 bestiary,19,bestiary-duck,"Duck",10,10,3,5,0.750,0.650,29.92,false
 bestiary,20,bestiary-cat,"Cat",15,15,3,6,0.738,0.387,35.10,false
 bestiary,21,bestiary-elephant-large,"Elephant",20,19,3,9,0.784,0.658,40.18,false
-bestiary,22,bestiary-elephant,"Elephant",10,10,2,6,0.810,0.740,24.09,true
+bestiary,22,bestiary-elephant,"Elephant Calf",10,10,2,6,0.810,0.740,24.09,true
 bestiary,23,bestiary-hippo,"Hippo",20,15,3,11,0.820,0.600,41.63,false
 bestiary,24,bestiary-bee,"Bee",10,10,3,8,0.520,0.520,42.79,false
 bestiary,25,bestiary-bison,"Bison",20,16,3,10,0.794,0.519,43.33,false
@@ -105,3 +105,137 @@ bestiary,37,bestiary-stag,"Stag",20,14,4,16,0.179,0.357,65.05,false
 bestiary,38,bestiary-parrot,"Parrot",15,15,7,13,0.360,0.418,68.63,false
 bestiary,39,bestiary-kangaroo,"Kangaroo",20,20,6,19,0.168,0.260,72.55,false
 bestiary,40,bestiary-peacock,"Peacock",20,20,4,10,0.785,0.595,46.93,true
+small-hours,1,small-hours-teacup-small,"Teacup",5,5,1,0,1.000,0.680,7.68,false
+small-hours,2,small-hours-little-house,"Little House",5,5,1,0,1.000,0.680,7.68,false
+small-hours,3,small-hours-candle-small,"Candle",5,5,1,0,1.000,0.600,9.60,false
+small-hours,4,small-hours-mug,"Mug",10,10,2,1,0.960,0.560,17.99,false
+small-hours,5,small-hours-moonlit-picture,"Moonlit Picture",10,10,2,2,0.920,0.640,18.41,false
+small-hours,6,small-hours-armchair,"Armchair",15,11,2,2,0.952,0.758,16.18,false
+small-hours,7,small-hours-fireplace,"Fireplace",15,12,2,2,0.933,0.650,19.54,false
+small-hours,8,small-hours-lantern,"Lantern",10,10,2,4,0.760,0.400,26.03,false
+small-hours,9,small-hours-window,"Window at Night",15,13,2,5,0.851,0.497,29.45,false
+small-hours,10,small-hours-front-door,"Front Door",10,10,2,2,0.960,0.720,15.49,true
+small-hours,11,small-hours-house-night,"House at Night",15,15,2,6,0.831,0.560,30.55,false
+small-hours,12,small-hours-sleeping-fox,"Sleeping Fox",20,16,3,5,0.903,0.600,31.98,false
+small-hours,13,small-hours-bed,"Bed",20,13,2,8,0.877,0.581,32.32,false
+small-hours,14,small-hours-street-lamp,"Street Lamp",15,14,3,6,0.705,0.267,32.73,false
+small-hours,15,small-hours-mailbox,"Mailbox",15,13,2,8,0.805,0.431,33.00,false
+small-hours,16,small-hours-hourglass,"Hourglass",10,10,2,4,0.830,0.600,24.28,true
+small-hours,17,small-hours-typewriter,"Typewriter",20,16,2,6,0.819,0.550,33.12,false
+small-hours,18,small-hours-books,"Stack of Books",15,10,4,6,0.773,0.720,33.55,false
+small-hours,19,small-hours-key,"Key",10,5,2,6,0.560,0.560,33.59,false
+small-hours,20,small-hours-alarm-clock,"Alarm Clock",10,10,3,6,0.640,0.590,35.44,false
+small-hours,21,small-hours-birdcage,"Birdcage",15,12,2,8,0.639,0.383,35.70,false
+small-hours,22,small-hours-owl,"Owl",10,10,2,4,0.840,0.580,24.51,true
+small-hours,23,small-hours-bat,"Bat",10,10,4,6,0.680,0.420,38.18,false
+small-hours,24,small-hours-bookshelf,"Bookshelf",20,20,2,12,0.900,0.598,39.66,false
+small-hours,25,small-hours-piano,"Upright Piano",20,16,3,10,0.822,0.556,41.73,false
+small-hours,26,small-hours-kettle,"Kettle",15,12,3,10,0.622,0.578,43.22,false
+small-hours,27,small-hours-desk-lamp,"Desk Lamp",10,10,3,8,0.410,0.390,43.38,false
+small-hours,28,small-hours-radio,"Radio",15,10,2,7,0.773,0.673,29.01,true
+small-hours,29,small-hours-rocking-chair,"Rocking Chair",15,12,3,10,0.444,0.322,45.26,false
+small-hours,30,small-hours-teapot,"Teapot",15,12,4,9,0.572,0.617,45.70,false
+small-hours,31,small-hours-sleeping-cat,"Sleeping Cat",20,16,3,14,0.828,0.575,46.46,false
+small-hours,32,small-hours-grandfather-clock,"Grandfather Clock",10,20,3,9,0.435,0.495,48.74,false
+small-hours,33,small-hours-sofa-lamp,"Sofa and Lamp",20,14,3,12,0.471,0.479,53.14,false
+small-hours,34,small-hours-teacup,"Cup and Saucer",10,10,3,5,0.730,0.500,34.02,true
+small-hours,35,small-hours-candelabra,"Candelabra",20,15,3,14,0.343,0.217,53.15,false
+small-hours,36,small-hours-owl-branch,"Owl and Moon",20,20,3,14,0.502,0.340,54.26,false
+small-hours,37,small-hours-jigsaw,"Jigsaw Piece",15,13,5,12,0.528,0.590,55.27,false
+small-hours,38,small-hours-gramophone,"Gramophone",20,18,4,16,0.450,0.419,61.46,false
+small-hours,39,small-hours-tea-tray,"Tea Tray",20,17,5,17,0.574,0.494,63.24,false
+small-hours,40,small-hours-knight,"Chess Knight",15,14,3,7,0.600,0.486,41.94,true
+small-hours,41,small-hours-pocket-watch,"Pocket Watch",15,12,5,12,0.189,0.406,63.32,false
+small-hours,42,small-hours-crescent,"Crescent Moon",15,14,6,12,0.219,0.324,64.74,false
+small-hours,43,small-hours-cuckoo-clock,"Cuckoo Clock",20,20,5,17,0.345,0.285,65.21,false
+small-hours,44,small-hours-telescope,"Telescope",20,20,7,17,0.495,0.278,68.28,false
+daily,1,daily-a-bell,"Bell",10,10,2,6,0.880,0.520,27.62,false
+daily,2,daily-b-windmill,"Windmill",15,15,1,0,1.000,0.489,16.00,false
+daily,3,daily-b-skyline,"City Skyline",15,15,2,3,0.916,0.520,25.40,false
+daily,4,daily-b-ghost,"Ghost",15,13,4,7,0.697,0.677,38.78,false
+daily,5,daily-b-rainbow,"Rainbow",15,11,2,8,0.721,0.685,31.69,false
+daily,6,daily-a-trophy,"Trophy",10,10,2,4,0.820,0.560,25.49,false
+daily,7,daily-a-headphones,"Headphones",10,10,2,6,0.580,0.500,35.60,false
+daily,8,daily-a-lollipop,"Lollipop",10,10,3,6,0.640,0.500,37.60,false
+daily,9,daily-a-arrow,"Arrow",10,10,2,2,0.920,0.340,17.93,false
+daily,10,daily-b-teddy,"Teddy Bear",15,15,2,8,0.769,0.618,33.38,false
+daily,11,daily-b-jack-in-the-box,"Jack-in-the-Box",15,15,2,8,0.636,0.493,39.38,false
+daily,12,daily-a-hammer,"Hammer",10,10,2,2,0.840,0.420,21.85,false
+daily,13,daily-b-gazebo,"Gazebo",15,11,2,9,0.818,0.491,34.81,false
+daily,14,daily-b-sock,"Striped Sock",15,14,3,7,0.800,0.500,37.28,false
+daily,15,daily-b-blocks,"Building Blocks",15,10,2,9,0.587,0.447,39.22,false
+daily,16,daily-b-tent,"Tent",15,10,2,7,0.653,0.433,34.57,false
+daily,17,daily-b-laptop,"Laptop",15,13,2,5,0.851,0.538,28.59,false
+daily,18,daily-b-beanie,"Winter Hat",15,10,2,2,0.973,0.573,19.74,false
+daily,19,daily-a-burger,"Burger",10,10,2,2,0.960,0.820,13.09,false
+daily,20,daily-b-viking-helmet,"Viking Helmet",15,8,2,4,0.800,0.667,23.86,false
+daily,21,daily-a-hot-air-balloon,"Hot-Air Balloon",20,20,3,10,0.805,0.625,42.21,false
+daily,22,daily-a-car,"Car",10,10,4,6,0.820,0.450,35.40,false
+daily,23,daily-a-bus,"Bus",10,10,2,4,0.920,0.560,22.99,false
+daily,24,daily-b-ufo,"Flying Saucer",15,9,3,8,0.630,0.415,39.23,false
+daily,25,daily-a-kite,"Kite",10,10,3,6,0.520,0.280,35.32,false
+daily,26,daily-b-igloo,"Igloo",15,11,2,3,0.964,0.739,17.65,false
+daily,27,daily-a-guitar,"Guitar",10,10,2,6,0.620,0.460,33.64,false
+daily,28,daily-a-train,"Train",10,10,2,2,0.900,0.590,20.11,false
+daily,29,daily-b-wizard-hat,"Wizard Hat",15,14,2,2,0.981,0.500,22.59,false
+daily,30,daily-b-satellite,"Satellite",15,9,2,2,0.941,0.511,21.73,false
+daily,31,daily-b-sneaker,"Sneaker",15,8,2,1,0.983,0.642,15.88,false
+daily,32,daily-a-fried-egg,"Fried Egg",10,10,2,4,0.860,0.490,25.69,false
+daily,33,daily-b-mitten,"Mitten",15,12,2,6,0.711,0.539,33.10,false
+daily,34,daily-a-crown,"Crown",10,10,3,2,0.880,0.640,22.91,false
+daily,35,daily-b-handbag,"Handbag",15,11,2,6,0.794,0.661,27.78,false
+daily,36,daily-a-ice-cream,"Ice Cream Cone",10,10,3,3,0.760,0.620,27.72,false
+daily,37,daily-a-airplane,"Airplane",10,10,2,4,0.840,0.400,24.03,false
+daily,38,daily-b-sun-cloud,"Sun and Cloud",15,11,2,5,0.806,0.648,26.44,false
+daily,39,daily-a-star,"Star",10,10,3,8,0.580,0.560,40.33,false
+daily,40,daily-a-birthday-cake,"Birthday Cake",20,20,2,13,0.935,0.615,39.70,false
+daily,41,daily-a-pizza,"Pizza Slice",10,10,1,0,1.000,0.520,13.12,false
+daily,42,daily-a-light-bulb,"Light Bulb",10,10,3,6,0.680,0.540,35.64,false
+daily,43,daily-a-spade,"Spade",10,10,2,6,0.640,0.580,32.18,false
+daily,44,daily-b-rain-boot,"Rain Boot",15,12,2,4,0.733,0.511,30.54,false
+daily,45,daily-a-drum,"Drum",10,10,1,0,1.000,0.620,10.72,false
+daily,46,daily-b-crystal-ball,"Crystal Ball",15,15,3,6,0.796,0.724,30.99,false
+daily,47,daily-b-snowman,"Snowman",15,15,2,6,0.760,0.591,31.58,false
+daily,48,daily-a-padlock,"Padlock",10,10,2,6,0.740,0.580,29.68,false
+daily,49,daily-b-castle,"Castle",15,15,1,0,1.000,0.707,11.31,false
+daily,50,daily-b-camera,"Camera",15,12,2,6,0.889,0.756,23.45,false
+daily,51,daily-b-yo-yo,"Yo-Yo",15,12,3,10,0.600,0.444,44.31,false
+daily,52,daily-b-pagoda,"Pagoda",15,15,3,9,0.662,0.547,42.59,false
+daily,53,daily-a-robot,"Robot",20,20,3,10,0.765,0.590,44.05,false
+daily,54,daily-b-barn,"Barn",15,13,1,0,1.000,0.759,9.41,false
+daily,55,daily-a-donut,"Donut",10,10,2,6,0.760,0.680,26.78,false
+daily,56,daily-a-locomotive,"Locomotive",20,20,2,8,0.922,0.655,32.38,false
+daily,57,daily-a-gem,"Gem",10,10,2,6,0.840,0.440,27.66,false
+daily,58,daily-b-dress,"Dress",15,12,1,0,1.000,0.489,15.04,false
+daily,59,daily-a-magnet,"Magnet",10,7,2,4,0.714,0.514,28.59,false
+daily,60,daily-a-music-notes,"Music Notes",10,10,2,6,0.730,0.460,30.89,false
+daily,61,daily-a-popsicle,"Popsicle",10,10,2,5,0.780,0.590,27.11,false
+daily,62,daily-b-bow-tie,"Bow Tie",15,9,2,4,0.881,0.600,23.74,false
+daily,63,daily-a-layer-cake,"Slice of Cake",10,10,1,0,1.000,0.600,11.20,false
+daily,64,daily-a-bowling-pin,"Bowling Pin",10,10,2,4,0.720,0.420,27.51,false
+daily,65,daily-a-gift,"Gift",10,10,2,2,0.920,0.680,17.45,false
+daily,66,daily-b-skull,"Skull",15,12,2,10,0.678,0.667,36.20,false
+daily,67,daily-a-cheese,"Cheese",10,10,1,0,1.000,0.630,10.48,false
+daily,68,daily-a-heart,"Heart",10,10,3,8,0.840,0.560,33.83,false
+daily,69,daily-a-wine-glass,"Wine Glass",10,10,2,6,0.680,0.460,32.14,false
+daily,70,daily-b-tornado,"Tornado",15,14,2,3,0.929,0.381,22.38,false
+daily,71,daily-b-sunglasses,"Sunglasses",15,7,3,10,0.657,0.600,40.21,false
+daily,72,daily-b-thunderstorm,"Thunderstorm",15,12,3,11,0.639,0.383,43.20,false
+daily,73,daily-a-rocket,"Rocket",10,10,2,4,0.820,0.460,25.97,false
+daily,74,daily-b-bridge,"Stone Bridge",15,10,1,0,1.000,0.687,10.19,false
+daily,75,daily-b-spinning-top,"Spinning Top",15,10,2,8,0.707,0.480,35.69,false
+daily,76,daily-b-church,"Chapel",15,15,2,3,0.951,0.458,23.98,false
+daily,77,daily-a-truck,"Delivery Truck",20,20,2,9,0.825,0.670,35.80,false
+daily,78,daily-a-smiley,"Smiley",10,10,1,0,1.000,0.660,9.76,false
+daily,79,daily-b-pyramids,"Pyramids",15,7,1,0,1.000,0.638,10.39,false
+daily,80,daily-a-balloon,"Party Balloon",10,10,3,7,0.620,0.480,38.95,false
+daily,81,daily-b-microscope,"Microscope",15,14,3,9,0.600,0.419,43.00,false
+daily,82,daily-b-robot,"Tin Robot",15,15,3,9,0.636,0.507,44.22,false
+daily,83,daily-b-gift,"Gift Box",15,12,2,4,0.911,0.778,19.70,false
+daily,84,daily-a-t-shirt,"T-Shirt",10,10,2,2,0.960,0.660,16.93,false
+daily,85,daily-a-house,"House",10,10,2,4,0.800,0.620,24.55,false
+daily,86,daily-b-shirt,"Shirt",15,12,2,2,0.956,0.678,18.32,false
+daily,87,daily-a-lightning,"Lightning Bolt",10,10,3,6,0.620,0.490,37.86,false
+daily,88,daily-a-cupcake,"Cupcake",10,10,2,4,0.760,0.630,25.31,false
+daily,89,daily-b-rocking-horse,"Rocking Horse",15,11,3,6,0.697,0.461,36.62,false
+daily,90,daily-b-rain-cloud,"Rain Cloud",15,14,3,4,0.838,0.381,29.47,false

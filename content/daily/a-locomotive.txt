@@ -1,0 +1,23 @@
+name: Locomotive
+source: original
+---
+....................
+...kkkkk............
+....kkk.....kkkkkkkk
+....kkk......rrrrrrr
+....kkk......rr...rr
+....kkk......rr...rr
+..kkkkkkkkkkkrr...rr
+..krrrrrrrrrrrrrrrrr
+..kkkkkkkkkkkrrrrrrr
+..kkkkkkkkkkkrrrrrrr
+..kkkkkkkkkkkrrrrrrr
+..kkkkkkkkkkkrrrrrrr
+ssssssssssssssssssss
+...kkkk...kkkk......
+..kkkkkk.kkkkkk.....
+..kkssssssssskk.kkkk
+..kk..kk.kk..kk.kkkk
+..kkkkkk.kkkkkk.kkkk
+...kkkk...kkkk..kkkk
+ssssssssssssssssssss

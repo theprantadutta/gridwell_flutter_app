@@ -1,0 +1,13 @@
+name: Trophy
+source: original
+---
+oooooooooo
+o.oooooo.o
+oo.oooo.oo
+..oooooo..
+...oooo...
+....oo....
+....oo....
+...oooo...
+..kkkkkk..
+..kkkkkk..

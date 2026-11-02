@@ -1,0 +1,8 @@
+name: Key
+source: original
+---
+.oooo.....
+oo..oo....
+oo..oooooo
+oo..oo.o.o
+.oooo..o.o

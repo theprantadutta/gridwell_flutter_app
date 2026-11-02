@@ -1,0 +1,13 @@
+name: T-Shirt
+source: original
+---
+.iii..iii.
+iiiiiiiiii
+iiiiiiiiii
+iiiiiiiiii
+..iiiiii..
+..iiiiii..
+..iiiiii..
+..iiiiii..
+..iiiiii..
+..........
