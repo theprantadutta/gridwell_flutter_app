@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.gridwell_flutter_app"
+    namespace = "com.pranta.gridwell"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

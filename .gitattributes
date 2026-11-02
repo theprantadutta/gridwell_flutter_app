@@ -1,0 +1,7 @@
+# Normalize line endings in the repo; shell scripts and gradlew must stay LF on checkout.
+* text=auto
+*.sh text eol=lf
+gradlew text eol=lf
+*.bin binary
+*.png binary
+*.ttf binary

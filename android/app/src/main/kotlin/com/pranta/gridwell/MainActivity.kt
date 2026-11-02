@@ -1,4 +1,4 @@
-package com.example.gridwell_flutter_app
+package com.pranta.gridwell
 
 import io.flutter.embedding.android.FlutterActivity
 
