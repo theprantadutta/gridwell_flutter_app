@@ -2,7 +2,16 @@ import '../model/clues.dart';
 
 /// Result of counting solutions.
 class UniquenessResult {
-  const UniquenessResult(this.count, {required this.complete, required this.nodes});
+  const UniquenessResult(
+    this.count, {
+    required this.complete,
+    required this.nodes,
+    this.solutions = const [],
+  });
+
+  /// Solutions found, as row bitmasks (bit c = column c), when requested
+  /// with `collect: true`. Used by authoring tools to show an alternative.
+  final List<List<int>> solutions;
 
   /// Solutions found, up to the requested limit.
   final int count;
@@ -43,6 +52,7 @@ UniquenessResult countSolutions(
   Clues clues, {
   int limit = 2,
   int maxNodes = 5000000,
+  bool collect = false,
 }) {
   final w = clues.width;
   final h = clues.height;
@@ -64,11 +74,14 @@ UniquenessResult countSolutions(
   var nodes = 0;
   var aborted = false;
   final assigned = List<bool>.filled(h, false);
+  final chosen = List<int>.filled(h, 0);
+  final found = <List<int>>[];
 
   void search(List<List<int>> cols, int remaining) {
     if (count >= limit || aborted) return;
     if (remaining == 0) {
       count++;
+      if (collect) found.add(List<int>.unmodifiable(chosen));
       return;
     }
 
@@ -116,6 +129,7 @@ UniquenessResult countSolutions(
         aborted = true;
         break;
       }
+      chosen[bestRow] = pattern;
       final next = <List<int>>[];
       var dead = false;
       for (var c = 0; c < w && !dead; c++) {
@@ -134,7 +148,7 @@ UniquenessResult countSolutions(
   }
 
   search(colPatterns, h);
-  return UniquenessResult(count, complete: !aborted, nodes: nodes);
+  return UniquenessResult(count, complete: !aborted, nodes: nodes, solutions: found);
 }
 
 /// Every bitmask of [length] cells whose runs are exactly [blocks]

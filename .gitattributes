@@ -5,3 +5,5 @@ gradlew text eol=lf
 *.bin binary
 *.png binary
 *.ttf binary
+# Content sources and generated outputs are compared byte for byte; keep LF.
+content/** text eol=lf
