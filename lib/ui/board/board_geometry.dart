@@ -21,7 +21,7 @@ class BoardGeometry {
   });
 
   /// Fits a [clues] board into [available].
-  factory BoardGeometry.fit(Clues clues, Size available, {double maxCell = 56}) {
+  factory BoardGeometry.fit(Clues clues, Size available, {double maxCell = 104}) {
     final rowSlots = clues.rows.map((r) => r.length).fold<int>(1, math.max);
     final colSlots = clues.columns.map((c) => c.length).fold<int>(1, math.max);
     // Each clue number takes about 0.62 of a cell horizontally (row clues)

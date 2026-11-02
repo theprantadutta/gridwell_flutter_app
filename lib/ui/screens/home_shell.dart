@@ -86,14 +86,3 @@ class TabPlaceholder extends StatelessWidget {
     ]);
   }
 }
-
-class OnboardingPlaceholder extends StatelessWidget {
-  const OnboardingPlaceholder({super.key});
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        body: Center(
-          child: InkButton(label: 'Begin', onPressed: () => context.go('/contents')),
-        ),
-      );
-}

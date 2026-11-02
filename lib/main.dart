@@ -7,7 +7,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'firebase_options.dart';
+import 'services/feedback/sound_haptic_feedback.dart';
 import 'state/providers.dart';
+import 'state/services.dart';
+import 'state/settings.dart';
 import 'ui/app.dart';
 
 Future<void> main() async {
@@ -25,5 +28,25 @@ Future<void> main() async {
   }
 
   final overrides = await bootstrapOverrides();
-  runApp(ProviderScope(overrides: overrides, child: const GridwellApp()));
+  final feedback = await SoundHapticFeedback.create();
+  runApp(ProviderScope(
+    overrides: [...overrides, feedbackProvider.overrideWithValue(feedback)],
+    child: const _FeedbackSettingsSync(child: GridwellApp()),
+  ));
+}
+
+/// Keeps the feedback service in step with the Sound and Haptics settings.
+class _FeedbackSettingsSync extends ConsumerWidget {
+  const _FeedbackSettingsSync({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final s = ref.watch(settingsProvider);
+    ref.read(feedbackProvider)
+      ..soundEnabled = s.sound
+      ..hapticsEnabled = s.haptics;
+    return child;
+  }
 }

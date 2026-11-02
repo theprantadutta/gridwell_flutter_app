@@ -10,7 +10,8 @@ plugins {
 
 android {
     namespace = "com.pranta.gridwell"
-    compileSdk = flutter.compileSdkVersion
+    // Firebase, ads and androidx lifecycle need API 37 to compile against.
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
