@@ -1,0 +1,8 @@
+name: Sun
+source: original
+---
+o.o.o
+.ooo.
+ooooo
+.ooo.
+o.o.o

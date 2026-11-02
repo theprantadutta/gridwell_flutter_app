@@ -1,0 +1,31 @@
+group,plate,id,name,width,height,passes,max_ambiguity,early_forced_ratio,density,score,breather
+coastline,1,coastline-gull,"Gull",5,5,1,0,1.000,0.200,4.80,false
+coastline,2,coastline-sun,"Sun",5,5,1,0,1.000,0.680,7.68,false
+coastline,3,coastline-mackerel,"Mackerel",10,10,2,1,0.960,0.630,16.31,false
+coastline,4,coastline-rowboat,"Rowboat",10,10,2,1,0.970,0.580,17.26,false
+coastline,5,coastline-sailboat,"Sailboat",5,5,2,1,0.920,0.560,17.39,false
+coastline,6,coastline-scallop,"Scallop",5,5,2,2,0.840,0.680,17.85,false
+coastline,7,coastline-sandcastle,"Sandcastle",10,10,2,2,0.960,0.610,18.13,false
+coastline,8,coastline-whale,"Whale",10,10,2,2,0.960,0.590,18.61,false
+coastline,9,coastline-buoy,"Buoy",10,10,2,2,0.960,0.540,19.81,false
+coastline,10,coastline-dunes,"Dunes",10,10,1,0,1.000,0.520,13.12,true
+coastline,11,coastline-lighthouse,"Lighthouse",11,15,2,3,0.915,0.612,21.92,false
+coastline,12,coastline-seal,"Seal",15,15,2,5,0.809,0.413,29.13,false
+coastline,13,coastline-umbrella,"Beach Umbrella",10,10,2,7,0.800,0.450,30.23,false
+coastline,14,coastline-fishing-boat,"Fishing Boat",15,15,2,7,0.831,0.413,31.24,false
+coastline,15,coastline-crab,"Crab",10,10,2,6,0.720,0.520,31.62,false
+coastline,16,coastline-cottage,"Harbor Cottage",15,15,2,4,0.964,0.667,21.99,true
+coastline,17,coastline-starfish,"Starfish",5,5,3,3,0.600,0.520,32.52,false
+coastline,18,coastline-bucket,"Sand Pail",10,10,3,6,0.680,0.600,34.20,false
+coastline,19,coastline-ship,"Tall Ship",15,15,2,8,0.738,0.560,35.55,false
+coastline,20,coastline-steamship,"Steamship",20,20,2,9,0.745,0.472,41.22,false
+coastline,21,coastline-jellyfish,"Jellyfish",10,10,4,7,0.450,0.450,45.98,false
+coastline,22,coastline-bottle,"Message in a Bottle",10,10,2,4,0.680,0.440,28.99,true
+coastline,23,coastline-puffin,"Puffin",15,15,5,9,0.573,0.316,48.51,false
+coastline,24,coastline-turtle,"Sea Turtle",15,15,3,12,0.573,0.480,49.45,false
+coastline,25,coastline-helmet,"Diving Helmet",20,20,3,16,0.730,0.675,49.55,false
+coastline,26,coastline-gull-post,"Gull on a Post",20,20,4,16,0.422,0.385,62.18,false
+coastline,27,coastline-octopus,"Octopus",10,10,9,8,0.340,0.540,67.81,false
+coastline,28,coastline-lifebuoy,"Lifebuoy",10,10,3,6,0.480,0.560,40.16,true
+coastline,29,coastline-lobster,"Lobster",15,15,6,13,0.120,0.387,70.38,false
+coastline,30,coastline-anchor-large,"Anchor",20,20,9,18,0.090,0.280,85.47,false

@@ -1,0 +1,8 @@
+name: Sailboat
+source: original
+---
+.k...
+.kk..
+.kkk.
+rrrrr
+.rrr.

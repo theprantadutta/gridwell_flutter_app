@@ -1,0 +1,13 @@
+name: Jellyfish
+source: original
+---
+...iiii...
+..iiiiii..
+.iiiiiiii.
+.iiiiiiii.
+.i.i..i.i.
+.i.i..i.i.
+..i.ii.i..
+..i.i..i..
+.i..i...i.
+.....i....

@@ -1,0 +1,13 @@
+name: Whale
+source: original
+---
+..i.i.....
+...i......
+.kkkkk...k
+kkkkkkk.kk
+k.kkkkkkkk
+kkkkkkkkk.
+.kkkkkkk..
+..........
+ii..ii..ii
+iiiiiiiiii

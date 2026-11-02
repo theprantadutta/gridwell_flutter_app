@@ -1,0 +1,13 @@
+name: Sand Pail
+source: original
+---
+..kkkkkk..
+.k......k.
+.k......k.
+rrrrrrrrrr
+.rrrrrrrr.
+.rrooorrr.
+.rrrrrrrr.
+..rrrrrr..
+..rrrrrr..
+...rrrr...

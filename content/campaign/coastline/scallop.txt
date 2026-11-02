@@ -1,0 +1,8 @@
+name: Scallop
+source: original
+---
+.ooo.
+ooooo
+ooooo
+.ooo.
+..s..

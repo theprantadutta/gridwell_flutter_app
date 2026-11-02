@@ -1,0 +1,13 @@
+name: Buoy
+source: original
+---
+....kk....
+...k..k...
+....kk....
+...rrrr...
+..rrrrrr..
+..ssssss..
+..rrrrrr..
+.rrrrrrrr.
+ii.iiii.ii
+iiiiiiiiii

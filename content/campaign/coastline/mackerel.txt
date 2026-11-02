@@ -1,0 +1,13 @@
+name: Mackerel
+source: original
+---
+..........
+...iiii..i
+..iiiiiiii
+.ik.iiiiii
+iiiiiiiiii
+iiiiiiiiii
+.iiiiiiiii
+..iiiiiiii
+...iiii..i
+..........

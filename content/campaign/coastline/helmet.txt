@@ -1,0 +1,23 @@
+name: Diving Helmet
+source: original
+---
+......ssssssss......
+....ssssssssssss....
+...ssssssssssssss...
+..sssskkkkkkkkssss..
+.sssskk......kkssss.
+.ssskk........kksss.
+.ssskk........kksss.
+sssskk........kkssss
+sssskk........kkssss
+sssskk........kkssss
+.ssskk........kksss.
+.sssskk......kkssss.
+..sssskkkkkkkkssss..
+...ssssssssssssss...
+....ssssssssssss....
+..oooooooooooooooo..
+.oooooooooooooooooo.
+oooooooooooooooooooo
+oo.oo.oo.oo.oo.oo.oo
+oooooooooooooooooooo

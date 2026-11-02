@@ -1,0 +1,13 @@
+name: Octopus
+source: original
+---
+...rrrr...
+..rrrrrr..
+.rrrrrrrr.
+.rrkrrkrr.
+.rrrrrrrr.
+..rrrrrr..
+.r.r..r.r.
+r..r..r..r
+r.r....r.r
+.r......r.

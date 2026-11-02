@@ -1,0 +1,13 @@
+name: Lifebuoy
+source: original
+---
+...rrss...
+.rrrrssss.
+.rrr..sss.
+rrr....sss
+rr......ss
+ss......rr
+sss....rrr
+.sss..rrr.
+.ssssrrrr.
+...ssrr...

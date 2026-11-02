@@ -1,0 +1,13 @@
+name: Rowboat
+source: original
+---
+..........
+...ss.....
+...ss.....
+kkkkkkkkk.
+..kkkk....
+rrrrrrrrrr
+.rrrrrrrr.
+..rrrrrr..
+i.ii.ii.ii
+iiiiiiiiii

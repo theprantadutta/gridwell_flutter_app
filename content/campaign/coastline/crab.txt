@@ -1,0 +1,13 @@
+name: Crab
+source: original
+---
+.rr....rr.
+r.r....r.r
+.rr....rr.
+..rk..kr..
+..rrrrrr..
+rrrrrrrrrr
+.rrrrrrrr.
+r.rrrrrr.r
+.r.r..r.r.
+..........
