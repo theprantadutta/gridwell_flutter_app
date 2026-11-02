@@ -5,6 +5,7 @@ import 'screens/board_screen.dart';
 import 'screens/collection_screen.dart';
 import 'screens/completion_screen.dart';
 import 'screens/contents_screen.dart';
+import 'screens/daily_screen.dart';
 import 'screens/gallery_screen.dart';
 import 'screens/home_shell.dart';
 import 'screens/onboarding_screen.dart';
@@ -19,7 +20,7 @@ GoRouter buildRouter({required bool onboardingDone}) => GoRouter(
           builder: (context, state, child) => HomeShell(location: state.uri.path, child: child),
           routes: [
             GoRoute(path: '/contents', pageBuilder: (_, _) => const NoTransitionPage(child: ContentsScreen())),
-            GoRoute(path: '/daily', pageBuilder: (_, _) => const NoTransitionPage(child: TabPlaceholder('The Daily'))),
+            GoRoute(path: '/daily', pageBuilder: (_, _) => const NoTransitionPage(child: DailyScreen())),
             GoRoute(path: '/gallery', pageBuilder: (_, _) => const NoTransitionPage(child: GalleryScreen())),
             GoRoute(path: '/settings', pageBuilder: (_, _) => const NoTransitionPage(child: SettingsScreen())),
           ],

@@ -1,5 +1,6 @@
 {
   "puzzle_set_version": 1,
+  "daily_start_date": "2026-12-01",
   "collections": [
     { "id": "coastline", "name": "Coastline", "blurb": "Harbor and shore." },
     { "id": "botanica", "name": "Botanica", "blurb": "Leaves, flowers and fruit." },

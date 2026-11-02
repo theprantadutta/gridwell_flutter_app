@@ -42,6 +42,7 @@ BakeResult bake(Directory contentDir, {int seed = defaultSeed}) {
   final meta = jsonDecode(File('${contentDir.path}/collections.json').readAsStringSync())
       as Map<String, dynamic>;
   final setVersion = meta['puzzle_set_version'] as int;
+  final dailyStartDate = meta['daily_start_date'] as String;
   final collections = [
     for (final c in meta['collections'] as List)
       CollectionInfo(
@@ -133,13 +134,27 @@ BakeResult bake(Directory contentDir, {int seed = defaultSeed}) {
     seed: seed,
     collections: collections,
     puzzles: puzzles,
+    dailyStartDate: dailyStartDate,
+    dailyPool: [
+      for (final a in dailyOrder)
+        PuzzleRecord(
+          id: a.plate.id,
+          name: a.plate.name,
+          solution: a.plate.solution,
+          clues: a.clues,
+          difficulty: double.parse(a.score!.toStringAsFixed(2)),
+          collectionId: 'daily',
+          plateNumber: 0,
+          colorLayer: a.plate.colors,
+        ),
+    ],
   );
   return BakeResult(
     errors: errors,
     report: report,
     csv: csv,
     bytes: PuzzleSetCodec.encode(set),
-    dailyJson: _dailyJson(dailyOrder, seed),
+    dailyJson: _dailyJson(dailyOrder, seed, dailyStartDate),
   );
 }
 
@@ -155,10 +170,11 @@ int minPlausibleMs(Clues clues) {
   return (ms / 100).round() * 100;
 }
 
-String _dailyJson(List<PlateAnalysis> daily, int seed) {
+String _dailyJson(List<PlateAnalysis> daily, int seed, String startDate) {
   final encoder = const JsonEncoder.withIndent('  ');
   return '${encoder.convert({
         'seed': seed,
+        'start_date': startDate,
         'count': daily.length,
         'puzzles': [
           for (final a in daily)

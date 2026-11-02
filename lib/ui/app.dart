@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;
 
+import '../state/online.dart';
 import '../state/settings.dart';
 import 'router.dart';
 import 'theme/gridwell_theme.dart';
@@ -19,6 +20,21 @@ class GridwellApp extends ConsumerStatefulWidget {
 class _GridwellAppState extends ConsumerState<GridwellApp> {
   late final GoRouter _router =
       buildRouter(onboardingDone: ref.read(settingsProvider).onboardingDone);
+  late final AppLifecycleListener _lifecycle;
+
+  @override
+  void initState() {
+    super.initState();
+    // Online enrichment on start and every resume: never awaited, never blocking.
+    ref.read(onlineSessionProvider).onForeground();
+    _lifecycle = AppLifecycleListener(onResume: () => ref.read(onlineSessionProvider).onForeground());
+  }
+
+  @override
+  void dispose() {
+    _lifecycle.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

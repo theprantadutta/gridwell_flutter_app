@@ -13,6 +13,7 @@ import '../engine/solver/line_solver.dart';
 import '../services/ads/ad_service.dart';
 import '../services/analytics/analytics_service.dart';
 import 'explain.dart';
+import 'online.dart';
 import 'providers.dart';
 import 'services.dart';
 import 'settings.dart';
@@ -142,9 +143,16 @@ class CompletionResult {
     required this.collectionSolved,
     required this.collectionTotal,
     required this.completedCollection,
+    this.dailyDate,
+    this.dailyOnDay = false,
   });
 
   final PuzzleRecord puzzle;
+
+  /// Set for daily puzzles: the day it belongs to, and whether it was solved
+  /// on that day (leaderboard-eligible).
+  final String? dailyDate;
+  final bool dailyOnDay;
   final int timeMs;
   final SolveOutcome outcome;
   final int hintsUsed;
@@ -169,9 +177,10 @@ final lastCompletionProvider =
     NotifierProvider<LastCompletion, CompletionResult?>(LastCompletion.new);
 
 /// Saved board for a puzzle, loaded before the controller starts.
-final savedBoardProvider = FutureProvider.family<SavedBoard?, String>((ref, id) {
-  final set = ref.watch(puzzleSetProvider);
-  final p = set.puzzles.firstWhere((p) => p.id == id);
+final savedBoardProvider = FutureProvider.family<SavedBoard?, String>((ref, id) async {
+  if (id.startsWith('daily@')) await ref.watch(dailyCacheProvider.future);
+  final p = resolvePuzzle(ref, id);
+  if (p == null) return null;
   return ref.watch(boardRepositoryProvider).load(id, p.width, p.height);
 });
 
@@ -200,11 +209,18 @@ class BoardController extends Notifier<BoardSession> {
   late PuzzleRecord _puzzle;
   late int _setVersion;
 
+  /// Local date when this is a daily puzzle.
+  String? _dailyDate;
+
   @override
   BoardSession build() {
     final set = ref.read(puzzleSetProvider);
-    _puzzle = set.puzzles.firstWhere((p) => p.id == puzzleId);
+    _puzzle = resolvePuzzle(ref, puzzleId)!;
     _setVersion = set.puzzleSetVersion;
+    _dailyDate = dailyDateOfKey(puzzleId);
+    if (_dailyDate != null) {
+      unawaited(ref.read(analyticsProvider).log(AnalyticsEvents.dailyStarted, {'date': _dailyDate!}));
+    }
     final saved = ref.read(savedBoardProvider(puzzleId)).value;
     final usable = saved != null && saved.setVersion == _setVersion;
     final board = usable ? saved.board : Board.empty(_puzzle.width, _puzzle.height);
@@ -613,6 +629,36 @@ class BoardController extends Notifier<BoardSession> {
         );
     await ref.read(boardRepositoryProvider).delete(puzzleId);
 
+    final online = ref.read(onlineSessionProvider);
+    final now = DateTime.now();
+    if (_dailyDate == null) {
+      unawaited(online.enqueue('progress', {
+      'puzzle_id': puzzleId,
+      'puzzle_set_version': _setVersion,
+      'is_solved': true,
+      'best_time_ms': outcome.isPersonalBest ? timeMs : outcome.previousBestMs,
+      'solved_at': now.toUtc().toIso8601String(),
+      'last_played_at': now.toUtc().toIso8601String(),
+      'client_updated_at': now.toUtc().toIso8601String(),
+      }));
+    }
+    final daily = _dailyDate;
+    final onDay = daily != null && daily == localDateString(now);
+    if (daily != null) {
+      await ref.read(dailyRepositoryProvider).recordSolve(
+            date: daily, puzzleId: puzzleId, timeMs: timeMs, onDay: onDay);
+      unawaited(online.enqueue('daily_complete', {
+        'date': daily,
+        'time_ms': timeMs,
+        'client_local_date': localDateString(now),
+      }));
+      unawaited(ref.read(analyticsProvider).log(AnalyticsEvents.dailyCompleted, {
+        'date': daily,
+        'duration_seconds': timeMs ~/ 1000,
+        'on_day': onDay ? 1 : 0,
+      }));
+    }
+
     final inCollection = set.inCollection(_puzzle.collectionId);
     final solvedBefore = inCollection.where((p) => progressBefore[p.id]?.isSolved ?? false).length;
     final solvedNow = solvedBefore + (outcome.isFirstSolve ? 1 : 0);
@@ -640,6 +686,8 @@ class BoardController extends Notifier<BoardSession> {
       collectionSolved: solvedNow,
       collectionTotal: inCollection.length,
       completedCollection: completedCollection,
+      dailyDate: daily,
+      dailyOnDay: onDay,
     ));
   }
 

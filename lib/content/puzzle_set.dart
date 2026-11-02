@@ -38,8 +38,18 @@ class PuzzleSet {
     required this.seed,
     required List<CollectionInfo> collections,
     required List<PuzzleRecord> puzzles,
+    this.dailyStartDate = '',
+    List<PuzzleRecord> dailyPool = const [],
   })  : collections = List.unmodifiable(collections),
-        puzzles = List.unmodifiable(puzzles);
+        puzzles = List.unmodifiable(puzzles),
+        dailyPool = List.unmodifiable(dailyPool);
+
+  /// First day of the daily calendar (yyyy-MM-dd), shared with the server.
+  final String dailyStartDate;
+
+  /// Daily puzzles in serving order: day N after [dailyStartDate] is
+  /// `dailyPool[N % length]`. Bundled so the daily works with no connection.
+  final List<PuzzleRecord> dailyPool;
 
   /// Bumped whenever any shipped puzzle changes. Progress stores it.
   final int puzzleSetVersion;
@@ -65,13 +75,15 @@ class PuzzleSet {
 ///   str id, str name, u8 collectionIndex, u16 plateNumber,
 ///   u8 width, u8 height, u16 difficulty x 100,
 ///   ceil(width*height*3/8) bytes: 3-bit color index per cell, row-major, LSB first
+/// str dailyStartDate, u16 dailyCount, then per daily:
+///   str id, str name, u8 width, u8 height, u16 difficulty x 100, color bytes
 /// str = u16 byte length + UTF-8 bytes
 /// ```
 /// Stored uncompressed so the bytes never depend on a zlib version; the app
 /// bundle compresses it anyway. Clues are derived on load.
 abstract final class PuzzleSetCodec {
   static const _magic = [0x47, 0x57, 0x50, 0x53]; // GWPS
-  static const formatVersion = 1;
+  static const formatVersion = 2;
 
   static Uint8List encode(PuzzleSet set) {
     final out = _Writer();
@@ -113,7 +125,34 @@ abstract final class PuzzleSetCodec {
         ..u16((p.difficulty * 100).round())
         ..bytes(_pack(colors));
     }
+    out
+      ..str(set.dailyStartDate)
+      ..u16(set.dailyPool.length);
+    for (final p in set.dailyPool) {
+      out
+        ..str(p.id)
+        ..str(p.name)
+        ..u8(p.width)
+        ..u8(p.height)
+        ..u16((p.difficulty * 100).round())
+        ..bytes(_pack(p.colorLayer ?? [for (final f in p.solution.cells) f ? PictureColor.ink : 0]));
+    }
     return out.take();
+  }
+
+  static PuzzleRecord _record(String id, String name, String collection, int plate, int w, int h,
+      double difficulty, List<int> colors) {
+    final solution = Solution(w, h, [for (final c in colors) c != 0]);
+    return PuzzleRecord(
+      id: id,
+      name: name,
+      solution: solution,
+      clues: Clues.fromSolution(solution),
+      difficulty: difficulty,
+      collectionId: collection,
+      plateNumber: plate,
+      colorLayer: colors,
+    );
   }
 
   static PuzzleSet decode(Uint8List data) {
@@ -141,17 +180,18 @@ abstract final class PuzzleSetCodec {
       final h = r.u8();
       final difficulty = r.u16() / 100;
       final colors = _unpack(r.bytes((w * h * 3 + 7) ~/ 8), w * h);
-      final solution = Solution(w, h, [for (final c in colors) c != 0]);
-      puzzles.add(PuzzleRecord(
-        id: id,
-        name: name,
-        solution: solution,
-        clues: Clues.fromSolution(solution),
-        difficulty: difficulty,
-        collectionId: collection,
-        plateNumber: plate,
-        colorLayer: colors,
-      ));
+      puzzles.add(_record(id, name, collection, plate, w, h, difficulty, colors));
+    }
+    final dailyStart = r.str();
+    final daily = <PuzzleRecord>[];
+    for (var i = r.u16(); i > 0; i--) {
+      final id = r.str();
+      final name = r.str();
+      final w = r.u8();
+      final h = r.u8();
+      final difficulty = r.u16() / 100;
+      final colors = _unpack(r.bytes((w * h * 3 + 7) ~/ 8), w * h);
+      daily.add(_record(id, name, 'daily', 0, w, h, difficulty, colors));
     }
     if (!r.atEnd) throw const FormatException('Trailing bytes in puzzle set');
     return PuzzleSet(
@@ -159,6 +199,8 @@ abstract final class PuzzleSetCodec {
       seed: seed,
       collections: collections,
       puzzles: puzzles,
+      dailyStartDate: dailyStart,
+      dailyPool: daily,
     );
   }
 

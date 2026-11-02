@@ -59,7 +59,7 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
   void _next(PuzzleRecord? next) {
     if (DateTime.now().isBefore(_acceptNextAfter) || _t.isAnimating) return;
     if (next == null) {
-      context.go('/contents');
+      context.go(_result?.dailyDate != null ? '/daily' : '/contents');
     } else {
       context.pushReplacement('/play/${next.id}');
     }
@@ -77,8 +77,11 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
     final p = context.palette;
     final set = ref.watch(puzzleSetProvider);
     final puzzle = r.puzzle;
-    final collection = set.collections.firstWhere((c) => c.id == puzzle.collectionId);
-    final next = nextPuzzleAfter(set, ref.watch(progressProvider).value ?? const {}, puzzle);
+    final isDaily = r.dailyDate != null;
+    final collectionName = isDaily
+        ? 'The Daily'
+        : set.collections.firstWhere((c) => c.id == puzzle.collectionId).name;
+    final next = isDaily ? null : nextPuzzleAfter(set, ref.watch(progressProvider).value ?? const {}, puzzle);
     final pb = !r.outcome.isFirstSolve && r.outcome.isPersonalBest;
 
     return Scaffold(
@@ -100,8 +103,10 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
                 FolioHeader(
                   leading: 'Contents',
                   onLeading: () => context.go('/contents'),
-                  center: collection.name,
-                  trailing: Text('Plate ${puzzle.plateNumber} of ${r.collectionTotal}', style: FolioType.header(p)),
+                  center: collectionName,
+                  trailing: isDaily
+                      ? Text(r.dailyDate!, style: FolioType.header(p))
+                      : Text('Plate ${puzzle.plateNumber} of ${r.collectionTotal}', style: FolioType.header(p)),
                 ),
                 Expanded(
                   child: SingleChildScrollView(
@@ -143,7 +148,8 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
                       Opacity(
                         opacity: title,
                         child: Column(children: [
-                          Text('PLATE ${roman(puzzle.plateNumber)}', style: FolioType.kicker(p)),
+                          Text(isDaily ? (r.dailyOnDay ? "TODAY'S LEAF" : 'A MISSED LEAF') : 'PLATE ${roman(puzzle.plateNumber)}',
+                              style: FolioType.kicker(p)),
                           const SizedBox(height: 8),
                           Text(puzzle.name, style: FolioType.plateTitle(p, size: 48), textAlign: TextAlign.center),
                         ]),
@@ -153,13 +159,25 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
                       const SizedBox(height: 22),
                       const Hairline(),
                       const SizedBox(height: 16),
-                      _CollectionProgress(
-                        name: collection.name,
-                        solved: r.collectionSolved,
-                        total: r.collectionTotal,
-                        advanced: progress,
-                        justSolved: r.outcome.isFirstSolve,
-                      ),
+                      if (isDaily)
+                        Opacity(
+                          opacity: progress,
+                          child: Text(
+                            r.dailyOnDay
+                                ? "Pressed into your calendar. Your time goes on today's leaderboard when you are online."
+                                : 'Pressed into your calendar. Late leaves are not ranked.',
+                            textAlign: TextAlign.center,
+                            style: FolioType.bodyMuted(p, size: 17),
+                          ),
+                        )
+                      else
+                        _CollectionProgress(
+                          name: collectionName,
+                          solved: r.collectionSolved,
+                          total: r.collectionTotal,
+                          advanced: progress,
+                          justSolved: r.outcome.isFirstSolve,
+                        ),
                       const SizedBox(height: 28),
                       IgnorePointer(
                         ignoring: cta < 1,
@@ -167,7 +185,7 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
                           opacity: cta,
                           child: Column(children: [
                             InkButton(
-                              label: next == null ? 'Back to contents' : 'Next puzzle',
+                              label: next == null ? (isDaily ? 'Back to the calendar' : 'Back to contents') : 'Next puzzle',
                               detail: next == null ? null : 'No. ${next.plateNumber} · ${next.width} × ${next.height}',
                               onPressed: () => _next(next),
                             ),

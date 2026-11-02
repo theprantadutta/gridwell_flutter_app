@@ -97,7 +97,10 @@ class _BoardPageState extends ConsumerState<_BoardPage> with WidgetsBindingObser
     final set = ref.watch(puzzleSetProvider);
     final p = context.palette;
     final puzzle = session.puzzle;
-    final collection = set.collections.firstWhere((c) => c.id == puzzle.collectionId);
+    final isDaily = puzzle.collectionId == 'daily';
+    final headerTitle = isDaily
+        ? 'The Daily'
+        : set.collections.firstWhere((c) => c.id == puzzle.collectionId).name;
 
     // Turn the page once the solve is recorded (not merely detected).
     ref.listen(lastCompletionProvider, (_, result) {
@@ -115,7 +118,7 @@ class _BoardPageState extends ConsumerState<_BoardPage> with WidgetsBindingObser
       FolioHeader(
         leading: 'Contents',
         onLeading: () => context.pop(),
-        center: collection.name,
+        center: headerTitle,
         trailing: settings.showTimer
             ? Text(formatClock(_controller.elapsedMs), style: FolioType.header(p))
             : null,
@@ -124,7 +127,7 @@ class _BoardPageState extends ConsumerState<_BoardPage> with WidgetsBindingObser
         padding: const EdgeInsets.fromLTRB(folioMargin, 18, folioMargin, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            Text('NO. ${puzzle.plateNumber}', style: FolioType.kicker(p)),
+            Text(isDaily ? "TODAY'S LEAF" : 'NO. ${puzzle.plateNumber}', style: FolioType.kicker(p)),
             const Spacer(),
             Text('${puzzle.width} × ${puzzle.height}', style: FolioType.header(p).copyWith(fontStyle: FontStyle.normal)),
           ]),
