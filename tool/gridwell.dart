@@ -2,6 +2,7 @@
 //
 //   dart run tool/gridwell.dart check [file-or-dir ...]   analyze pictures while drawing
 //   dart run tool/gridwell.dart nudge <file>               suggest pixel fixes for a rejected picture
+//   dart run tool/gridwell.dart curve <collection-id>       order + validate one collection, write nothing
 //   dart run tool/gridwell.dart bake [--seed N] [--api-seed-dir DIR]
 //
 // bake writes assets/puzzles/set.bin, content/curve_report.md,
@@ -12,7 +13,10 @@ import 'dart:io';
 
 import 'package:gridwell_flutter_app/engine/solver/logic_solver.dart';
 
+import 'dart:math';
+
 import 'content/bake.dart';
+import 'content/curve.dart';
 import 'content/nudge.dart';
 import 'content/plates.dart';
 
@@ -26,6 +30,8 @@ void main(List<String> args) {
       exit(_check(args.skip(1).toList()));
     case 'nudge':
       exit(_nudge(args.skip(1).toList()));
+    case 'curve':
+      exit(_curve(args.skip(1).toList()));
     case 'bake':
       exit(_bake(args.skip(1).toList()));
     default:
@@ -102,6 +108,45 @@ int _nudge(List<String> args) {
   stdout.writeln();
   result.rows.forEach(stdout.writeln);
   return result.solved ? 0 : 1;
+}
+
+int _curve(List<String> args) {
+  if (args.isEmpty) {
+    stderr.writeln('usage: curve <collection-id>');
+    return 2;
+  }
+  final id = args.first;
+  final dir = Directory('content/campaign/$id');
+  if (!dir.existsSync()) {
+    stderr.writeln('No such collection folder: ${dir.path}');
+    return 2;
+  }
+  final logic = LogicSolver();
+  final analyses = [
+    for (final f in dir.listSync().whereType<File>().where((f) => f.path.endsWith('.txt')).toList()
+      ..sort((a, b) => a.path.compareTo(b.path)))
+      analyzePlate(parsePlate(f, group: id), logic),
+  ];
+  final rejected = analyses.where((a) => !a.ok).toList();
+  for (final a in rejected) {
+    stdout.writeln('REJECTED ${a.plate.id}: ${a.verdict}');
+  }
+  final ordered = orderCollection(analyses.where((a) => a.ok).toList(), Random(defaultSeed));
+  for (final o in ordered) {
+    final p = o.analysis.plate;
+    final label = '${o.plateNumber.toString().padLeft(3)}${o.isBreather ? ' b' : '  '} '
+        '${p.name.padRight(24)} ${p.width}x${p.height}';
+    stdout.writeln('${label.padRight(40)} ${o.score.toStringAsFixed(1).padLeft(5)} '
+        '${'#' * (o.score / 4).round()}');
+  }
+  final errors = validateCollection(id, ordered);
+  for (final e in errors) {
+    stdout.writeln('PROBLEM $e');
+  }
+  stdout.writeln(errors.isEmpty && rejected.isEmpty
+      ? 'Curve OK (${ordered.length} plates)'
+      : '${errors.length + rejected.length} problem(s)');
+  return errors.isEmpty && rejected.isEmpty ? 0 : 1;
 }
 
 int _bake(List<String> args) {

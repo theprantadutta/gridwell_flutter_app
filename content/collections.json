@@ -3,7 +3,7 @@
   "collections": [
     { "id": "coastline", "name": "Coastline", "blurb": "Harbor and shore." },
     { "id": "botanica", "name": "Botanica", "blurb": "Leaves, flowers and fruit." },
-    { "id": "bestiary", "name": "Bestiary", "blurb": "Creatures, from a snail to a whale." },
+    { "id": "bestiary", "name": "Bestiary", "blurb": "Creatures, from a snail to an elephant." },
     { "id": "small-hours", "name": "Small Hours", "blurb": "Lamps, teacups and the moon." }
   ]
 }
