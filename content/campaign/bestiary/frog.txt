@@ -1,0 +1,13 @@
+name: Frog
+source: original
+---
+.kkk..kkk.
+kk.kkkk.kk
+kkkkkkkkkk
+.kkkkkkkk.
+kkk....kkk
+.kkkkkkkk.
+kkkkkkkkkk
+kk.kkkk.kk
+kk......kk
+kkk....kkk

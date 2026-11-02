@@ -1,0 +1,13 @@
+name: Fox
+source: original
+---
+r........r
+rr......rr
+rrr....rrr
+rrrrrrrrrr
+rr.rrrr.rr
+rrrrrrrrrr
+ssrrrrrrss
+.ssrrrrss.
+.ssskksss.
+....ss....

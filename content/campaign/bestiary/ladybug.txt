@@ -1,0 +1,8 @@
+name: Ladybug
+source: original
+---
+..k..
+.rkr.
+rrkrr
+rkkkr
+.rkr.

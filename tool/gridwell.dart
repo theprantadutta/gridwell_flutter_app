@@ -3,7 +3,7 @@
 //   dart run tool/gridwell.dart check [file-or-dir ...]   analyze pictures while drawing
 //   dart run tool/gridwell.dart nudge <file>               suggest pixel fixes for a rejected picture
 //   dart run tool/gridwell.dart curve <collection-id>       order + validate one collection, write nothing
-//   dart run tool/gridwell.dart bake [--seed N] [--api-seed-dir DIR]
+//   dart run tool/gridwell.dart bake [--seed N] [--content DIR] [--api-seed-dir DIR]
 //
 // bake writes assets/puzzles/set.bin, content/curve_report.md,
 // content/curve_report.csv and content/daily_pool.json, and exits 1 if any
@@ -151,12 +151,15 @@ int _curve(List<String> args) {
 
 int _bake(List<String> args) {
   var seed = defaultSeed;
+  var contentDir = 'content';
   String? apiSeedDir;
   for (var i = 0; i < args.length; i++) {
     if (args[i] == '--seed') seed = int.parse(args[++i]);
+    if (args[i] == '--content') contentDir = args[++i];
     if (args[i] == '--api-seed-dir') apiSeedDir = args[++i];
   }
-  final result = bake(Directory('content'), seed: seed);
+  // Outputs always land in this repo; --content only changes what is read.
+  final result = bake(Directory(contentDir), seed: seed);
   File('content/curve_report.md').writeAsStringSync(result.report);
   File('content/curve_report.csv').writeAsStringSync(result.csv);
   if (!result.ok) {

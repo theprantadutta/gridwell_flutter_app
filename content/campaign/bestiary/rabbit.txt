@@ -1,0 +1,13 @@
+name: Rabbit
+source: original
+---
+..kk..kk..
+..kk..kk..
+..kk..kk..
+.kkkkkkkk.
+kkk.kk.kkk
+kkkkkkkkkk
+.kkkrrkkk.
+..kkkkkk..
+.kkkkkkkk.
+kkk....kkk

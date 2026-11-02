@@ -1,0 +1,19 @@
+name: Gorilla
+source: original
+---
+......kkkkkkkk......
+....kkkkkkkkkkkk....
+...kkkkkkkkkkkkkk...
+..kkkkkkkkkkkkkkkk..
+.kkks.ssssssss.skkk.
+.kkksssssssssssskkk.
+kkkkksssssssssskkkkk
+kkkksss.ssss.ssskkkk
+kkkksssssssssssskkkk
+kkkkskkkkkkkkkkskkkk
+.kkksssssssssssskkk.
+..kkkkkkkkkkkkkkkk..
+...kkkkkkkkkkkkkk...
+....kkkkkkkkkkkk....
+.kkkkkkkkkkkkkkkkkk.
+kkkkkkkkkkkkkkkkkkkk

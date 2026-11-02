@@ -1,0 +1,13 @@
+name: Raccoon
+source: original
+---
+ss...........ss
+sss.sssssss.sss
+sssssssssssssss
+sskkkkssskkkkss
+skk.kkssskk.kks
+sskkkkssskkkkss
+.sssssssssssss.
+..sssssksssss..
+...sssssssss...
+.....sssss.....

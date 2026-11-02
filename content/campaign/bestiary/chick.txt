@@ -1,0 +1,13 @@
+name: Chick
+source: original
+---
+....oo....
+...oooo...
+..oo.ooo..
+..ooooorr.
+..oooooo..
+.oooooooo.
+oooooooooo
+.oooooooo.
+..oooooo..
+...r..r...

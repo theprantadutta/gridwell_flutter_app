@@ -1,0 +1,13 @@
+name: Pig
+source: original
+---
+.r......r.
+rrr....rrr
+rrrrrrrrrr
+rr.rrrr.rr
+rrrrrrrrrr
+rrr.rr.rrr
+rrrrrrrrrr
+.rrrrrrrr.
+..rrrrrr..
+..........

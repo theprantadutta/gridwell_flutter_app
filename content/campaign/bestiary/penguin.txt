@@ -1,0 +1,13 @@
+name: Penguin
+source: original
+---
+...kkkk...
+..kkkkkk..
+..k.kk.k..
+..kkookk..
+.kk....kk.
+kk......kk
+kk......kk
+.kk....kk.
+..kkkkkk..
+..oo..oo..

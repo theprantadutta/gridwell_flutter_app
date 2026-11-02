@@ -1,0 +1,8 @@
+name: Paw Print
+source: original
+---
+k.k.k
+.....
+.kkk.
+kkkkk
+.kkk.

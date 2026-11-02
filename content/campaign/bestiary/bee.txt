@@ -1,0 +1,13 @@
+name: Bee
+source: original
+---
+.ss....ss.
+ssss..ssss
+.sss..sss.
+...oooo...
+..oooooo..
+..kkkkkk..
+..oooooo..
+..kkkkkk..
+...oooo...
+....kk....

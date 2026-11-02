@@ -1,0 +1,15 @@
+name: Bear
+source: original
+---
+.kkk.......kkk.
+kk.kkkkkkkkk.kk
+kkkkkkkkkkkkkkk
+.kkkkkkkkkkkkk.
+.kk.kkkkkkk.kk.
+.kkkkkkkkkkkkk.
+.kkkkssssskkkk.
+.kkkssskssskkk.
+.kkkssssssskkk.
+..kkkssssskkk..
+...kkkkkkkkk...
+.....kkkkk.....

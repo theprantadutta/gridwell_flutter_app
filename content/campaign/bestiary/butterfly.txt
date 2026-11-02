@@ -1,0 +1,13 @@
+name: Butterfly
+source: original
+---
+rr......rr
+rrr.kk.rrr
+rrrrkkrrrr
+rrrrkkrrrr
+.rrrkkrrr.
+..rrkkrr..
+.rrrkkrrr.
+rrrrkkrrrr
+rr..kk..rr
+....k.....

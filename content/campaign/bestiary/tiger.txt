@@ -1,0 +1,17 @@
+name: Tiger
+source: original
+---
+..oo............oo..
+.oooo.oooooooo.oooo.
+.oooooookookooooooo.
+oookooookookooookooo
+ookooooooooooooookoo
+oooooo..oooo..oooooo
+kooooooooooooooooook
+kkooooossssssoooookk
+oooooosskkkkssoooooo
+kooooossssssssoooook
+.oooosss.ss.sssoooo.
+..oooossssssssoooo..
+...oooooooooooooo...
+.....oooooooooo.....

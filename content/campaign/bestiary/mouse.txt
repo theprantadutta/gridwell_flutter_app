@@ -1,0 +1,13 @@
+name: Mouse
+source: original
+---
+.ss....ss.
+ssss..ssss
+ssssssssss
+.ssssssss.
+.s.ssss.s.
+.ssssssss.
+..ssssss..
+...ssss...
+....kk....
+..........

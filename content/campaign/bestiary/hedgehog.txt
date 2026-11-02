@@ -1,0 +1,13 @@
+name: Hedgehog
+source: original
+---
+..k.k.k...
+.kkkkkkk..
+kkkkkkkkk.
+kkkkkkkkoo
+kkkkkkk.ok
+kkkkkkkooo
+.kkkkkkkk.
+..o.o..o.o
+..........
+..........

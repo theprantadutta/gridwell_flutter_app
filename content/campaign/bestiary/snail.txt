@@ -1,0 +1,8 @@
+name: Snail
+source: original
+---
+..ooo
+k.o.o
+kkooo
+kkkkk
+.....

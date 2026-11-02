@@ -1,0 +1,13 @@
+name: Elephant
+source: original
+---
+....ssss..
+..ssssssss
+.sssssssss
+ss.sssssss
+ssssssssss
+s.ssssssss
+s.ssssssss
+s.ss..ss..
+s.ss..ss..
+ssss..ss..

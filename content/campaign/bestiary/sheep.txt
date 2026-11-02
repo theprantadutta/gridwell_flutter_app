@@ -1,0 +1,14 @@
+name: Sheep
+source: original
+---
+...ss.ss.ss....
+..sssssssssss..
+kkkssssssssssss
+k.kssssssssssss
+kkkssssssssssss
+..ssssssssssss.
+...ssssssssss..
+...k.k....k.k..
+...k.k....k.k..
+...k.k....k.k..
+ooooooooooooooo

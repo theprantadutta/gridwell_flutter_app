@@ -1,0 +1,16 @@
+name: Lion
+source: original
+---
+....rrrrrrr....
+..rrrrrrrrrrr..
+.rrrooooooorrr.
+rrrooooooooorrr
+rroo.ooooo.oorr
+rrooooooooooorr
+rroooookooooorr
+rroooookooooorr
+rrrooo.o.ooorrr
+.rrrooooooorrr.
+..rrrooooorrr..
+...rrrrrrrrr...
+.....rrrrr.....

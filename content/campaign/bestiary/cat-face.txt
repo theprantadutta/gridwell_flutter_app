@@ -1,0 +1,8 @@
+name: Cat
+source: original
+---
+k...k
+kkkkk
+k.k.k
+kkkkk
+.kkk.

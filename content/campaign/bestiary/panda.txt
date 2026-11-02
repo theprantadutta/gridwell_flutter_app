@@ -1,0 +1,15 @@
+name: Panda
+source: original
+---
+.kk.........kk.
+kkkk.sssss.kkkk
+kkkssssssssskkk
+.sskkssssskkss.
+sskk.ksssk.kkss
+sskkkssssskkkss
+sssssssssssssss
+sssssskkkssssss
+sssssssssssssss
+.sssss.s.sssss.
+..sssssssssss..
+...sssssssss...
