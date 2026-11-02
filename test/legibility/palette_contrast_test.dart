@@ -10,15 +10,12 @@ import 'package:gridwell_flutter_app/ui/theme/palette.dart';
 import 'cvd.dart';
 
 class _Check {
-  const _Check(this.name, this.a, this.b, this.min, {this.max});
+  const _Check(this.name, this.a, this.b, this.min);
 
   final String name;
   final Color Function(GridwellPalette) a;
   final Color Function(GridwellPalette) b;
   final double min;
-
-  /// Optional ceiling, for pairs that must stay visibly *different* in strength.
-  final double? max;
 }
 
 Color _hl(GridwellPalette p, Color under) => composite(p.highlight, under, p.highlightBlend);
