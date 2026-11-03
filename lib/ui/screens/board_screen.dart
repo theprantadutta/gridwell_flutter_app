@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../state/board_controller.dart';
+import '../../state/monetization.dart' show bonusHintsProvider;
 import '../../state/providers.dart';
 import '../../state/services.dart';
 import '../../state/settings.dart';
@@ -248,7 +249,8 @@ class _Footer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final p = context.palette;
     final premium = ref.watch(entitlementsProvider).premium;
-    final hintsLeft = premium ? null : session.freeHintsLeft;
+    final bonus = ref.watch(bonusHintsProvider);
+    final hintsLeft = premium ? null : session.freeHintsLeft + bonus;
     return Padding(
       padding: const EdgeInsets.fromLTRB(folioMargin, 12, folioMargin, 18),
       child: Column(children: [

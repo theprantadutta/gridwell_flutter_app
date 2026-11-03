@@ -124,11 +124,44 @@ class PurchaseController extends Notifier<StoreState> {
 
 final purchaseControllerProvider = NotifierProvider<PurchaseController, StoreState>(PurchaseController.new);
 
-/// When an interstitial may appear: only after a completed puzzle, only from
+/// Bonus hints banked by watching a rewarded interstitial between puzzles.
+/// Spent before any rewarded video is asked for, in any puzzle.
+class BonusHints extends Notifier<int> {
+  @override
+  int build() => ref.watch(initialBonusHintsProvider);
+
+  void add(int n) => _set(state + n);
+
+  /// Uses one if available. Returns false when there are none.
+  bool spend() {
+    if (state <= 0) return false;
+    _set(state - 1);
+    return true;
+  }
+
+  void _set(int v) {
+    state = v;
+    ref.read(settingsRepositoryProvider).put('bonus_hints', '$v', DateTime.now());
+  }
+}
+
+/// Overridden in main() with the count saved on this device.
+final initialBonusHintsProvider = Provider<int>((ref) => 0);
+
+final bonusHintsProvider = NotifierProvider<BonusHints, int>(BonusHints.new);
+
+/// What the between-puzzle slot should do after "Next puzzle".
+enum BetweenPuzzleAd { none, offerRewardedInterstitial, interstitial }
+
+/// The between-puzzle ad slot: only after a completed puzzle, only from
 /// "Next puzzle", never before the player has solved a few, at most every
 /// third completion and never within four minutes of the last one. Never for
 /// Remove Ads or Premium. Never on restart or resume (it is only ever asked
 /// from the completion page).
+///
+/// Prefers a rewarded interstitial (behind an intro screen that offers a
+/// bonus hint and a skip button, as Google requires) and falls back to a
+/// plain interstitial when none is loaded.
 class InterstitialPolicy {
   InterstitialPolicy(this._ref);
 
@@ -142,18 +175,52 @@ class InterstitialPolicy {
 
   void recordCompletion() => _completionsSinceLast++;
 
-  Future<void> maybeShow() async {
-    if (_ref.read(entitlementsProvider).noInterstitials) return;
+  BetweenPuzzleAd decide() {
+    if (_ref.read(entitlementsProvider).noInterstitials) return BetweenPuzzleAd.none;
     final solved = (_ref.read(progressProvider).value ?? const {}).values.where((p) => p.isSolved).length;
-    if (solved < minSolvesBeforeFirst) return;
-    if (_completionsSinceLast < everyNthCompletion) return;
+    if (solved < minSolvesBeforeFirst) return BetweenPuzzleAd.none;
+    if (_completionsSinceLast < everyNthCompletion) return BetweenPuzzleAd.none;
     final last = _lastShown;
-    if (last != null && DateTime.now().difference(last) < cooldown) return;
+    if (last != null && DateTime.now().difference(last) < cooldown) return BetweenPuzzleAd.none;
+    return _ref.read(adServiceProvider).rewardedInterstitialReady
+        ? BetweenPuzzleAd.offerRewardedInterstitial
+        : BetweenPuzzleAd.interstitial;
+  }
+
+  /// The slot was used (an ad played, or the offer was seen and declined), so
+  /// the frequency counters reset either way: a "No thanks" is not asked again
+  /// on the very next puzzle.
+  void _consumed() {
+    _completionsSinceLast = 0;
+    _lastShown = DateTime.now();
+  }
+
+  /// After the player accepted (or let the countdown run). Returns true if a
+  /// bonus hint was earned.
+  Future<bool> playRewardedInterstitial() async {
+    final analytics = _ref.read(analyticsProvider);
+    final outcome = await _ref.read(adServiceProvider).showRewardedInterstitial(AdPlacement.afterCompletion);
+    _consumed();
+    if (outcome == RewardedInterstitialOutcome.unavailable) return false;
+    unawaited(analytics.log(AnalyticsEvents.adShown, {'placement': 'between_puzzles_rewarded'}));
+    if (outcome == RewardedInterstitialOutcome.earned) {
+      _ref.read(bonusHintsProvider.notifier).add(1);
+      unawaited(analytics.log(AnalyticsEvents.adCompleted, {'placement': 'between_puzzles_rewarded'}));
+      return true;
+    }
+    return false;
+  }
+
+  void declinedOffer() {
+    _consumed();
+    unawaited(_ref.read(analyticsProvider).log('ad_offer_declined', {'placement': 'between_puzzles_rewarded'}));
+  }
+
+  Future<void> playInterstitial() async {
     final analytics = _ref.read(analyticsProvider);
     final shown = await _ref.read(adServiceProvider).showInterstitial(AdPlacement.afterCompletion);
     if (shown) {
-      _completionsSinceLast = 0;
-      _lastShown = DateTime.now();
+      _consumed();
       unawaited(analytics.log(AnalyticsEvents.adShown, {'placement': 'after_completion'}));
       unawaited(analytics.log(AnalyticsEvents.adCompleted, {'placement': 'after_completion'}));
     }

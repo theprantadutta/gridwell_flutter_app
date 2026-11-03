@@ -63,8 +63,33 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
 
   Future<void> _next(PuzzleRecord? next) async {
     if (DateTime.now().isBefore(_acceptNextAfter) || _t.isAnimating) return;
-    // The only place an interstitial can ever appear.
-    await ref.read(interstitialPolicyProvider).maybeShow();
+    // The only place a between-puzzle ad can ever appear.
+    final policy = ref.read(interstitialPolicyProvider);
+    switch (policy.decide()) {
+      case BetweenPuzzleAd.offerRewardedInterstitial:
+        final accepted = await showModalBottomSheet<bool>(
+          context: context,
+          isDismissible: false,
+          enableDrag: false,
+          backgroundColor: context.palette.surfaceRaised,
+          shape: const RoundedRectangleBorder(),
+          builder: (_) => const _RewardedIntro(),
+        );
+        if (accepted == true) {
+          final earned = await policy.playRewardedInterstitial();
+          if (earned && mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('A bonus hint is waiting for you.')),
+            );
+          }
+        } else {
+          policy.declinedOffer();
+        }
+      case BetweenPuzzleAd.interstitial:
+        await policy.playInterstitial();
+      case BetweenPuzzleAd.none:
+        break;
+    }
     if (!mounted) return;
     if (next == null) {
       context.go(_result?.dailyDate != null ? '/daily' : '/contents');
@@ -423,6 +448,71 @@ class _Leaderboard extends ConsumerWidget {
           line(board.you!),
         ],
       ]),
+    );
+  }
+}
+
+/// Google requires an intro before a rewarded interstitial: clear reward
+/// messaging, an unobstructed way to skip, and time to decide. The ad starts
+/// when the countdown ends or on "Watch now"; "No thanks" skips it entirely.
+class _RewardedIntro extends StatefulWidget {
+  const _RewardedIntro();
+
+  @override
+  State<_RewardedIntro> createState() => _RewardedIntroState();
+}
+
+class _RewardedIntroState extends State<_RewardedIntro> {
+  static const _seconds = 5;
+  int _left = _seconds;
+  bool _closed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _tick();
+  }
+
+  Future<void> _tick() async {
+    while (mounted && !_closed && _left > 0) {
+      await Future<void>.delayed(const Duration(seconds: 1));
+      if (!mounted || _closed) return;
+      setState(() => _left--);
+    }
+    if (mounted && !_closed) _close(true);
+  }
+
+  void _close(bool watch) {
+    if (_closed) return;
+    _closed = true;
+    Navigator.of(context).pop(watch);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(folioMargin, 22, folioMargin, 20),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Text('A BONUS HINT', style: FolioType.kicker(p)),
+            const Spacer(),
+            Text('Starting in $_left s', style: FolioType.header(p).copyWith(fontSize: 15)),
+          ]),
+          const SizedBox(height: 10),
+          Text('Watch a short ad and your next puzzle starts with a bonus hint, kept until you need it.',
+              style: FolioType.body(p, size: 19)),
+          const SizedBox(height: 8),
+          Text('Skip it and carry straight on. Nothing is lost.', style: FolioType.bodyMuted(p)),
+          const SizedBox(height: 18),
+          Row(children: [
+            Expanded(child: InkButton(label: 'Watch now', height: 52, onPressed: () => _close(true))),
+            const SizedBox(width: 14),
+            Expanded(child: OutlineButtonFolio(label: 'No thanks', height: 52, onPressed: () => _close(false))),
+          ]),
+        ]),
+      ),
     );
   }
 }

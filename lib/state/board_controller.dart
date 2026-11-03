@@ -13,6 +13,7 @@ import '../engine/solver/line_solver.dart';
 import '../services/ads/ad_service.dart';
 import '../services/analytics/analytics_service.dart';
 import 'explain.dart';
+import 'monetization.dart' show bonusHintsProvider;
 import 'online.dart';
 import 'providers.dart';
 import 'services.dart';
@@ -425,6 +426,16 @@ class BoardController extends Notifier<BoardSession> {
   Future<HintOutcome> requestHint() async {
     final hint = peekHint();
     if (hint is! ResolvingHint) return HintOutcome.nothingToHint;
+    // After the free allowance: a banked bonus hint first, then a video.
+    if (!hintIsFree && ref.read(bonusHintsProvider.notifier).spend()) {
+      final fresh = peekHint();
+      if (fresh is! ResolvingHint) {
+        ref.read(bonusHintsProvider.notifier).add(1); // nothing to hint: give it back
+        return HintOutcome.nothingToHint;
+      }
+      applyHint(fresh);
+      return HintOutcome.applied;
+    }
     if (!hintIsFree) {
       // Time spent watching a video is not time spent solving.
       final wasRunning = _clock.isRunning;

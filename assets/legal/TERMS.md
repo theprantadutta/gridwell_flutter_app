@@ -1,7 +1,7 @@
 # Terms of Use for Gridwell: Nonogram Picross
 
 **Legal Version: 1.0**  
-**Document Version: 1.0**  
+**Document Version: 1.1**  
 **Effective Date: November 3, 2026**  
 **Last Updated: November 3, 2026**
 
@@ -30,7 +30,12 @@ We grant you a personal, non-exclusive, non-transferable, revocable license to u
 
 ## 5. Advertising
 
-The free version shows ads, including optional rewarded videos (for example, for extra hints) and occasional ads between puzzles. Ads are provided by Google AdMob. See our Privacy Policy for your choices.
+The free version shows ads, provided by Google AdMob:
+
+- **Rewarded videos** you choose to watch, for example for an extra hint or to open a missed daily puzzle.
+- **Between puzzles**, occasionally, after you tap "Next puzzle". This may be an optional rewarded ad: a short screen first offers a bonus hint for watching, and you can skip it with "No thanks". When no such ad is available, a regular ad may be shown instead. Between-puzzle ads never appear before you have solved a few puzzles, and are spaced apart.
+
+A bonus hint earned this way is kept on your device until you use it; it has no cash value. Remove Ads turns off the ads between puzzles, and Premium turns off all ads. See our Privacy Policy for your choices.
 
 ## 6. Leaderboards and fair play
 

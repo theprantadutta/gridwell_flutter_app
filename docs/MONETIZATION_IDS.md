@@ -16,20 +16,22 @@ The format is `ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY`. It contains a **tilde** 
 
 | Platform | Value | Goes in |
 |---|---|---|
-| Android app ID | `________________________________` | `android/app/src/main/AndroidManifest.xml`, `com.google.android.gms.ads.APPLICATION_ID` (currently Google's test id) |
-| iOS app ID | `________________________________` | `ios/Runner/Info.plist`, `GADApplicationIdentifier` (added on the Mac) |
+| Android app ID | `ca-app-pub-9242904787767394~4349249949` | `android/app/src/main/AndroidManifest.xml`, `com.google.android.gms.ads.APPLICATION_ID` |
+| iOS app ID | `ca-app-pub-9242904787767394~6672160958` | `ios/Runner/Info.plist`, `GADApplicationIdentifier` |
 
 ## 2. AdMob ad unit IDs (Dart)
 
 The format is `ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY`. It contains a **slash** (`/`).
 
-Gridwell uses only two formats: **rewarded** (hints, revealing a line, unlocking a missed daily)
-and **interstitial** (after a completed puzzle, with a frequency cap). There are no banners.
+Gridwell uses three formats: **rewarded** (hints, unlocking a missed daily), **rewarded
+interstitial** (optional bonus-hint offer between puzzles, with a skippable intro) and
+**interstitial** (the same slot, when no rewarded interstitial is available). There are no banners.
 
 | Unit | Android | iOS | Goes in |
 |---|---|---|---|
-| Rewarded | `______________________` | `______________________` | `lib/services/ads/ad_config.dart` |
-| Interstitial | `______________________` | `______________________` | `lib/services/ads/ad_config.dart` |
+| Rewarded | `ca-app-pub-9242904787767394/3986947003` | `ca-app-pub-9242904787767394/5339110017` | `lib/services/ads/ad_config.dart` |
+| Rewarded interstitial | `ca-app-pub-9242904787767394/6421538657` | `ca-app-pub-9242904787767394/5108456984` | `lib/services/ads/ad_config.dart` |
+| Interstitial | `ca-app-pub-9242904787767394/3718694550` | `ca-app-pub-9242904787767394/9577525894` | `lib/services/ads/ad_config.dart` |
 
 Debug builds always use Google's official test units, whatever is filled in here. Serving your own
 real ads during development is an AdMob policy violation.
@@ -67,5 +69,5 @@ For subscriptions on Google Play, also note the **base plan id** for each plan (
 
 - **EEA/UK consent (Google UMP):** create a GDPR message in AdMob → Privacy & messaging. The app
   shows it before the first ad.
-- **iOS App Tracking Transparency:** Info.plist `NSUserTrackingUsageDescription`. Proposed text:
+- **iOS App Tracking Transparency:** Info.plist `NSUserTrackingUsageDescription` (set):
   "Your choice lets Gridwell show ads that are less random. The game works the same either way."

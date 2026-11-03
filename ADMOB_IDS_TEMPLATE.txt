@@ -4,35 +4,48 @@ GRIDWELL - ADMOB IDS
 Fill in the values after the "=" signs (no quotes, no spaces) and tell Claude
 "admob ids are filled". They get copied into lib/services/ads/ad_config.dart
 (release builds) and the Android manifest / iOS Info.plist. Debug builds
-always use Google's test ids, so leaving this empty is safe.
+always use Google's test ids, so leaving a line empty is safe.
 
 Where to find them: AdMob console → Apps → Gridwell → App settings (app id)
 and → Ad units (unit ids). App ids contain "~", unit ids contain "/".
 
 Publisher id (same account as your other apps): pub-9242904787767394
 
-Gridwell uses only two ad formats: rewarded and interstitial.
-No banners and no app-open ads (they would break the calm puzzle-book feel).
+Gridwell uses three ad formats: rewarded, rewarded interstitial and
+interstitial. No banners and no app-open ads (they would break the calm
+puzzle-book feel).
 
 
 # ---------- ANDROID ----------
-ANDROID_APP_ID=                 # ca-app-pub-9242904787767394~XXXXXXXXXX
-ANDROID_REWARDED=               # ca-app-pub-9242904787767394/XXXXXXXXXX   extra hints, missed dailies (always optional)
-ANDROID_INTERSTITIAL=           # ca-app-pub-9242904787767394/XXXXXXXXXX   only after "Next puzzle", frequency capped
+ANDROID_APP_ID=ca-app-pub-9242904787767394~4349249949
+ANDROID_REWARDED=ca-app-pub-9242904787767394/3986947003
+ANDROID_REWARDED_INTERSTITIAL=ca-app-pub-9242904787767394/6421538657
+ANDROID_INTERSTITIAL=ca-app-pub-9242904787767394/3718694550
 
 
 # ---------- iOS ----------
-IOS_APP_ID=                     # ca-app-pub-9242904787767394~XXXXXXXXXX
-IOS_REWARDED=                   # ca-app-pub-9242904787767394/XXXXXXXXXX
-IOS_INTERSTITIAL=               # ca-app-pub-9242904787767394/XXXXXXXXXX
+IOS_APP_ID=ca-app-pub-9242904787767394~6672160958
+IOS_REWARDED=ca-app-pub-9242904787767394/5339110017
+IOS_REWARDED_INTERSTITIAL=ca-app-pub-9242904787767394/5108456984
+IOS_INTERSTITIAL=ca-app-pub-9242904787767394/9577525894
 
 
+# Where each format is used
+# - REWARDED: the player taps "Hint" after the 3 free hints, or opens a
+#   missed daily. They asked for it, so no intro screen is needed.
+# - REWARDED_INTERSTITIAL: after a completed puzzle, when the player taps
+#   "Next puzzle". A short intro offers a bonus hint for watching, with a
+#   5-second countdown and a "No thanks" button (Google requires the intro
+#   and the skip option). Skipping goes straight on with no ad.
+# - INTERSTITIAL: the same slot, used only when no rewarded interstitial is
+#   available.
+#
 # Notes
-# - "Remove ads" turns off interstitials. Premium turns off all ads.
-#   Rewarded videos stay as an optional choice for free players.
+# - "Remove ads" turns off the between-puzzle ads (rewarded interstitial and
+#   interstitial). Premium turns off all ads.
+# - Between-puzzle ads: never before 6 solved puzzles, at most every 3rd
+#   puzzle, at least 4 minutes apart, never on restart or resume.
 # - If no rewarded ad can load (offline, no fill), the reward is granted
 #   anyway, so the game never needs a connection.
-# - Interstitials: never before 6 solved puzzles, at most every 3rd puzzle,
-#   at least 4 minutes apart, never on restart or resume.
 # - Store product ids (Remove Ads, Premium monthly/yearly) are separate:
 #   see docs/MONETIZATION_IDS.md. They are created after store approval.

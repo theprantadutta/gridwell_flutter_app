@@ -22,6 +22,7 @@ class GoogleAdService implements AdService {
   final void Function(AdPlacement)? onUnavailableGrant;
 
   RewardedAd? _rewarded;
+  RewardedInterstitialAd? _rewardedInterstitial;
   InterstitialAd? _interstitial;
   bool _sdkReady = false;
   bool _consentDone = false;
@@ -51,7 +52,21 @@ class GoogleAdService implements AdService {
     await MobileAds.instance.initialize();
     _sdkReady = true;
     _loadRewarded();
+    _loadRewardedInterstitial();
     _loadInterstitial();
+  }
+
+  void _loadRewardedInterstitial() {
+    final id = AdConfig.rewardedInterstitialUnitId;
+    if (id == null || !_sdkReady || _rewardedInterstitial != null) return;
+    RewardedInterstitialAd.load(
+      adUnitId: id,
+      request: const AdRequest(),
+      rewardedInterstitialAdLoadCallback: RewardedInterstitialAdLoadCallback(
+        onAdLoaded: (ad) => _rewardedInterstitial = ad,
+        onAdFailedToLoad: (_) => _rewardedInterstitial = null,
+      ),
+    );
   }
 
   /// UMP form if required (EEA/UK), then ATT on iOS. Runs once per session.
@@ -111,6 +126,37 @@ class GoogleAdService implements AdService {
 
   @override
   bool get rewardedReady => _rewarded != null;
+
+  @override
+  bool get rewardedInterstitialReady => _rewardedInterstitial != null;
+
+  @override
+  Future<RewardedInterstitialOutcome> showRewardedInterstitial(AdPlacement placement) async {
+    final ad = _rewardedInterstitial;
+    if (ad == null) {
+      _loadRewardedInterstitial();
+      return RewardedInterstitialOutcome.unavailable;
+    }
+    _rewardedInterstitial = null;
+    final done = Completer<RewardedInterstitialOutcome>();
+    var earned = false;
+    ad.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (a) {
+        a.dispose();
+        if (!done.isCompleted) {
+          done.complete(earned ? RewardedInterstitialOutcome.earned : RewardedInterstitialOutcome.notEarned);
+        }
+        _loadRewardedInterstitial();
+      },
+      onAdFailedToShowFullScreenContent: (a, _) {
+        a.dispose();
+        if (!done.isCompleted) done.complete(RewardedInterstitialOutcome.unavailable);
+        _loadRewardedInterstitial();
+      },
+    );
+    await ad.show(onUserEarnedReward: (_, _) => earned = true);
+    return done.future;
+  }
 
   @override
   Future<bool> privacyOptionsRequired() async {
