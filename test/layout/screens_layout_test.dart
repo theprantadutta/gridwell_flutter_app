@@ -50,9 +50,8 @@ const textScales = [1.0, 1.3];
 
 final _shotKey = GlobalKey();
 
-/// Phones are portrait-only (main.dart locks them), so landscape is only
-/// checked at tablet sizes.
-bool _isPhone(Size s) => s.shortestSide < 600;
+// Phones are portrait-only (main.dart locks them), so landscape sizes are
+// tablet sizes only.
 
 Future<void> _loadFonts() async {
   Future<ByteData> read(String path) async => ByteData.sublistView(File(path).readAsBytesSync());
