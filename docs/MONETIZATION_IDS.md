@@ -7,6 +7,9 @@ exactly one place, listed in the **Goes in** column.
 
 None of these values are secrets: they ship inside the app binary.
 
+> **Quickest path for ads:** fill in `ADMOB_IDS_TEMPLATE.txt` at the repo root (same format as
+> Screw Out) and say "admob ids are filled". Sections 1 and 2 below explain where each value ends up.
+
 ## 1. AdMob app IDs (native config)
 
 The format is `ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY`. It contains a **tilde** (`~`).
