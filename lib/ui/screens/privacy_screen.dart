@@ -108,8 +108,9 @@ class PrivacyScreen extends ConsumerWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         title: Text('Delete your data?', style: FolioType.plateTitle(p, size: 26)),
         content: Text(
-          'This deletes your account on our server (progress, times, pen name and achievements) and clears '
-          'the progress on this device. Purchases stay with your store account and can be restored. '
+          'This deletes your account (progress, times, pen name, achievements and, if you signed in, '
+          'your email and sign-in) and clears the progress on this device. Purchases stay with your '
+          'store account and can be restored. '
           'This cannot be undone.',
           style: FolioType.body(p),
         ),

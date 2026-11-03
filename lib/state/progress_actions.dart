@@ -34,10 +34,12 @@ extension AccountDeletion on ProgressActions {
     final db = ref.read(databaseProvider);
     await db.delete(db.dailyResults).go();
     await db.delete(db.outbox).go();
-    ref.read(apiClientProvider).token = null;
     try {
       await ref.read(authServiceProvider).signOut();
     } catch (_) {}
+    // Forget the deleted account's session and pen name; the next online
+    // call starts a fresh guest.
+    online.resetSession();
     return serverDeleted ? DeleteOutcome.deleted : DeleteOutcome.deletedLocallyOnly;
   }
 }
