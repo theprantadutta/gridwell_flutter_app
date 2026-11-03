@@ -1,3 +1,5 @@
+import 'dart:ui' show Color;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -17,6 +19,8 @@ class NotificationService {
     channelDescription: "A quiet note when today's puzzle is still open",
     importance: Importance.defaultImportance,
     priority: Priority.defaultPriority,
+    icon: '@drawable/ic_notification',
+    color: Color(0xFFC44323),
   );
 
   Future<void> initialize() async {
@@ -26,7 +30,7 @@ class NotificationService {
       tz.setLocalLocation(tz.getLocation(local.identifier));
       await _plugin.initialize(
         settings: const InitializationSettings(
-          android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+          android: AndroidInitializationSettings('@drawable/ic_notification'),
           iOS: DarwinInitializationSettings(
             requestAlertPermission: false,
             requestBadgePermission: false,

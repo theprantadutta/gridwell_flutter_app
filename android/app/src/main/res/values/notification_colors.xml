@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Vermilion: the accent that tints the notification icon. -->
+    <color name="notification_accent">#C44323</color>
+</resources>

@@ -1,0 +1,26 @@
+# dart run flutter_native_splash:create
+#
+# Paper and ink, following the system theme like the rest of the app. The mark
+# sits at 128 dp in the centre, exactly where the Flutter splash
+# (lib/ui/screens/splash_screen.dart) draws it, so the hand-off is seamless.
+#
+# Images are 4x: 512 px renders at 128 dp. Regenerate them from the logo kit
+# with the script in brand/README-splash.md if the mark ever changes.
+flutter_native_splash:
+  color: "#F7F3EB"
+  color_dark: "#17130F"
+  image: brand/splash/splash-light.png
+  image_dark: brand/splash/splash-dark.png
+
+  # Android 12+ crops the splash icon to a circle 2/3 of a 1152 px canvas; the
+  # 512 px mark (half-diagonal 362 px) sits inside the 384 px radius.
+  android_12:
+    color: "#F7F3EB"
+    color_dark: "#17130F"
+    image: brand/splash/android12-light.png
+    image_dark: brand/splash/android12-dark.png
+
+  android: true
+  ios: true
+  web: false
+  fullscreen: false

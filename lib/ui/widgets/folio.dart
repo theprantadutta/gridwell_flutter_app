@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/gridwell_theme.dart';
 import '../theme/typography.dart';
+import 'gridwell_mark.dart';
 
 /// Horizontal page margin used across Folio screens.
 const folioMargin = 24.0;
@@ -87,6 +88,8 @@ class WordmarkHeader extends StatelessWidget {
         SizedBox(
           height: 52,
           child: Row(children: [
+            const GridwellMark(size: 18),
+            const SizedBox(width: 10),
             Text('GRIDWELL', style: FolioType.wordmark(p)),
             const Spacer(),
             if (trailing != null) Text(trailing!, style: FolioType.header(p)),

@@ -13,11 +13,14 @@ import 'screens/onboarding_screen.dart';
 import 'screens/plate_screen.dart';
 import 'screens/privacy_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/splash_screen.dart';
 import 'screens/store_screen.dart';
 
 GoRouter buildRouter({required bool onboardingDone}) => GoRouter(
-      initialLocation: onboardingDone ? '/contents' : '/onboarding',
+      // The splash decides where to go next (contents, or onboarding first time).
+      initialLocation: '/splash',
       routes: [
+        GoRoute(path: '/splash', pageBuilder: (_, _) => const NoTransitionPage(child: SplashScreen())),
         GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingScreen()),
         ShellRoute(
           builder: (context, state, child) => HomeShell(location: state.uri.path, child: child),

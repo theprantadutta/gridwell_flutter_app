@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'firebase_options.dart';
@@ -25,7 +26,10 @@ import 'state/settings.dart';
 import 'ui/app.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final binding = WidgetsFlutterBinding.ensureInitialized();
+  // Keep the native splash up through start-up; the Flutter splash takes over
+  // on its first frame (lib/ui/screens/splash_screen.dart).
+  FlutterNativeSplash.preserve(widgetsBinding: binding);
 
   // Phones are portrait-only; tablets (shortest side >= 600 dp) may rotate.
   final view = PlatformDispatcher.instance.views.first;
