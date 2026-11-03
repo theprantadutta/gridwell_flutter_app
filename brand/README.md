@@ -25,7 +25,7 @@ Open `05-brand-sheet/gridwell-brand-sheet.png` first for the visual guidelines.
 ```
 
 "light" variants are for light backgrounds and "dark" variants are for dark backgrounds.
-The mono versions are a single colour. Use them for small sizes, one-colour print, and photos or busy backgrounds.
+The mono versions are a single color. Use them for small sizes, one-color print, and photos or busy backgrounds.
 
 ## Install: iOS (Xcode 15+)
 
@@ -44,7 +44,7 @@ If Xcode or App Store Connect rejects the light icon because of an alpha channel
    Android 13+ also uses the monochrome layer for themed icons. Older devices use the PNG mipmaps.
 4. Upload `play-store-512.png` as the hi-res icon in Play Console.
 
-## Colours
+## Colors
 
 | Name | Light theme | Dark theme | Used for |
 |---|---|---|---|
@@ -67,7 +67,7 @@ These are the in-app tokens `--ink`, `--paper`, `--paper-2`, `--rule` and `--acc
 
 - **Clear space:** keep at least one cell's width clear on every side (1/5 of the mark's width).
 - **Minimum size:** mark 20 px (6 mm in print), lockup 22 px mark height (25 mm wide). Drop the tagline when the lockup is under 160 px wide.
-- **Don't:** stretch, rotate, recolour the cross or cells, add effects or shadows, remove the cross, or place the full-colour mark on mid-tone or busy backgrounds (use the mono mark instead).
+- **Don't:** stretch, rotate, recolor the cross or cells, add effects or shadows, remove the cross, or place the full-color mark on mid-tone or busy backgrounds (use the mono mark instead).
 
 ## Mark geometry
 

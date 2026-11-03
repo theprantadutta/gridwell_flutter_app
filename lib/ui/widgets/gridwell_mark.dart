@@ -15,7 +15,7 @@ class GridwellMark extends StatelessWidget {
 
   final double size;
 
-  /// Single-colour version for small sizes and busy backgrounds.
+  /// Single-color version for small sizes and busy backgrounds.
   final bool mono;
 
   @override
@@ -39,7 +39,7 @@ class GridwellMarkPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final u = size.shortestSide / _units;
     final ink = Paint()..color = palette.textPrimary;
-    // Frame, then the gap colour beneath the cells.
+    // Frame, then the gap color beneath the cells.
     canvas.drawRect(Offset.zero & Size.square(_units * u), ink);
     canvas.drawRect(
       Rect.fromLTWH(_frame * u, _frame * u, (_units - 2 * _frame) * u, (_units - 2 * _frame) * u),

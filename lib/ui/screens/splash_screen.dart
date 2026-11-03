@@ -73,7 +73,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
         opacity: _leave,
         duration: const Duration(milliseconds: 200),
         child: LayoutBuilder(builder: (context, c) {
-          // Centred in the full window, as the native splash is.
+          // Centered in the full window, as the native splash is.
           final cx = c.maxWidth / 2, cy = c.maxHeight / 2;
           const m = SplashScreen.markSize;
           return AnimatedBuilder(
