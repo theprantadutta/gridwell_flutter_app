@@ -89,6 +89,21 @@ class NotificationService {
     }
   }
 
+  /// Shows a notification right away (a push that arrived while the app was open).
+  Future<void> showNow({required String title, required String body}) async {
+    if (!_ready) return;
+    try {
+      await _plugin.show(
+        id: DateTime.now().millisecondsSinceEpoch ~/ 1000 % 100000 + 100,
+        title: title,
+        body: body,
+        notificationDetails: const NotificationDetails(android: _channel, iOS: DarwinNotificationDetails()),
+      );
+    } catch (e) {
+      debugPrint('notification failed: $e');
+    }
+  }
+
   Future<void> cancelReminder() async {
     if (!_ready) return;
     try {

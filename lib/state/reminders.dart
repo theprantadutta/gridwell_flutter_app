@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/notifications/notification_service.dart';
+import '../services/notifications/push_service.dart';
 import 'online.dart';
 import 'settings.dart';
 
@@ -49,6 +50,7 @@ class ReminderScheduler {
     final granted = await _ref.read(notificationServiceProvider).requestPermission();
     await _ref.read(settingsProvider.notifier).update((s) => s.copyWith(notificationsAsked: true, dailyReminder: granted));
     unawaited(reschedule());
+    if (granted) unawaited(_ref.read(pushRegistrarProvider).register());
     return granted;
   }
 
@@ -57,3 +59,41 @@ class ReminderScheduler {
 }
 
 final reminderSchedulerProvider = Provider((ref) => ReminderScheduler(ref));
+
+final pushServiceProvider = Provider((ref) => PushService());
+
+/// Keeps the server holding this device's push token, for the signed-in
+/// account, once notifications are allowed. Runs on start and resume, after
+/// opting in, after any sign-in change, and when Firebase rotates the token.
+class PushRegistrar {
+  PushRegistrar(this._ref);
+
+  final Ref _ref;
+  String? _registered;
+  bool _listening = false;
+
+  /// Forget what was registered (the account changed), so the next
+  /// [register] sends the token for the new account.
+  void reset() => _registered = null;
+
+  Future<void> register({String? token}) async {
+    if (!await _ref.read(notificationServiceProvider).permitted) return;
+    final push = _ref.read(pushServiceProvider);
+    final t = token ?? await push.token();
+    if (t == null || t == _registered) return;
+    if (!await _ref.read(onlineSessionProvider).ensureSignedIn()) return;
+    if (await _ref.read(apiClientProvider).registerToken(t, push.platform, tzOffsetMinutes)) _registered = t;
+  }
+
+  /// Token rotation and pushes received while the app is open.
+  void listen() {
+    if (_listening) return;
+    _listening = true;
+    final push = _ref.read(pushServiceProvider);
+    push.tokenRefreshes.listen((t) => register(token: t));
+    push.foregroundMessages.listen(
+        (m) => _ref.read(notificationServiceProvider).showNow(title: m.title, body: m.body));
+  }
+}
+
+final pushRegistrarProvider = Provider((ref) => PushRegistrar(ref));

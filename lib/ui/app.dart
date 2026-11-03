@@ -30,12 +30,13 @@ class _GridwellAppState extends ConsumerState<GridwellApp> {
     // On start and every resume: online enrichment, purchase reconcile and the
     // reminder schedule. Never awaited, never blocking play.
     _onForeground();
+    ref.read(pushRegistrarProvider).listen();
     ref.read(purchaseControllerProvider);
     _lifecycle = AppLifecycleListener(onResume: _onForeground);
   }
 
   void _onForeground() {
-    ref.read(onlineSessionProvider).onForeground();
+    ref.read(onlineSessionProvider).onForeground().then((_) => ref.read(pushRegistrarProvider).register());
     ref.read(reminderSchedulerProvider).reschedule();
   }
 

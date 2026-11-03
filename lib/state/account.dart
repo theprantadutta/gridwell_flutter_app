@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/auth/auth_service.dart';
 import 'online.dart';
 import 'providers.dart';
+import 'reminders.dart';
 import 'services.dart';
 
 export '../services/auth/auth_service.dart' show Account, AccountKind, AuthFailure, SignInOutcome;
@@ -43,7 +44,8 @@ class AccountActions {
     await _auth.signOut();
     _online.resetSession();
     _ref.read(analyticsProvider).log('sign_out', const {});
-    unawaited(_online.ensureSignedIn());
+    _ref.read(pushRegistrarProvider).reset();
+    unawaited(_online.ensureSignedIn().then((_) => _ref.read(pushRegistrarProvider).register()));
   }
 
   Future<SignInOutcome> _run(String method, Future<SignInOutcome> Function() signIn) async {
@@ -59,6 +61,9 @@ class AccountActions {
       await _online.ensureSignedIn(); // tells the server the account is no longer anonymous
       await _online.flushOutbox();
     }
+    // The push token now belongs to this account.
+    _ref.read(pushRegistrarProvider).reset();
+    unawaited(_ref.read(pushRegistrarProvider).register());
     return outcome;
   }
 }

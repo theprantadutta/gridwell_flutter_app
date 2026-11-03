@@ -12,6 +12,7 @@ import '../services/auth/auth_service.dart';
 import '../services/config/app_env.dart';
 import 'providers.dart';
 import 'services.dart';
+import 'settings.dart';
 
 final apiClientProvider = Provider((ref) => ApiClient(baseUrl: AppEnv.apiBaseUrl));
 final authServiceProvider = Provider((ref) => AuthService());
@@ -206,6 +207,8 @@ class OnlineSession {
     final changed = await _ref.read(progressRepositoryProvider).mergeRemote(rows, DateTime.now());
     final ent = snapshot['entitlements'] as Map<String, Object?>?;
     if (ent != null) applyEntitlements(ent);
+    final values = (snapshot['settings'] as Map<String, Object?>?)?['values'];
+    if (values is Map<String, Object?>) await _ref.read(settingsProvider.notifier).applyRemote(values);
     return changed;
   }
 

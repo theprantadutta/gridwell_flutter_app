@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart' show ThemeMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'online.dart';
 import 'providers.dart';
 
 /// Player settings. Stored locally first; synced last-write-wins.
@@ -112,7 +115,42 @@ class SettingsNotifier extends Notifier<Settings> {
     for (final key in b.keys) {
       if (a[key] != b[key]) await repo.put(key, b[key]!, now);
     }
+    if (syncedSettingKeys.any((k) => a[k] != b[k])) {
+      unawaited(ref.read(onlineSessionProvider).enqueue('settings', {
+        'values': {for (final k in syncedSettingKeys) k: b[k]},
+        'client_updated_at': now.toUtc().toIso8601String(),
+      }));
+    }
+  }
+
+  /// Applies settings restored from the account (last write wins on the
+  /// server). Only the synced keys; device choices stay as they are.
+  Future<void> applyRemote(Map<String, Object?> values) async {
+    final merged = state.toMap()
+      ..addAll({
+        for (final k in syncedSettingKeys)
+          if (values[k] is String) k: values[k]! as String,
+      });
+    final next = Settings.fromMap(merged);
+    state = next;
+    final repo = ref.read(settingsRepositoryProvider);
+    final now = DateTime.now();
+    for (final k in syncedSettingKeys) {
+      await repo.put(k, merged[k]!, now);
+    }
   }
 }
+
+/// Preferences that follow the account across devices. Notification
+/// permission, onboarding and analytics consent are per device.
+const syncedSettingKeys = [
+  'theme_mode',
+  'sound',
+  'haptics',
+  'show_proven_mistakes',
+  'auto_cross',
+  'show_timer',
+  'high_contrast',
+];
 
 final settingsProvider = NotifierProvider<SettingsNotifier, Settings>(SettingsNotifier.new);

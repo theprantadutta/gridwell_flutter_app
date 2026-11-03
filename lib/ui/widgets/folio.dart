@@ -178,7 +178,9 @@ class InkButton extends StatelessWidget {
             final labelMax = detail == null || labelW + detailW <= c.maxWidth
                 ? c.maxWidth
                 : math.max(labelW.clamp(0.0, c.maxWidth * 0.65), c.maxWidth - detailW);
-            return Row(children: [
+            // A lone label is centered, matching the outlined button it often
+            // sits beside; with a detail it reads left to right.
+            return Row(mainAxisAlignment: detail == null ? MainAxisAlignment.center : MainAxisAlignment.start, children: [
               ConstrainedBox(
                 constraints: BoxConstraints(maxWidth: math.min(labelMax, c.maxWidth)),
                 child: FittedBox(

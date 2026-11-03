@@ -195,7 +195,11 @@ class BoardRepository {
       (_db.delete(_db.boardSaves)..where((t) => t.puzzleId.equals(puzzleId))).go();
 
   /// Puzzle ids with a board in progress, most recent first.
+  /// Boards the player has actually worked on, most recent first. A board
+  /// that was only opened is saved too (to keep its timer) but is not a
+  /// bookmark until it has a move.
   Stream<List<BoardSave>> watchInProgress() => (_db.select(_db.boardSaves)
+        ..where((t) => t.moves.isBiggerThanValue(0))
         ..orderBy([(t) => OrderingTerm.desc(t.savedAt)]))
       .watch();
 
