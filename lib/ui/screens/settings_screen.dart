@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../state/app_info.dart';
+import '../../state/online.dart';
 import '../../state/progress_actions.dart';
 import '../../state/settings.dart';
 import '../theme/gridwell_theme.dart';
@@ -72,9 +73,14 @@ class SettingsScreen extends ConsumerWidget {
             onChanged: (v) => notifier.update((x) => x.copyWith(highContrast: v)),
           ),
           section('ACCOUNT'),
+          _Row(
+            label: 'Pen name',
+            trailing: ref.watch(penNameProvider) ?? 'offline',
+            onTap: () => _rename(context, ref),
+          ),
           _Row(label: 'Remove ads & premium', trailing: '›', onTap: () => context.push('/store')),
           _Row(label: 'Restore purchase', trailing: '›', onTap: () => context.push('/store?restore=1')),
-          _Row(label: 'Privacy', trailing: '›', onTap: () => context.push('/privacy')),
+          _Row(label: 'Privacy & your data', trailing: '›', onTap: () => context.push('/privacy')),
           _Row(
             label: 'Reset progress',
             trailing: 'asks first',
@@ -89,6 +95,35 @@ class SettingsScreen extends ConsumerWidget {
         ]),
       ),
     ]);
+  }
+
+  Future<void> _rename(BuildContext context, WidgetRef ref) async {
+    final p = context.palette;
+    final controller = TextEditingController(text: ref.read(penNameProvider) ?? '');
+    final name = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: p.surfaceRaised,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+        title: Text('Your pen name', style: FolioType.plateTitle(p, size: 26)),
+        content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text("Shown on daily leaderboards. Please don't use your real name.", style: FolioType.bodyMuted(p, size: 15)),
+          const SizedBox(height: 12),
+          TextField(controller: controller, maxLength: 24, autofocus: true, style: FolioType.body(p)),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel', style: FolioType.body(p))),
+          TextButton(
+            onPressed: () => Navigator.pop(context, controller.text),
+            child: Text('Save', style: FolioType.body(p).copyWith(fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+    if (name == null || name.trim().isEmpty || !context.mounted) return;
+    final error = await ref.read(onlineSessionProvider).rename(name);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error ?? 'Saved.')));
   }
 
   Future<void> _confirmReset(BuildContext context, WidgetRef ref) async {

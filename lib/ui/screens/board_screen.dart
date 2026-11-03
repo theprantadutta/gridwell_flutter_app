@@ -114,52 +114,78 @@ class _BoardPageState extends ConsumerState<_BoardPage> with WidgetsBindingObser
 
     final big = puzzle.width >= 15;
     final note = session.note;
-    return Column(children: [
-      FolioHeader(
-        leading: 'Contents',
-        onLeading: () => context.pop(),
-        center: headerTitle,
-        trailing: settings.showTimer
-            ? Text(formatClock(_controller.elapsedMs), style: FolioType.header(p))
-            : null,
-      ),
-      Padding(
-        padding: const EdgeInsets.fromLTRB(folioMargin, 18, folioMargin, 0),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Text(isDaily ? "TODAY'S LEAF" : 'NO. ${puzzle.plateNumber}', style: FolioType.kicker(p)),
-            const Spacer(),
-            Text('${puzzle.width} × ${puzzle.height}', style: FolioType.header(p).copyWith(fontStyle: FontStyle.normal)),
-          ]),
-          const SizedBox(height: 4),
-          Text(puzzle.name, style: FolioType.plateTitle(p, size: big ? 36 : 40)),
+    final header = FolioHeader(
+      leading: 'Contents',
+      onLeading: () => context.pop(),
+      center: headerTitle,
+      trailing: settings.showTimer
+          ? Text(formatClock(_controller.elapsedMs), style: FolioType.header(p))
+          : null,
+    );
+    final title = Padding(
+      padding: const EdgeInsets.fromLTRB(folioMargin, 18, folioMargin, 0),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Text(isDaily ? "TODAY'S LEAF" : 'NO. ${puzzle.plateNumber}', style: FolioType.kicker(p)),
+          const Spacer(),
+          Text('${puzzle.width} × ${puzzle.height}', style: FolioType.header(p).copyWith(fontStyle: FontStyle.normal)),
         ]),
-      ),
-      const SizedBox(height: 12),
-      Expanded(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: big ? 8 : folioMargin),
-          child: BoardView(
-            clues: puzzle.clues,
-            board: session.board,
-            rowRetired: session.rowRetired,
-            colRetired: session.colRetired,
-            mistakes: settings.showProvenMistakes ? session.mistakeCells : const {},
-            cursorRow: session.cursorRow,
-            cursorCol: session.cursorCol,
-            flashCell: note == null ? null : (note.row, note.col),
-            enabled: !session.solved,
-            onStrokeStart: _controller.strokeStart,
-            onStrokeMove: _controller.strokeMove,
-            onStrokeEnd: _controller.strokeEnd,
-            onStrokeCancel: _controller.strokeCancel,
+        const SizedBox(height: 4),
+        Text(puzzle.name, style: FolioType.plateTitle(p, size: big ? 36 : 40)),
+      ]),
+    );
+    final board = BoardView(
+      clues: puzzle.clues,
+      board: session.board,
+      rowRetired: session.rowRetired,
+      colRetired: session.colRetired,
+      mistakes: settings.showProvenMistakes ? session.mistakeCells : const {},
+      cursorRow: session.cursorRow,
+      cursorCol: session.cursorCol,
+      flashCell: note == null ? null : (note.row, note.col),
+      enabled: !session.solved,
+      onStrokeStart: _controller.strokeStart,
+      onStrokeMove: _controller.strokeMove,
+      onStrokeEnd: _controller.strokeEnd,
+      onStrokeCancel: _controller.strokeCancel,
+    );
+    final controls = note != null
+        ? _NoteSheet(note: note, session: session, controller: _controller)
+        : _Footer(session: session, controller: _controller, onHint: _hint);
+
+    return LayoutBuilder(builder: (context, c) {
+      // Tablets in landscape: board on the left, everything else beside it.
+      final sideBySide = c.maxWidth >= 840 && c.maxWidth > c.maxHeight * 1.15;
+      if (sideBySide) {
+        return Column(children: [
+          header,
+          Expanded(
+            child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Expanded(child: Padding(padding: const EdgeInsets.all(16), child: board)),
+              SizedBox(
+                width: 400,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  title,
+                  if (session.cursorRow != null && note == null) _LineReadout(session: session),
+                  const Spacer(),
+                  controls,
+                ]),
+              ),
+            ]),
           ),
+        ]);
+      }
+      return Column(children: [
+        header,
+        title,
+        const SizedBox(height: 12),
+        Expanded(
+          child: Padding(padding: EdgeInsets.symmetric(horizontal: big ? 8 : folioMargin), child: board),
         ),
-      ),
-      if (big && note == null && session.cursorRow != null) _LineReadout(session: session),
-      if (note != null) _NoteSheet(note: note, session: session, controller: _controller)
-      else _Footer(session: session, controller: _controller, onHint: _hint),
-    ]);
+        if (big && note == null && session.cursorRow != null) _LineReadout(session: session),
+        controls,
+      ]);
+    });
   }
 }
 

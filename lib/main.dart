@@ -27,6 +27,13 @@ import 'ui/app.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Phones are portrait-only; tablets (shortest side >= 600 dp) may rotate.
+  final view = PlatformDispatcher.instance.views.first;
+  final shortest = view.physicalSize.shortestSide / view.devicePixelRatio;
+  if (shortest < 600) {
+    await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  }
+
   LicenseRegistry.addLicense(() async* {
     yield LicenseEntryWithLineBreaks([
       'Literata',

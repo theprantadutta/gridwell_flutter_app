@@ -195,3 +195,52 @@ class OnlineSession {
 }
 
 final onlineSessionProvider = Provider((ref) => OnlineSession(ref));
+
+/// One leaderboard row.
+class LeaderboardEntry {
+  const LeaderboardEntry(this.rank, this.penName, this.timeMs, this.isYou);
+  final int rank;
+  final String penName;
+  final int timeMs;
+  final bool isYou;
+}
+
+class DailyLeaderboard {
+  const DailyLeaderboard(this.total, this.entries, this.you);
+  final int total;
+  final List<LeaderboardEntry> entries;
+  final LeaderboardEntry? you;
+}
+
+/// The day's leaderboard, or null when offline. Waits for any queued
+/// completion to be pushed first, so your own time is included.
+final dailyLeaderboardProvider = FutureProvider.family<DailyLeaderboard?, String>((ref, date) async {
+  final online = ref.read(onlineSessionProvider);
+  await online.flushOutbox();
+  if (!await online.ensureSignedIn()) return null;
+  final j = await ref.read(apiClientProvider).dailyLeaderboard(date, limit: 5);
+  if (j == null) return null;
+  LeaderboardEntry entry(Map<String, Object?> e) => LeaderboardEntry(
+        e['rank'] as int,
+        e['pen_name'] as String,
+        e['time_ms'] as int,
+        e['is_current_user'] == true,
+      );
+  final you = j['current_user'];
+  return DailyLeaderboard(
+    j['total_entries'] as int? ?? 0,
+    [for (final e in (j['entries'] as List? ?? const [])) entry(e as Map<String, Object?>)],
+    you is Map<String, Object?> ? entry(you) : null,
+  );
+});
+
+extension PenNameActions on OnlineSession {
+  /// Renames the pen name on the server. Returns an error message, or null.
+  Future<String?> rename(String name) async {
+    if (!await ensureSignedIn()) return 'You need a connection to change your pen name.';
+    final res = await _ref.read(apiClientProvider).updateProfile(penName: name.trim());
+    if (res == null) return 'That name could not be used. Try another.';
+    _ref.read(penNameProvider.notifier).set(res['pen_name'] as String? ?? name.trim());
+    return null;
+  }
+}

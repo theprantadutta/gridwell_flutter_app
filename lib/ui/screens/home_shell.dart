@@ -24,7 +24,11 @@ class HomeShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = context.palette;
     return Scaffold(
-      body: SafeArea(bottom: false, child: child),
+      // Book pages keep a reading width on tablets.
+      body: SafeArea(
+        bottom: false,
+        child: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 760), child: child)),
+      ),
       bottomNavigationBar: SafeArea(
         top: false,
         child: Padding(

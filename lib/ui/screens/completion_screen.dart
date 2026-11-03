@@ -7,6 +7,10 @@ import 'package:go_router/go_router.dart';
 import '../../engine/model/puzzle.dart';
 import '../../state/board_controller.dart';
 import '../../state/completion.dart';
+import '../../state/monetization.dart';
+import '../../state/online.dart';
+import '../../state/reminders.dart';
+import '../../state/settings.dart';
 import '../../state/providers.dart';
 import '../theme/gridwell_theme.dart';
 import '../theme/typography.dart';
@@ -41,6 +45,7 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
     final full = r != null && (r.outcome.isPersonalBest && !r.outcome.isFirstSolve || r.completedCollection || r.beatSizeBest);
     _t = AnimationController(vsync: this, duration: Duration(milliseconds: full ? 3200 : 1700))
       ..forward();
+    if (r != null) ref.read(interstitialPolicyProvider).recordCompletion();
   }
 
   @override
@@ -56,8 +61,11 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
     }
   }
 
-  void _next(PuzzleRecord? next) {
+  Future<void> _next(PuzzleRecord? next) async {
     if (DateTime.now().isBefore(_acceptNextAfter) || _t.isAnimating) return;
+    // The only place an interstitial can ever appear.
+    await ref.read(interstitialPolicyProvider).maybeShow();
+    if (!mounted) return;
     if (next == null) {
       context.go(_result?.dailyDate != null ? '/daily' : '/contents');
     } else {
@@ -178,6 +186,10 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
                           advanced: progress,
                           justSolved: r.outcome.isFirstSolve,
                         ),
+                      if (isDaily && r.dailyOnDay)
+                        Opacity(opacity: progress, child: _Leaderboard(date: r.dailyDate!)),
+                      if (r.outcome.isFirstSolve && !ref.watch(settingsProvider).notificationsAsked)
+                        Opacity(opacity: cta, child: const _ReminderOptIn()),
                       const SizedBox(height: 28),
                       IgnorePointer(
                         ignoring: cta < 1,
@@ -341,6 +353,76 @@ class _BestStamp extends StatelessWidget {
           Text('${puzzle.width} × ${puzzle.height}', style: FolioType.kicker(p).copyWith(fontSize: 10, letterSpacing: 2)),
         ]),
       ),
+    );
+  }
+}
+
+/// After the first solve: offer the 7 PM reminder. The OS permission prompt
+/// only appears if the player says yes here.
+class _ReminderOptIn extends ConsumerWidget {
+  const _ReminderOptIn();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final p = context.palette;
+    final scheduler = ref.read(reminderSchedulerProvider);
+    return Container(
+      margin: const EdgeInsets.only(top: 22),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(border: Border.all(color: p.ruleStrong)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('A QUIET REMINDER?', style: FolioType.kicker(p)),
+        const SizedBox(height: 8),
+        Text("A single note at 7 in the evening when the day's puzzle is still open. Nothing else.",
+            style: FolioType.body(p, size: 17)),
+        const SizedBox(height: 14),
+        Row(children: [
+          Expanded(child: InkButton(label: 'Remind me', height: 48, onPressed: scheduler.optIn)),
+          const SizedBox(width: 12),
+          Expanded(child: OutlineButtonFolio(label: 'No thanks', height: 48, onPressed: scheduler.decline)),
+        ]),
+      ]),
+    );
+  }
+}
+
+/// Today's leaderboard on a daily's completion page (online only).
+class _Leaderboard extends ConsumerWidget {
+  const _Leaderboard({required this.date});
+
+  final String date;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final p = context.palette;
+    final board = ref.watch(dailyLeaderboardProvider(date)).value;
+    if (board == null || board.entries.isEmpty) return const SizedBox();
+    Widget line(LeaderboardEntry e) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(children: [
+            SizedBox(width: 36, child: Text('${e.rank}', style: FolioType.style(size: 16, color: p.textMuted))),
+            Expanded(
+              child: Text(e.penName,
+                  style: FolioType.style(size: 17, color: p.textPrimary, weight: e.isYou ? 600 : 400)),
+            ),
+            Text(formatClock(e.timeMs), style: FolioType.style(size: 17, color: e.isYou ? p.accent : p.textPrimary)),
+          ]),
+        );
+    return Padding(
+      padding: const EdgeInsets.only(top: 22),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Text("TODAY'S QUICKEST", style: FolioType.kicker(p)),
+          const Spacer(),
+          Text('${board.total} solvers', style: FolioType.header(p)),
+        ]),
+        const SizedBox(height: 8),
+        for (final e in board.entries) line(e),
+        if (board.you != null && !board.entries.any((e) => e.isYou)) ...[
+          const Hairline(),
+          line(board.you!),
+        ],
+      ]),
     );
   }
 }
