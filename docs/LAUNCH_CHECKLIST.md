@@ -55,10 +55,10 @@ build whose monetization IDs are still test values.
 
 The daily calendar is shared: the app bundles the 90-day pool with `daily_start_date`, and the API
 schedules the same pool from the exported file's `start_date`, so offline and online players see the same
-daily. The current value **`2026-12-01` is a placeholder**.
+daily. Set on 2026-11-03 to **`2026-11-04`**, the Play release day (rebaked and exported).
 
 - [ ] Choose the real launch date: day 1 of the daily calendar. It should be on or shortly before the
-  public launch so the leaderboard starts with the launch. Date: ____________.
+  public launch so the leaderboard starts with the launch. Date: **2026-11-04**.
 - [ ] Set it in `content/collections.json`:
   ```json
   "daily_start_date": "YYYY-MM-DD",
