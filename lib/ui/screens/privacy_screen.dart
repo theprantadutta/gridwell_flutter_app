@@ -44,7 +44,7 @@ class PrivacyScreen extends ConsumerWidget {
         );
 
     return Scaffold(
-      body: SafeArea(
+      body: FolioBody(
         child: Column(children: [
           const FolioHeader(leading: 'Settings', center: 'Privacy'),
           Expanded(

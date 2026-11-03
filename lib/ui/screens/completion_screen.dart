@@ -119,7 +119,7 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
     final pb = !r.outcome.isFirstSolve && r.outcome.isPersonalBest;
 
     return Scaffold(
-      body: SafeArea(
+      body: FolioBody(
         child: GestureDetector(
           behavior: HitTestBehavior.translucent,
           onTap: _skip,
@@ -226,16 +226,15 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
                           child: Column(children: [
                             InkButton(
                               label: next == null ? (isDaily ? 'Back to the calendar' : 'Back to contents') : 'Next puzzle',
-                              detail: next == null ? null : 'No. ${next.plateNumber} · ${next.width} × ${next.height}',
+                              detail: next == null ? null : 'No. ${next.plateNumber} · ${next.width} × ${next.height}',
                               onPressed: () => _next(next),
                             ),
                             const SizedBox(height: 6),
-                            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                            Wrap(alignment: WrapAlignment.center, spacing: 40, children: [
                               TextAction(
                                 label: 'Solve again',
                                 onPressed: () => context.pushReplacement('/play/${puzzle.id}'),
                               ),
-                              const SizedBox(width: 40),
                               TextAction(label: 'Return to contents', onPressed: () => context.go('/contents')),
                             ]),
                           ]),
@@ -270,7 +269,7 @@ class _TimeLine extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = context.palette;
     final r = result;
-    final size = '${r.puzzle.width} × ${r.puzzle.height}';
+    final size = '${r.puzzle.width} × ${r.puzzle.height}';
     if (personalBest && r.outcome.previousBestMs != null) {
       final gained = (r.outcome.previousBestMs! - r.timeMs) ~/ 1000;
       return Column(children: [
@@ -326,9 +325,9 @@ class _CollectionProgress extends StatelessWidget {
     final p = context.palette;
     final before = justSolved ? solved - 1 : solved;
     return Column(children: [
-      Row(children: [
-        Text('$name now holds', style: FolioType.bodyMuted(p, size: 17)),
-        const Spacer(),
+      Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        Expanded(child: Text('$name now holds', style: FolioType.bodyMuted(p, size: 17))),
+        const SizedBox(width: 12),
         Text(solved == total ? 'all $total plates' : '$solved of $total plates', style: FolioType.body(p)),
       ]),
       const SizedBox(height: 10),
@@ -378,7 +377,7 @@ class _BestStamp extends StatelessWidget {
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Text('NEW', style: FolioType.kicker(p).copyWith(fontSize: 10)),
           Text('Best', style: FolioType.style(size: 26, color: p.accent, weight: 600, italic: true)),
-          Text('${puzzle.width} × ${puzzle.height}', style: FolioType.kicker(p).copyWith(fontSize: 10, letterSpacing: 2)),
+          Text('${puzzle.width} × ${puzzle.height}', style: FolioType.kicker(p).copyWith(fontSize: 10, letterSpacing: 2)),
         ]),
       ),
     );

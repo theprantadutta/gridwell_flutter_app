@@ -69,7 +69,8 @@ class _CollectionScreenState extends ConsumerState<CollectionScreen> {
         );
 
     return Scaffold(
-      body: SafeArea(
+      body: FolioBody(
+        maxWidth: 760,
         child: Column(children: [
           FolioHeader(
             leading: 'Contents',
@@ -86,9 +87,9 @@ class _CollectionScreenState extends ConsumerState<CollectionScreen> {
               Text(
                 notBegun
                     ? '${_countWord(plates.length)} plates, none drawn yet. They grow from '
-                        '${sizes.first} × ${sizes.first} to ${sizes.last} × ${sizes.last}, so begin at the beginning.'
+                        '${sizes.first} × ${sizes.first} to ${sizes.last} × ${sizes.last}, so begin at the beginning.'
                     : '${_countWord(plates.length)} plates. ${collection.blurb} '
-                        'From ${sizes.first} × ${sizes.first} to ${sizes.last} × ${sizes.last}.',
+                        'From ${sizes.first} × ${sizes.first} to ${sizes.last} × ${sizes.last}.',
                 style: FolioType.bodyMuted(p, size: 18),
               ),
               const SizedBox(height: 18),
@@ -96,18 +97,42 @@ class _CollectionScreenState extends ConsumerState<CollectionScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Row(children: [
-                  filter(_Filter.all, 'All'),
-                  filter(_Filter.solved, 'Solved ${solved.length}'),
-                  filter(_Filter.unsolved, 'Unsolved ${plates.length - solved.length}'),
-                  const Spacer(),
+                  // Shrinks a touch on the narrowest phones instead of overflowing.
+                  Expanded(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        filter(_Filter.all, 'All'),
+                        filter(_Filter.solved, 'Solved ${solved.length}'),
+                        filter(_Filter.unsolved, 'Unsolved ${plates.length - solved.length}'),
+                      ]),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                   Text('${(100 * solved.length / plates.length).round()}%',
                       style: FolioType.style(size: 19, color: p.textMuted)),
                 ]),
               ),
               const Hairline(),
               const SizedBox(height: 18),
+              if (shown.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 36),
+                  child: Text(
+                    _filter == _Filter.solved
+                        ? 'No plates solved here yet. The first one is waiting.'
+                        : 'Every plate in this collection is solved.',
+                    textAlign: TextAlign.center,
+                    style: FolioType.bodyMuted(p, size: 17),
+                  ),
+                ),
               LayoutBuilder(builder: (context, c) {
                 final columns = c.maxWidth > 700 ? 8 : (c.maxWidth > 500 ? 6 : 5);
+                // Square plate plus a caption line, sized for the system font
+                // scale (a fixed aspect ratio overflows on enlarged text).
+                final tile = (c.maxWidth - 12 * (columns - 1)) / columns;
+                final caption = MediaQuery.textScalerOf(context).scale(13) * 1.45;
                 return GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -116,7 +141,7 @@ class _CollectionScreenState extends ConsumerState<CollectionScreen> {
                     crossAxisCount: columns,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 8,
-                    childAspectRatio: 0.78,
+                    mainAxisExtent: tile + 4 + caption + 4,
                   ),
                   itemBuilder: (context, i) {
                     final x = shown[i];
@@ -136,8 +161,15 @@ class _CollectionScreenState extends ConsumerState<CollectionScreen> {
                         const SizedBox(height: 4),
                         Row(children: [
                           Text('${x.plateNumber}', style: FolioType.style(size: 13, color: p.textMuted)),
-                          const Spacer(),
-                          Text('${x.width}×${x.height}', style: FolioType.style(size: 13, color: p.textMuted)),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerRight,
+                              child: Text('${x.width}×${x.height}',
+                                  style: FolioType.style(size: 13, color: p.textMuted)),
+                            ),
+                          ),
                         ]),
                       ]),
                     );
@@ -148,7 +180,7 @@ class _CollectionScreenState extends ConsumerState<CollectionScreen> {
               if (notBegun && nextUnsolved != null)
                 InkButton(
                   label: 'Begin with No. ${nextUnsolved.plateNumber}',
-                  detail: '${nextUnsolved.width} × ${nextUnsolved.height}',
+                  detail: '${nextUnsolved.width} × ${nextUnsolved.height}',
                   onPressed: () => context.push('/play/${nextUnsolved.id}'),
                 ),
               const SizedBox(height: 28),

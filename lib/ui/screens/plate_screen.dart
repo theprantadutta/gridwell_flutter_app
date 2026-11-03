@@ -22,7 +22,7 @@ class PlateScreen extends ConsumerWidget {
     final progress = ref.watch(progressProvider).value?[puzzleId];
     final collection = set.collections.firstWhere((c) => c.id == x.collectionId);
     return Scaffold(
-      body: SafeArea(
+      body: FolioBody(
         child: Column(children: [
           FolioHeader(leading: 'Gallery', center: collection.name),
           Expanded(
@@ -46,7 +46,7 @@ class PlateScreen extends ConsumerWidget {
               const SizedBox(height: 10),
               if (progress?.bestTimeMs != null)
                 Center(
-                  child: Text('Best time ${formatClock(progress!.bestTimeMs!)} · ${x.width} × ${x.height}',
+                  child: Text('Best time ${formatClock(progress!.bestTimeMs!)} · ${x.width} × ${x.height}',
                       style: FolioType.bodyMuted(p, size: 18)),
                 ),
               const SizedBox(height: 28),

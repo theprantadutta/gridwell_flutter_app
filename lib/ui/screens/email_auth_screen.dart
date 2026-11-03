@@ -37,7 +37,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
   Widget build(BuildContext context) {
     final p = context.palette;
     return Scaffold(
-      body: SafeArea(
+      body: FolioBody(
         child: Column(children: [
           FolioHeader(leading: 'Account', center: _create ? 'New account' : 'Sign in'),
           Expanded(

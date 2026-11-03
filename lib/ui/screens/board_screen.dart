@@ -129,7 +129,7 @@ class _BoardPageState extends ConsumerState<_BoardPage> with WidgetsBindingObser
         Row(children: [
           Text(isDaily ? "TODAY'S LEAF" : 'NO. ${puzzle.plateNumber}', style: FolioType.kicker(p)),
           const Spacer(),
-          Text('${puzzle.width} × ${puzzle.height}', style: FolioType.header(p).copyWith(fontStyle: FontStyle.normal)),
+          Text('${puzzle.width} × ${puzzle.height}', style: FolioType.header(p).copyWith(fontStyle: FontStyle.normal)),
         ]),
         const SizedBox(height: 4),
         Text(puzzle.name, style: FolioType.plateTitle(p, size: big ? 36 : 40)),

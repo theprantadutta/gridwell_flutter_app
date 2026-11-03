@@ -40,7 +40,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final p = context.palette;
     final first = ref.watch(puzzleSetProvider).puzzles.first;
     return Scaffold(
-      body: SafeArea(
+      body: FolioBody(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: folioMargin),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -150,7 +150,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 detail: switch (_page) {
                   0 => "Finding what's certain",
                   1 => 'Crossing out',
-                  _ => '${first.width} × ${first.height}',
+                  _ => '${first.width} × ${first.height}',
                 },
                 onPressed: () {
                   if (_page < 2) {

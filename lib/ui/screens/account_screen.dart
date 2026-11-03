@@ -28,7 +28,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
     final account = ref.watch(accountProvider).value ?? Account.guest;
 
     return Scaffold(
-      body: SafeArea(
+      body: FolioBody(
         child: Stack(children: [
           Column(children: [
             const FolioHeader(leading: 'Back', center: 'Account'),

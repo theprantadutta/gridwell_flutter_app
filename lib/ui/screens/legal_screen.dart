@@ -26,7 +26,8 @@ class LegalScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      body: FolioBody(
+        maxWidth: 720,
         child: Column(children: [
           FolioHeader(leading: 'Privacy', center: doc.title),
           Expanded(
@@ -61,7 +62,7 @@ abstract final class FolioMarkdown {
       if (paragraph.isEmpty) return;
       out.add(Padding(
         padding: const EdgeInsets.only(bottom: 12),
-        child: Text.rich(_inline(paragraph.join(' ').replaceAll('  ', ' '), FolioType.body(p, size: 16.5))),
+        child: Text.rich(_inline(paragraph.join().replaceAll('  ', ' ').trim(), FolioType.body(p, size: 16.5))),
       ));
       paragraph = [];
     }
@@ -134,7 +135,8 @@ abstract final class FolioMarkdown {
           ]),
         ));
       } else {
-        paragraph.add(line.trim());
+        // Two trailing spaces are a markdown hard line break.
+        paragraph.add(line.trim() + (lines[i].endsWith('  ') ? '\n' : ' '));
       }
     }
     flush();

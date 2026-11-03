@@ -85,7 +85,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
         );
 
     return Scaffold(
-      body: SafeArea(
+      body: FolioBody(
         child: Column(children: [
           const FolioHeader(leading: 'Settings'),
           Expanded(
@@ -161,11 +161,9 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                 style: FolioType.style(size: 12.5, color: p.textMuted, height: 1.4),
               ),
               const SizedBox(height: 8),
-              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Wrap(alignment: WrapAlignment.center, spacing: 24, children: [
                 TextAction(label: 'Terms', onPressed: () => context.push('/legal/terms')),
-                const SizedBox(width: 24),
                 TextAction(label: 'Privacy', onPressed: () => context.push('/legal/privacy')),
-                const SizedBox(width: 24),
                 TextAction(label: 'Refunds', onPressed: () => context.push('/legal/refund')),
               ]),
             ]),

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -63,10 +65,16 @@ class ContentsScreen extends ConsumerWidget {
               onTap: () => context.push('/collection/${set.collections[i].id}'),
             ),
           const SizedBox(height: 28),
-          Row(children: [
-            Text('${roman(featuredIndex + 1)}. ${set.collections[featuredIndex].name.toUpperCase()} · FIRST PLATES',
-                style: FolioType.kicker(p, color: p.textPrimary)),
-            const Spacer(),
+          Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            Expanded(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text('${roman(featuredIndex + 1)}. ${set.collections[featuredIndex].name.toUpperCase()} · FIRST PLATES',
+                    maxLines: 1, style: FolioType.kicker(p, color: p.textPrimary)),
+              ),
+            ),
+            const SizedBox(width: 12),
             GestureDetector(
               onTap: () => context.push('/collection/$featured'),
               child: Text('All ${featuredPlates.length} →', style: FolioType.header(p)),
@@ -111,7 +119,7 @@ class _Bookmark extends StatelessWidget {
               TextSpan(children: [
                 TextSpan(text: 'Bookmark: ', style: FolioType.bodyMuted(p, size: 17)),
                 TextSpan(text: puzzle.name, style: FolioType.body(p)),
-                TextSpan(text: ', $pct% solved', style: FolioType.bodyMuted(p, size: 17)),
+                TextSpan(text: ' · $pct%', style: FolioType.bodyMuted(p, size: 17)),
               ]),
               overflow: TextOverflow.ellipsis,
             ),
@@ -157,24 +165,44 @@ class _ContentsLine extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
             SizedBox(
-              width: 64,
+              width: 56,
               child: Text('$numeral.',
                   style: FolioType.style(size: 19, color: current ? p.accent : p.textMuted)),
             ),
-            Text(name, style: FolioType.style(size: 24, color: p.textPrimary, weight: current ? 600 : 400)),
-            const SizedBox(width: 12),
+            // A table-of-contents leader: the name at its natural width (an
+            // ellipsis only when it truly cannot fit), dots filling the rest.
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 7),
-                child: LayoutBuilder(
-                  builder: (context, c) => Text(
-                    '.' * (c.maxWidth / 4.2).floor(),
-                    maxLines: 1,
-                    overflow: TextOverflow.clip,
-                    style: FolioType.style(size: 10, color: p.ruleStrong, letterSpacing: 1.2),
+              child: LayoutBuilder(builder: (context, c) {
+                final nameStyle = FolioType.style(size: 24, color: p.textPrimary, weight: current ? 600 : 400);
+                final natural = (TextPainter(
+                  text: TextSpan(text: name, style: nameStyle),
+                  textDirection: TextDirection.ltr,
+                  textScaler: MediaQuery.textScalerOf(context),
+                  maxLines: 1,
+                )..layout())
+                    .width;
+                final nameWidth = math.min(natural + 1, math.max(0.0, c.maxWidth - 24));
+                return Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                  SizedBox(
+                    width: nameWidth,
+                    child: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: nameStyle),
                   ),
-                ),
-              ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 7),
+                      child: LayoutBuilder(
+                        builder: (context, d) => Text(
+                          '.' * (d.maxWidth / 4.2).floor(),
+                          maxLines: 1,
+                          overflow: TextOverflow.clip,
+                          style: FolioType.style(size: 10, color: p.ruleStrong, letterSpacing: 1.2),
+                        ),
+                      ),
+                    ),
+                  ),
+                ]);
+              }),
             ),
             const SizedBox(width: 12),
             Text(status,

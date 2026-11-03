@@ -300,9 +300,13 @@ class _Row extends StatelessWidget {
           decoration: BoxDecoration(border: Border(bottom: BorderSide(color: p.rule))),
           padding: const EdgeInsets.symmetric(vertical: 18),
           child: Row(children: [
-            Text(label, style: FolioType.body(p, size: 20).copyWith(color: danger ? p.accent : null)),
-            const SizedBox(width: 12),
             Expanded(
+              child: Text(label, style: FolioType.body(p, size: 20).copyWith(color: danger ? p.accent : null)),
+            ),
+            const SizedBox(width: 12),
+            ConstrainedBox(
+              // The label always wins; a long detail (an email) gives way.
+              constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.45),
               child: Text(trailing,
                   textAlign: TextAlign.right,
                   maxLines: 1,

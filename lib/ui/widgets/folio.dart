@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../theme/gridwell_theme.dart';
@@ -6,6 +8,25 @@ import 'gridwell_mark.dart';
 
 /// Horizontal page margin used across Folio screens.
 const folioMargin = 24.0;
+
+/// Page body for pushed screens: a [SafeArea] whose content is centered and
+/// held to a comfortable reading width, so tablets get a page rather than
+/// lines stretched edge to edge. Phones are narrower than [maxWidth] and are
+/// unaffected.
+class FolioBody extends StatelessWidget {
+  const FolioBody({super.key, required this.child, this.maxWidth = 640});
+
+  final Widget child;
+  final double maxWidth;
+
+  @override
+  Widget build(BuildContext context) => SafeArea(
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(constraints: BoxConstraints(maxWidth: maxWidth), child: child),
+        ),
+      );
+}
 
 class Hairline extends StatelessWidget {
   const Hairline({super.key, this.strong = false, this.thickness = 1});
@@ -36,10 +57,11 @@ class FolioHeader extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: folioMargin),
       child: Column(children: [
-        SizedBox(
-          height: 52,
+        ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 52),
           child: Row(children: [
             Expanded(
+              flex: 2,
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: leading == null
@@ -52,17 +74,27 @@ class FolioHeader extends StatelessWidget {
                           onTap: onLeading ?? () => Navigator.of(context).maybePop(),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 12),
-                            child: Text('‹ ${leading!}', style: style),
+                            child: Text('‹ ${leading!}', maxLines: 1, overflow: TextOverflow.ellipsis, style: style),
                           ),
                         ),
                       ),
               ),
             ),
-            if (center != null) Text(center!, style: style),
+            const SizedBox(width: 8),
+            // Equal side columns keep the title centered on the page.
             Expanded(
+              flex: 3,
+              child: center == null
+                  ? const SizedBox()
+                  : Text(center!,
+                      maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: style),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              flex: 2,
               child: Align(
                 alignment: Alignment.centerRight,
-                child: trailing ?? const SizedBox(),
+                child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerRight, child: trailing ?? const SizedBox()),
               ),
             ),
           ]),
@@ -85,14 +117,21 @@ class WordmarkHeader extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: folioMargin),
       child: Column(children: [
-        SizedBox(
-          height: 52,
+        ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 52),
           child: Row(children: [
             const GridwellMark(size: 20), // the logo kit's minimum mark size
             const SizedBox(width: 10),
             Text('GRIDWELL', style: FolioType.wordmark(p)),
-            const Spacer(),
-            if (trailing != null) Text(trailing!, style: FolioType.header(p)),
+            const SizedBox(width: 16),
+            if (trailing != null)
+              Expanded(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerRight,
+                  child: Text(trailing!, maxLines: 1, style: FolioType.header(p)),
+                ),
+              ),
           ]),
         ),
         const Hairline(),
@@ -122,12 +161,41 @@ class InkButton extends StatelessWidget {
           height: height,
           padding: const EdgeInsets.symmetric(horizontal: 22),
           decoration: BoxDecoration(color: p.textPrimary, borderRadius: BorderRadius.circular(4)),
-          child: Row(children: [
-            Text(label, style: FolioType.button(p.onInk, size: 19)),
-            const Spacer(),
-            if (detail != null)
-              Text(detail!, style: FolioType.style(size: 16, color: p.onInk.withValues(alpha: 0.75))),
-          ]),
+          child: LayoutBuilder(builder: (context, c) {
+            final labelStyle = FolioType.button(p.onInk, size: 19);
+            final detailStyle = FolioType.style(size: 16, color: p.onInk.withValues(alpha: 0.75));
+            final scaler = MediaQuery.textScalerOf(context);
+            double natural(String t, TextStyle st) =>
+                (TextPainter(text: TextSpan(text: t, style: st), textDirection: TextDirection.ltr, textScaler: scaler, maxLines: 1)
+                      ..layout())
+                    .width +
+                1;
+            final labelW = natural(label, labelStyle);
+            final detailW = detail == null ? 0.0 : natural(detail!, detailStyle) + 12;
+            // Both at natural size when they fit. Otherwise the detail gives
+            // way first (ellipsis), and the label shrinks only if it alone is
+            // too wide.
+            final labelMax = detail == null || labelW + detailW <= c.maxWidth
+                ? c.maxWidth
+                : math.max(labelW.clamp(0.0, c.maxWidth * 0.65), c.maxWidth - detailW);
+            return Row(children: [
+              ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: math.min(labelMax, c.maxWidth)),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(label, maxLines: 1, style: labelStyle),
+                ),
+              ),
+              if (detail != null) ...[
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(detail!,
+                      maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.right, style: detailStyle),
+                ),
+              ],
+            ]);
+          }),
         ),
       ),
     );
