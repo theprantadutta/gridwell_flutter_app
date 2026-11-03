@@ -88,7 +88,7 @@ class WordmarkHeader extends StatelessWidget {
         SizedBox(
           height: 52,
           child: Row(children: [
-            const GridwellMark(size: 18),
+            const GridwellMark(size: 20), // the logo kit's minimum mark size
             const SizedBox(width: 10),
             Text('GRIDWELL', style: FolioType.wordmark(p)),
             const Spacer(),
