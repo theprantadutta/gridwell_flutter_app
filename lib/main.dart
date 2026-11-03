@@ -13,7 +13,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
 import 'services/analytics/analytics_service.dart';
 import 'services/analytics/firebase_analytics_service.dart';
+import 'services/ads/google_ad_service.dart';
 import 'services/feedback/sound_haptic_feedback.dart';
+import 'services/notifications/notification_service.dart';
+import 'services/purchases/store_service.dart';
+import 'state/monetization.dart';
+import 'state/reminders.dart';
 import 'state/providers.dart';
 import 'state/services.dart';
 import 'state/settings.dart';
@@ -50,12 +55,25 @@ Future<void> main() async {
 
   final overrides = await bootstrapOverrides();
   final feedback = await SoundHapticFeedback.create();
+  final notifications = NotificationService();
+  await notifications.initialize();
+  // Store and ads connect in the background: they must never delay launch.
+  final store = StoreService();
+  unawaited(store.initialize());
+  final ads = GoogleAdService(
+    onUnavailableGrant: (placement) =>
+        analytics.log('ad_unavailable_grant', {'placement': placement.name}),
+  );
+  unawaited(ads.initialize());
   runApp(
     ProviderScope(
       overrides: [
         ...overrides,
         feedbackProvider.overrideWithValue(feedback),
         analyticsProvider.overrideWithValue(analytics),
+      adServiceProvider.overrideWithValue(ads),
+      storeServiceProvider.overrideWithValue(store),
+      notificationServiceProvider.overrideWithValue(notifications),
       ],
       child: const _FeedbackSettingsSync(child: GridwellApp()),
     ),
@@ -74,6 +92,7 @@ class _FeedbackSettingsSync extends ConsumerWidget {
     ref.read(feedbackProvider)
       ..soundEnabled = s.sound
       ..hapticsEnabled = s.haptics;
+    ref.read(analyticsProvider).setEnabled(s.shareAnalytics);
     return child;
   }
 }

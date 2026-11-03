@@ -91,6 +91,7 @@ flutter:
     - assets/puzzles/set.bin
     - assets/fonts/OFL.txt
     - assets/sounds/
+    - assets/legal/
 
   fonts:
     - family: Literata

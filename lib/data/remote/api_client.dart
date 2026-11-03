@@ -80,10 +80,29 @@ class ApiClient {
     return r is Map<String, Object?> ? r : null;
   }
 
+  /// Returns `{verified, status, product_id, entitlements, ...}`.
+  Future<Map<String, Object?>?> verifyPurchase({
+    required String platform,
+    required String productId,
+    String? purchaseToken,
+    String? signedTransaction,
+  }) async {
+    final r = await _send('POST', '/purchases/verify', body: {
+      'platform': platform,
+      'product_id': productId,
+      'purchase_token': ?purchaseToken,
+      'signed_transaction': ?signedTransaction,
+    });
+    return r is Map<String, Object?> ? r : null;
+  }
+
   Future<bool> registerToken(String fcmToken, String platform, int tzOffsetMinutes) async =>
       await _send('POST', '/users/register-token',
           body: {'token': fcmToken, 'platform': platform, 'time_zone_offset_minutes': tzOffsetMinutes}) !=
       null;
+
+  /// Deletes the account and all server-side data (and the Firebase user).
+  Future<bool> deleteAccount() async => await _send('DELETE', '/users/me') != null;
 
   Future<Map<String, Object?>?> updateProfile({String? penName, bool? notificationsEnabled}) async {
     final r = await _send('PATCH', '/users/me', body: {

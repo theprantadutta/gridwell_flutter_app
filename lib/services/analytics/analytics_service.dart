@@ -5,6 +5,9 @@ abstract interface class AnalyticsService {
 
   /// Sends anything buffered. Called when the app goes to the background.
   Future<void> flush();
+
+  /// Turns collection on or off (the player's choice in Settings > Privacy).
+  Future<void> setEnabled(bool enabled);
 }
 
 /// Records events in memory. Used in tests and before Firebase is ready.
@@ -17,6 +20,9 @@ class MemoryAnalytics implements AnalyticsService {
 
   @override
   Future<void> flush() async {}
+
+  @override
+  Future<void> setEnabled(bool enabled) async {}
 }
 
 /// Event names in one place so they cannot drift.

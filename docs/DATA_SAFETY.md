@@ -1,6 +1,6 @@
 # Data safety (Google Play) and App Privacy (App Store)
 
-Answers for the two store privacy forms, consistent with `PRIVACY_POLICY.md`. Where the policy changes,
+Answers for the two store privacy forms, consistent with `assets/legal/PRIVACY.md`. Where the policy changes,
 change this file too, and the other way round.
 
 Ground rules used throughout:

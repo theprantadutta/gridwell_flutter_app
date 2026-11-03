@@ -108,7 +108,7 @@ class OnlineSession {
         if (user == null) return false;
         _ref.read(penNameProvider.notifier).set(user['pen_name'] as String?);
         final ent = user['entitlements'] as Map<String, Object?>?;
-        if (ent != null) _applyEntitlements(ent);
+        if (ent != null) applyEntitlements(ent);
         return true;
       } finally {
         _signingIn = null;
@@ -116,7 +116,7 @@ class OnlineSession {
     }();
   }
 
-  void _applyEntitlements(Map<String, Object?> e) {
+  void applyEntitlements(Map<String, Object?> e) {
     final premium = (e['premium'] as Map<String, Object?>?)?['active'] == true;
     _ref.read(entitlementsProvider.notifier).set(Entitlements(
           removeAds: e['remove_ads'] == true,

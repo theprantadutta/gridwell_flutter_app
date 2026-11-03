@@ -15,6 +15,12 @@ abstract interface class AdService {
   Future<bool> showInterstitial(AdPlacement placement);
 
   bool get rewardedReady;
+
+  /// True where the player must be able to revisit their ad consent (EEA/UK).
+  Future<bool> privacyOptionsRequired();
+
+  /// Reopens the consent form.
+  Future<void> showPrivacyOptions();
 }
 
 /// Grants every reward instantly. Used in tests and debug builds before the
@@ -31,4 +37,10 @@ class InstantRewardAds implements AdService {
 
   @override
   bool get rewardedReady => true;
+
+  @override
+  Future<bool> privacyOptionsRequired() async => false;
+
+  @override
+  Future<void> showPrivacyOptions() async {}
 }

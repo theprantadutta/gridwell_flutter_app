@@ -3,7 +3,7 @@
 Everything that blocks the 1.0 launch on Google Play and the App Store, in the order it should start.
 Some items have long lead times (the Play closed test takes at least 14 days), so start those first.
 
-Related docs: `MONETIZATION_IDS.md` (IDs to fill in), `STORE_LISTING.md`, `PRIVACY_POLICY.md`,
+Related docs: `MONETIZATION_IDS.md` (IDs to fill in), `STORE_LISTING.md`, `assets/legal/PRIVACY.md`,
 `DATA_SAFETY.md`, `MAC_CHECKLIST.md` (all iOS work), `PERFORMANCE.md`, and the API repo's `CLAUDE.md`.
 
 ---
@@ -42,13 +42,13 @@ build whose monetization IDs are still test values.
   by cascade, and their Firebase account), but the app has no button that calls it yet. Add
   "Delete my data" with a confirmation, then clear local sync state and sign out of Firebase. Both stores
   expect this, and the privacy policy promises it. **[CONFIRM]** the final menu path, and update
-  `PRIVACY_POLICY.md` section 8 to match.
+  `assets/legal/PRIVACY.md` section 8 to match.
 - [ ] **Privacy options entry** that reopens the Google UMP consent form for EEA/UK users (required by
   Google's consent policy when consent is gathered).
 - [ ] **[CONFIRM]** a player/support ID visible in the app, so email deletion requests can be matched to an
   anonymous account (the privacy policy mentions it as optional).
 - [ ] **[CONFIRM]** Android advertising ID collection by Firebase Analytics: keep it, or add
-  `google_analytics_adid_collection_enabled = false` to the manifest. Make `PRIVACY_POLICY.md` 1.7 and
+  `google_analytics_adid_collection_enabled = false` to the manifest. Make `assets/legal/PRIVACY.md` 1.7 and
   `DATA_SAFETY.md` agree with the choice.
 
 ## 3. Daily start date, rebake, re-export
@@ -93,7 +93,7 @@ Fill in `MONETIZATION_IDS.md`, then put each value where its "Goes in" column sa
 - [ ] iOS app ID in `ios/Runner/Info.plist` `GADApplicationIdentifier` (on the Mac, `MAC_CHECKLIST.md` step 4).
 - [ ] Ad unit IDs in `lib/services/ads/ad_config.dart` (debug builds keep using Google's test units).
 - [ ] AdMob > Privacy & messaging: create and publish the **GDPR** message (EEA/UK) and, if wanted, the
-  **US state regulations** message. **[CONFIRM]** the US message decision; `PRIVACY_POLICY.md` 1.9 depends on it.
+  **US state regulations** message. **[CONFIRM]** the US message decision; `assets/legal/PRIVACY.md` 1.9 depends on it.
 - [ ] AdMob > app-ads.txt: publish `app-ads.txt` at the root of the **developer website domain** listed in
   both store listings (**[CONFIRM]** which domain, for example `pranta.dev`), then verify it in AdMob.
 - [ ] Product IDs: after the products exist (section 6), set `lib/services/purchases/product_ids.dart` and the
@@ -207,7 +207,7 @@ app uses placeholder IDs (`remove_ads`, `premium_monthly`, `premium_yearly`) and
 
 ## 7. Privacy policy hosting
 
-- [ ] Fill every **[CONFIRM]** in `PRIVACY_POLICY.md` (legal name, address, hosting location, retention
+- [ ] Fill every **[CONFIRM]** in `assets/legal/PRIVACY.md` (legal name, address, hosting location, retention
   settings, consent choices).
 - [ ] Host it at a stable public HTTPS URL that needs no login. Options (**[CONFIRM]** choice):
   - a page served by the API, for example `https://gridwell.pranta.dev/privacy` (not implemented yet);

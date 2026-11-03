@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;
 
+import '../state/monetization.dart';
 import '../state/online.dart';
+import '../state/reminders.dart';
 import '../state/settings.dart';
 import 'router.dart';
 import 'theme/gridwell_theme.dart';
@@ -25,9 +27,16 @@ class _GridwellAppState extends ConsumerState<GridwellApp> {
   @override
   void initState() {
     super.initState();
-    // Online enrichment on start and every resume: never awaited, never blocking.
+    // On start and every resume: online enrichment, purchase reconcile and the
+    // reminder schedule. Never awaited, never blocking play.
+    _onForeground();
+    ref.read(purchaseControllerProvider);
+    _lifecycle = AppLifecycleListener(onResume: _onForeground);
+  }
+
+  void _onForeground() {
     ref.read(onlineSessionProvider).onForeground();
-    _lifecycle = AppLifecycleListener(onResume: () => ref.read(onlineSessionProvider).onForeground());
+    ref.read(reminderSchedulerProvider).reschedule();
   }
 
   @override

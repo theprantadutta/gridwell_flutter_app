@@ -5,7 +5,6 @@
 // PNGs of every variant are written to build/legibility/ for a human look.
 
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/services.dart';

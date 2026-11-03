@@ -16,6 +16,7 @@ class Settings {
     this.onboardingDone = false,
     this.notificationsAsked = false,
     this.dailyReminder = true,
+    this.shareAnalytics = true,
   });
 
   final ThemeMode themeMode;
@@ -29,6 +30,9 @@ class Settings {
   final bool notificationsAsked;
   final bool dailyReminder;
 
+  /// Anonymous usage statistics (Firebase Analytics). Off stops collection.
+  final bool shareAnalytics;
+
   Settings copyWith({
     ThemeMode? themeMode,
     bool? sound,
@@ -40,6 +44,7 @@ class Settings {
     bool? onboardingDone,
     bool? notificationsAsked,
     bool? dailyReminder,
+    bool? shareAnalytics,
   }) =>
       Settings(
         themeMode: themeMode ?? this.themeMode,
@@ -52,6 +57,7 @@ class Settings {
         onboardingDone: onboardingDone ?? this.onboardingDone,
         notificationsAsked: notificationsAsked ?? this.notificationsAsked,
         dailyReminder: dailyReminder ?? this.dailyReminder,
+        shareAnalytics: shareAnalytics ?? this.shareAnalytics,
       );
 
   Map<String, String> toMap() => {
@@ -65,6 +71,7 @@ class Settings {
         'onboarding_done': '$onboardingDone',
         'notifications_asked': '$notificationsAsked',
         'daily_reminder': '$dailyReminder',
+        'share_analytics': '$shareAnalytics',
       };
 
   factory Settings.fromMap(Map<String, String> m) {
@@ -83,6 +90,7 @@ class Settings {
       onboardingDone: b('onboarding_done', false),
       notificationsAsked: b('notifications_asked', false),
       dailyReminder: b('daily_reminder', true),
+      shareAnalytics: b('share_analytics', true),
     );
   }
 }

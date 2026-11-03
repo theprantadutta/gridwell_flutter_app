@@ -23,4 +23,11 @@ class FirebaseAnalyticsService implements AnalyticsService {
   /// stays so another backend can flush explicitly.
   @override
   Future<void> flush() async {}
+
+  @override
+  Future<void> setEnabled(bool enabled) async {
+    try {
+      await _fa.setAnalyticsCollectionEnabled(enabled);
+    } catch (_) {}
+  }
 }

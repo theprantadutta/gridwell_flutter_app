@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/misc.dart' show Override;
 import '../content/puzzle_set.dart';
 import '../data/local/app_database.dart';
 import '../data/local/repositories.dart';
+import 'services.dart';
 import 'settings.dart';
 
 // Row types the UI reads (plain data). Re-exported so ui/ depends on state/
@@ -46,11 +47,16 @@ Future<PuzzleSet> loadPuzzleSet() async {
 /// Bootstrap values needed before the first frame.
 Future<List<Override>> bootstrapOverrides() async {
   final db = AppDatabase();
-  final settings = Settings.fromMap(await SettingsRepository(db).all());
+  final raw = await SettingsRepository(db).all();
+  final settings = Settings.fromMap(raw);
   final set = await loadPuzzleSet();
   return [
     databaseProvider.overrideWithValue(db),
     initialSettingsProvider.overrideWithValue(settings),
+    initialEntitlementsProvider.overrideWithValue(Entitlements(
+      removeAds: raw['ent_remove_ads'] == 'true',
+      premium: raw['ent_premium'] == 'true',
+    )),
     puzzleSetProvider.overrideWithValue(set),
   ];
 }
