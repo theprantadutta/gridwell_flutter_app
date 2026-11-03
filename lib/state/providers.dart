@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/misc.dart' show Override;
 import '../content/puzzle_set.dart';
 import '../data/local/app_database.dart';
 import '../data/local/repositories.dart';
+import 'account.dart' show initialAccountOfferDoneProvider;
 import 'monetization.dart' show initialBonusHintsProvider;
 import 'services.dart';
 import 'settings.dart';
@@ -55,6 +56,7 @@ Future<List<Override>> bootstrapOverrides() async {
     databaseProvider.overrideWithValue(db),
     initialSettingsProvider.overrideWithValue(settings),
     initialBonusHintsProvider.overrideWithValue(int.tryParse(raw['bonus_hints'] ?? '') ?? 0),
+    initialAccountOfferDoneProvider.overrideWithValue(raw['account_offer_done'] == 'true'),
     initialEntitlementsProvider.overrideWithValue(Entitlements(
       removeAds: raw['ent_remove_ads'] == 'true',
       premium: raw['ent_premium'] == 'true',

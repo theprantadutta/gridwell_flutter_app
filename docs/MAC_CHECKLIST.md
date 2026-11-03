@@ -7,8 +7,11 @@ What the repo already has (checked on Windows, 2026-11-03):
 - Bundle ID `com.pranta.gridwell` (Runner target, Debug/Release/Profile).
 - `IPHONEOS_DEPLOYMENT_TARGET = 15.0` in `ios/Runner.xcodeproj/project.pbxproj`.
 - `ios/Runner/Info.plist` with display name "Gridwell", iPhone and iPad orientations, and a `SceneDelegate`.
-- **Not yet present:** `GADApplicationIdentifier`, `SKAdNetworkItems`, `NSUserTrackingUsageDescription`,
-  any `.entitlements` file, a `Podfile`, and a StoreKit configuration file. This checklist adds them.
+- `Info.plist` already has the real `GADApplicationIdentifier`, `SKAdNetworkItems` (copied 2026-11-03) and
+  `NSUserTrackingUsageDescription`. Re-check them in step 4 rather than adding them again.
+- Google and email/password sign-in are built and tested on Android. Apple sign-in is not built yet
+  (step 4a).
+- **Not yet present:** any `.entitlements` file, a `Podfile`, and a StoreKit configuration file. This checklist adds them.
 
 Never commit `ios/Runner/GoogleService-Info.plist`, `lib/firebase_options.dart`, `firebase.json` or any
 `.p8` key. The main session (on Windows) does the commits; on the Mac, only commit if you mean to, and
@@ -109,19 +112,15 @@ Integrations > In-App Purchase.
 
 Edit `ios/Runner/Info.plist` (in Xcode or a text editor). Add inside the top-level `<dict>`:
 
-- [ ] **AdMob app ID.** Until the real ID exists, use Google's official iOS **test** app ID:
-  ```xml
-  <key>GADApplicationIdentifier</key>
-  <string>ca-app-pub-3940256099942544~1458002511</string>
-  ```
-  Replace it with the real iOS app ID from `MONETIZATION_IDS.md` section 1 (format with a `~`) before the
-  release build. The app crashes at launch if this key is missing once the Mobile Ads SDK is linked.
-- [ ] **SKAdNetwork identifiers.** Copy the full current `SKAdNetworkItems` array from Google's page,
-  not from memory or an old project:
+- [ ] **AdMob app ID.** Already set to the real iOS app ID `ca-app-pub-9242904787767394~6672160958`
+  (`MONETIZATION_IDS.md` section 1). Just confirm it is there. The app crashes at launch if this key is
+  missing once the Mobile Ads SDK is linked.
+- [ ] **SKAdNetwork identifiers.** Already present (copied 2026-11-03). Before each release, compare with
+  the current list on Google's page and add any new entries:
   https://developers.google.com/admob/ios/quick-start#update_your_infoplist
   It starts with Google's own `cstr6suwn9.skadnetwork` and continues with the partner networks. Paste the
   whole list. Refresh it before each release; Google adds entries.
-- [ ] **Tracking prompt text** (from `MONETIZATION_IDS.md` section 5):
+- [ ] **Tracking prompt text** (already present; from `MONETIZATION_IDS.md` section 5):
   ```xml
   <key>NSUserTrackingUsageDescription</key>
   <string>Your choice lets Gridwell show ads that are less random. The game works the same either way.</string>
@@ -140,6 +139,53 @@ Edit `ios/Runner/Info.plist` (in Xcode or a text editor). Add inside the top-lev
   ```
   plutil -lint ios/Runner/Info.plist
   ```
+
+## 4a. Sign-in: Google (finish) and Apple (build)
+
+Google and email/password sign-in already work on Android (`lib/services/auth/auth_service.dart`,
+`lib/ui/screens/account_screen.dart`). Email/password needs nothing more on iOS. Google needs URL setup,
+and Apple has to be built and tested here, because it needs a real Apple device and an Apple developer account.
+
+**Google on iOS**
+- [ ] After `flutterfire configure` (step 1), open `ios/Runner/GoogleService-Info.plist` and copy
+  `CLIENT_ID` and `REVERSED_CLIENT_ID`. If they are missing, enable Google in Firebase > Authentication >
+  Sign-in method first, then run `flutterfire configure` again.
+- [ ] Add to `ios/Runner/Info.plist` (google_sign_in 7.x reads these):
+  ```xml
+  <key>GIDClientID</key>
+  <string>CLIENT_ID value</string>
+  <key>GIDServerClientID</key>
+  <string>GOOGLE_WEB_CLIENT_ID from .env</string>
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleTypeRole</key><string>Editor</string>
+      <key>CFBundleURLSchemes</key>
+      <array><string>REVERSED_CLIENT_ID value</string></array>
+    </dict>
+  </array>
+  ```
+  If `CFBundleURLTypes` already exists, add the scheme to it rather than adding a second key.
+- [ ] Run on an iPhone: Settings > Account > Continue with Google. Check that the Settings row then shows the email.
+
+**Apple (new code, do it here)**
+- [ ] Apple Developer > Identifiers > `com.pranta.gridwell`: enable **Sign in with Apple**. In Xcode, Runner >
+  Signing & Capabilities > **+ Capability > Sign in with Apple** (adds it to `Runner.entitlements`).
+- [ ] Firebase console > Authentication > Sign-in method > **Apple**: enable it. For iOS-only native sign-in
+  the Services ID and key fields can stay empty.
+- [ ] Code: follow Snake Classic's `signInWithApple` / `linkAnonymousToApple` in
+  `snake-classic/snake_classic/lib/services/unified_user_service.dart`, which uses firebase_auth's native
+  `AppleAuthProvider` and needs no extra plugin. Add `signInWithApple()` to `AuthService`, routed through
+  the existing `_linkOrSignIn` so a guest is upgraded in place. Add it to `AccountActions`
+  (`lib/state/account.dart`). Add a "Continue with Apple" button to `AccountScreen` as the **first** button,
+  on iOS only, styled per Apple's guidelines. Remove the `TODO(mac)` there. `AccountKind.apple` and the
+  backend's `apple.com` mapping already exist.
+- [ ] App Store rule 4.8: an app that offers Google sign-in must also offer Sign in with Apple on iOS.
+  Do not submit to App Review without it.
+- [ ] Test on an iPhone in three cases: a fresh guest links Apple (progress kept), a second device signs in to
+  the same Apple ID (progress restored), and "Hide my email" (the relay address appears as the email).
+- [ ] Update `assets/legal/PRIVACY.md` (section 1, "Account (optional)") to mention Apple, and mirror it to
+  `privacy-project/Projects/gridwell/privacy.md`.
 
 ## 5. Minimum iOS version
 

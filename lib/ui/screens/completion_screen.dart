@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../engine/model/puzzle.dart';
+import '../../state/account.dart';
 import '../../state/board_controller.dart';
 import '../../state/completion.dart';
 import '../../state/monetization.dart';
@@ -214,7 +215,9 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
                       if (isDaily && r.dailyOnDay)
                         Opacity(opacity: progress, child: _Leaderboard(date: r.dailyDate!)),
                       if (r.outcome.isFirstSolve && !ref.watch(settingsProvider).notificationsAsked)
-                        Opacity(opacity: cta, child: const _ReminderOptIn()),
+                        Opacity(opacity: cta, child: const _ReminderOptIn())
+                      else if (ref.watch(showAccountOfferProvider))
+                        IgnorePointer(ignoring: cta < 1, child: Opacity(opacity: cta, child: const _AccountOffer())),
                       const SizedBox(height: 28),
                       IgnorePointer(
                         ignoring: cta < 1,
@@ -405,6 +408,44 @@ class _ReminderOptIn extends ConsumerWidget {
           Expanded(child: InkButton(label: 'Remind me', height: 48, onPressed: scheduler.optIn)),
           const SizedBox(width: 12),
           Expanded(child: OutlineButtonFolio(label: 'No thanks', height: 48, onPressed: scheduler.decline)),
+        ]),
+      ]),
+    );
+  }
+}
+
+/// Once a few plates are solved, a guest is offered (once) to keep their
+/// progress with an account. Never on first launch, never again after an
+/// answer; Settings > Account is always there.
+class _AccountOffer extends ConsumerWidget {
+  const _AccountOffer();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final p = context.palette;
+    return Container(
+      margin: const EdgeInsets.only(top: 22),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(border: Border.all(color: p.ruleStrong)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('KEEP YOUR PROGRESS?', style: FolioType.kicker(p)),
+        const SizedBox(height: 8),
+        Text(
+          'Sign in to keep your solved plates and best times if you change phones. '
+          'Or carry on as you are; you can always do it later in Settings.',
+          style: FolioType.body(p, size: 17),
+        ),
+        const SizedBox(height: 14),
+        Row(children: [
+          Expanded(child: InkButton(label: 'Sign in', height: 48, onPressed: () => context.push('/account'))),
+          const SizedBox(width: 12),
+          Expanded(
+            child: OutlineButtonFolio(
+              label: 'Not now',
+              height: 48,
+              onPressed: () => ref.read(accountOfferProvider.notifier).done(),
+            ),
+          ),
         ]),
       ]),
     );

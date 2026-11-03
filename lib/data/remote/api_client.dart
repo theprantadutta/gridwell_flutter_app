@@ -7,9 +7,7 @@ import 'package:http/http.dart' as http;
 /// returns null on any failure (offline, timeout, server error) and never
 /// throws, so callers treat "no network" as an ordinary state.
 class ApiClient {
-  ApiClient({http.Client? client, String? baseUrl})
-      : _http = client ?? http.Client(),
-        baseUrl = baseUrl ?? const String.fromEnvironment('GRIDWELL_API', defaultValue: 'https://gridwell.pranta.dev/api/v1');
+  ApiClient({http.Client? client, required this.baseUrl}) : _http = client ?? http.Client();
 
   final http.Client _http;
   final String baseUrl;

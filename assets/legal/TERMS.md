@@ -1,7 +1,7 @@
 # Terms of Use for Gridwell: Nonogram Picross
 
 **Legal Version: 1.0**  
-**Document Version: 1.1**  
+**Document Version: 1.2**  
 **Effective Date: November 3, 2026**  
 **Last Updated: November 3, 2026**
 
@@ -13,7 +13,7 @@ Gridwell is a nonogram (picross) puzzle game. It is fully playable offline. Onli
 
 ## 2. Your account
 
-Gridwell creates an anonymous account for you automatically; there is no sign-up. You are responsible for your device and for the pen name you choose. We may change a pen name that is offensive, impersonates someone, or breaks the law.
+Gridwell creates an anonymous account for you automatically, so you never need to sign up. If you want to keep your progress across devices, you can sign in with Google or an email address and password. Keep your sign-in details safe. You are responsible for your device, your account and the pen name you choose. We may change a pen name that is offensive, impersonates someone, or breaks the law.
 
 ## 3. License
 

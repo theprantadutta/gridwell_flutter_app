@@ -9,10 +9,11 @@ import '../data/local/daily_repository.dart';
 import '../data/remote/api_client.dart';
 import '../engine/model/puzzle.dart';
 import '../services/auth/auth_service.dart';
+import '../services/config/app_env.dart';
 import 'providers.dart';
 import 'services.dart';
 
-final apiClientProvider = Provider((ref) => ApiClient());
+final apiClientProvider = Provider((ref) => ApiClient(baseUrl: AppEnv.apiBaseUrl));
 final authServiceProvider = Provider((ref) => AuthService());
 final dailyRepositoryProvider = Provider((ref) => DailyRepository(ref.watch(databaseProvider)));
 
@@ -185,6 +186,54 @@ class OnlineSession {
           attempts: const Value(0),
         ));
     unawaited(flushOutbox());
+  }
+
+  /// Forgets the server session after the Firebase identity changed, so the
+  /// next call signs in again as the new account.
+  void resetSession() {
+    _api.token = null;
+    _signingIn = null;
+    _ref.read(penNameProvider.notifier).set(null);
+  }
+
+  /// Pulls the account's cloud progress and merges it into this device.
+  /// Returns the number of plates that changed, or null when offline.
+  Future<int?> restoreFromCloud() async {
+    if (!await ensureSignedIn()) return null;
+    final snapshot = await _api.syncPull();
+    if (snapshot == null) return null;
+    final rows = (snapshot['progress'] as List?)?.whereType<Map<String, Object?>>().toList() ?? const [];
+    final changed = await _ref.read(progressRepositoryProvider).mergeRemote(rows, DateTime.now());
+    final ent = snapshot['entitlements'] as Map<String, Object?>?;
+    if (ent != null) applyEntitlements(ent);
+    return changed;
+  }
+
+  /// Queues every solve on this device for upload, so a guest's progress
+  /// lands in the account they just signed in to.
+  Future<void> uploadAllProgress() async {
+    final rows = await _ref.read(progressRepositoryProvider).all();
+    final db = _ref.read(databaseProvider);
+    final now = DateTime.now();
+    await db.batch((b) {
+      for (final r in rows.values.where((r) => r.isSolved && dailyDateOfKey(r.puzzleId) == null)) {
+        b.insert(db.outbox, OutboxCompanion.insert(
+          kind: 'progress',
+          payload: jsonEncode({
+            'puzzle_id': r.puzzleId,
+            'puzzle_set_version': r.setVersion,
+            'is_solved': true,
+            'best_time_ms': r.bestTimeMs,
+            'solved_at': (r.solvedAt ?? now).toUtc().toIso8601String(),
+            'last_played_at': (r.lastPlayedAt ?? now).toUtc().toIso8601String(),
+            'client_updated_at': r.updatedAt.toUtc().toIso8601String(),
+          }),
+          createdAt: now,
+          attempts: const Value(0),
+        ));
+      }
+    });
+    await flushOutbox();
   }
 
   /// App start and resume: refresh dailies and push anything queued.

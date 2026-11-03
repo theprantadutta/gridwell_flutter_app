@@ -13,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'firebase_options.dart';
 import 'services/analytics/analytics_service.dart';
+import 'services/config/app_env.dart';
 import 'services/analytics/firebase_analytics_service.dart';
 import 'services/ads/google_ad_service.dart';
 import 'services/feedback/sound_haptic_feedback.dart';
@@ -37,6 +38,8 @@ Future<void> main() async {
   if (shortest < 600) {
     await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   }
+
+  await AppEnv.load();
 
   LicenseRegistry.addLicense(() async* {
     yield LicenseEntryWithLineBreaks([

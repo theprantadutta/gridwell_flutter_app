@@ -206,6 +206,7 @@ class Segmented<T> extends StatelessWidget {
     required this.value,
     required this.onChanged,
     this.height = 58,
+    this.expand = false,
   });
 
   final List<(T, String, Widget? Function(Color)?)> options;
@@ -213,9 +214,13 @@ class Segmented<T> extends StatelessWidget {
   final ValueChanged<T> onChanged;
   final double height;
 
+  /// Share the full width equally instead of sizing to the labels.
+  final bool expand;
+
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
+    Widget cell(Widget child) => expand ? Expanded(child: child) : child;
     return Container(
       height: height,
       decoration: BoxDecoration(
@@ -224,7 +229,7 @@ class Segmented<T> extends StatelessWidget {
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         for (final (v, label, icon) in options)
-          Semantics(
+          cell(Semantics(
             button: true,
             selected: v == value,
             label: label,
@@ -232,8 +237,8 @@ class Segmented<T> extends StatelessWidget {
               behavior: HitTestBehavior.opaque,
               onTap: () => onChanged(v),
               child: Container(
-                constraints: const BoxConstraints(minWidth: 96),
-                padding: const EdgeInsets.symmetric(horizontal: 22),
+                constraints: BoxConstraints(minWidth: expand ? 0 : 96),
+                padding: EdgeInsets.symmetric(horizontal: expand ? 10 : 22),
                 color: v == value ? p.textPrimary : Colors.transparent,
                 alignment: Alignment.center,
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -241,13 +246,19 @@ class Segmented<T> extends StatelessWidget {
                     icon(v == value ? p.onInk : p.accent) ?? const SizedBox(),
                     const SizedBox(width: 12),
                   ],
-                  Text(label,
-                      style: FolioType.button(v == value ? p.onInk : p.textMuted, size: 19)
-                          .copyWith(fontWeight: v == value ? FontWeight.w600 : FontWeight.w400)),
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(label,
+                          maxLines: 1,
+                          style: FolioType.button(v == value ? p.onInk : p.textMuted, size: 19)
+                              .copyWith(fontWeight: v == value ? FontWeight.w600 : FontWeight.w400)),
+                    ),
+                  ),
                 ]),
               ),
             ),
-          ),
+          )),
       ]),
     );
   }

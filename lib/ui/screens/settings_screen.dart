@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../state/account.dart';
 import '../../state/app_info.dart';
 import '../../state/online.dart';
 import '../../state/progress_actions.dart';
@@ -19,6 +20,7 @@ class SettingsScreen extends ConsumerWidget {
     final s = ref.watch(settingsProvider);
     final notifier = ref.read(settingsProvider.notifier);
     final version = ref.watch(appVersionProvider).value;
+    final account = ref.watch(accountProvider).value ?? Account.guest;
 
     Widget section(String title) => Padding(
           padding: const EdgeInsets.only(top: 22, bottom: 4),
@@ -73,6 +75,11 @@ class SettingsScreen extends ConsumerWidget {
             onChanged: (v) => notifier.update((x) => x.copyWith(highContrast: v)),
           ),
           section('ACCOUNT'),
+          _Row(
+            label: account.isGuest ? 'Sign in' : 'Signed in',
+            trailing: account.isGuest ? 'keep your progress ›' : (account.email ?? 'your account'),
+            onTap: () => context.push('/account'),
+          ),
           _Row(
             label: 'Pen name',
             trailing: ref.watch(penNameProvider) ?? 'offline',
@@ -294,11 +301,16 @@ class _Row extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 18),
           child: Row(children: [
             Text(label, style: FolioType.body(p, size: 20).copyWith(color: danger ? p.accent : null)),
-            const Spacer(),
-            Text(trailing,
-                style: trailing.length > 2
-                    ? FolioType.bodyMuted(p, size: 16)
-                    : FolioType.style(size: 20, color: p.textMuted)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(trailing,
+                  textAlign: TextAlign.right,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: trailing.length > 2
+                      ? FolioType.bodyMuted(p, size: 16)
+                      : FolioType.style(size: 20, color: p.textMuted)),
+            ),
           ]),
         ),
       ),

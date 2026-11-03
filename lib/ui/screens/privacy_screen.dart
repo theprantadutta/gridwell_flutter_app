@@ -50,8 +50,9 @@ class PrivacyScreen extends ConsumerWidget {
           Expanded(
             child: ListView(padding: const EdgeInsets.fromLTRB(folioMargin, 20, folioMargin, 32), children: [
               Text(
-                'Gridwell works fully offline and never asks for your name, email or location. '
-                'Online, it uses an anonymous ID to sync progress and keep daily leaderboards.',
+                'Gridwell works fully offline and never asks for your name or location. '
+                'Online, it uses an anonymous ID to sync progress and keep daily leaderboards. '
+                'Signing in with Google or email is optional and only keeps your progress safe.',
                 style: FolioType.bodyMuted(p, size: 17),
               ),
               if (penName != null) ...[

@@ -57,7 +57,7 @@ violation fixtures in `test/layering/fixtures/` prove that the check catches eac
 - **Leaderboard names**: generated pen name, editable, profanity-filtered.
 - **Notifications**: permission asked after the first solve. The daily reminder is a local scheduled
   notification at 19:00 local time, skipped if today's daily is solved. Server push is for re-engagement and announcements only.
-- **Monetization**: rewarded video (hints, reveal line, missed dailies); interstitial only after completion,
+- **Monetization**: rewarded video (hints, reveal line, missed dailies); between puzzles an optional rewarded interstitial (bonus hint, skippable intro) or an interstitial, only after completion,
   frequency-capped, never early, never on restart or resume; **no banners**. $1.99 one-time Remove Ads
   (interstitials only). Premium subscription $2.99/mo and $14.99/yr with trials on both, unlocking everything.
   Store products are created only after store approval; until then use placeholder IDs and test products.
@@ -82,6 +82,21 @@ picture (text art in `content/plates/`) → clue derivation → line-solvability
 - The curve report and validator gate every bake (line-solvable, unique, no duplicates, no early cliffs, breathers in window).
 - Art is authored in-house; third-party art is CC0 only, with every source recorded in `content/PROVENANCE.md`.
 - The daily pool is a separate seed and set. It is exported as JSON into the API repo's seed folder.
+
+## Environment (`.env`) and accounts
+
+- `.env` (gitignored, a bundled asset, so public values only) holds `GOOGLE_WEB_CLIENT_ID`,
+  `DEV_API_BACKEND_URL` and `PROD_API_BACKEND_URL`. The template is `.env.example`. There are **no fallbacks**:
+  a missing file fails the build, and a missing value throws at startup (`lib/services/config/app_env.dart`).
+- Debug and profile builds use DEV, release builds use PROD. `--dart-define=API_ENV=prod` points a debug
+  build at production without editing `.env`.
+- Accounts: everyone starts as an anonymous Firebase guest. Google and email/password sign-in are optional
+  (Settings > Account, plus a one-time offer on the completion screen after 3 book plates). **Never ask
+  at first launch.** A guest who signs up is linked in place (same UID). Signing in to an existing account
+  pulls cloud progress, merges it monotonically (`ProgressRepository.mergeRemote`) and uploads the
+  device's solves. Sign-out keeps local progress. Apple sign-in: `docs/MAC_CHECKLIST.md` step 4a.
+- Firebase console must have the Anonymous, Email/Password and Google providers enabled. The SHA-1
+  fingerprints of the debug key, upload key and Play app-signing key must be registered for Google sign-in.
 
 ## Firebase and platform notes
 

@@ -1,7 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
-
 import 'online.dart';
 import 'providers.dart';
 
@@ -38,7 +36,7 @@ extension AccountDeletion on ProgressActions {
     await db.delete(db.outbox).go();
     ref.read(apiClientProvider).token = null;
     try {
-      await FirebaseAuth.instance.signOut();
+      await ref.read(authServiceProvider).signOut();
     } catch (_) {}
     return serverDeleted ? DeleteOutcome.deleted : DeleteOutcome.deletedLocallyOnly;
   }

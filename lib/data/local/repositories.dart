@@ -80,6 +80,52 @@ class ProgressRepository {
   }
 
   Future<void> clearAll() => _db.delete(_db.puzzleProgress).go();
+
+  /// Merges progress pulled from the server (rows as the API sends them).
+  /// Monotonic like [recordSolve]: solved stays solved, the best time is the
+  /// lower one, the first solve date is the earlier one.
+  Future<int> mergeRemote(List<Map<String, Object?>> rows, DateTime now) {
+    DateTime? date(Object? v) => v is String ? DateTime.tryParse(v)?.toLocal() : null;
+    DateTime? earlier(DateTime? a, DateTime? b) => a == null ? b : (b == null || a.isBefore(b) ? a : b);
+    DateTime? later(DateTime? a, DateTime? b) => a == null ? b : (b == null || a.isAfter(b) ? a : b);
+
+    return _db.transaction(() async {
+      final local = await all();
+      var changed = 0;
+      for (final r in rows) {
+        final id = r['puzzle_id'];
+        if (id is! String) continue;
+        final mine = local[id];
+        final remoteSolved = r['is_solved'] == true;
+        final remoteBest = (r['best_time_ms'] as num?)?.toInt();
+        final solved = (mine?.isSolved ?? false) || remoteSolved;
+        final best = [mine?.bestTimeMs, if (remoteSolved) remoteBest].whereType<int>().fold<int?>(
+            null, (m, t) => m == null || t < m ? t : m);
+        final solvedAt = solved ? earlier(mine?.solvedAt, remoteSolved ? date(r['solved_at']) : null) : null;
+        final lastPlayed = later(mine?.lastPlayedAt, date(r['last_played_at']));
+        if (mine != null &&
+            mine.isSolved == solved &&
+            mine.bestTimeMs == best &&
+            mine.solvedAt == solvedAt &&
+            mine.lastPlayedAt == lastPlayed) {
+          continue;
+        }
+        await _db.into(_db.puzzleProgress).insertOnConflictUpdate(PuzzleProgressCompanion(
+          puzzleId: Value(id),
+          setVersion: Value(mine?.setVersion ?? (r['puzzle_set_version'] as num?)?.toInt() ?? 1),
+          isSolved: Value(solved),
+          bestTimeMs: Value(best),
+          solvedAt: Value(solvedAt ?? (solved ? now : null)),
+          lastPlayedAt: Value(lastPlayed),
+          solveCount: Value(mine?.solveCount ?? (remoteSolved ? 1 : 0)),
+          solvedWithoutHints: Value(mine?.solvedWithoutHints ?? false),
+          updatedAt: Value(now),
+        ));
+        changed++;
+      }
+      return changed;
+    });
+  }
 }
 
 /// A saved board in progress.

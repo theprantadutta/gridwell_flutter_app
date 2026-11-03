@@ -1,13 +1,13 @@
 # Privacy Policy for Gridwell: Nonogram Picross
 
 **Legal Version: 1.0**  
-**Policy Version: 1.0**  
+**Policy Version: 1.1**  
 **Effective Date: November 3, 2026**  
 **Last Updated: November 3, 2026**
 
 Gridwell ("we," "our," or "us") is a puzzle game made by Pranta Dutta, an independent developer based in Bangladesh. This policy explains what Gridwell collects, why, who else handles it, how long it is kept, and how to delete it.
 
-The short version: Gridwell works completely offline and never asks for your name, email or location. When you are online, it uses an anonymous ID to sync your progress and keep daily leaderboards, and it uses Google services for analytics, crash reports and ads.
+The short version: Gridwell works completely offline and never asks for your name or location. When you are online, it uses an anonymous ID to sync your progress and keep daily leaderboards, and it uses Google services for analytics, crash reports and ads. Signing in with Google or an email address is optional; it only keeps your progress safe across devices.
 
 ## 1. What we collect
 
@@ -17,7 +17,8 @@ Your solved puzzles, best times, boards in progress, daily results, settings, an
 
 ### Information sent to our server (when you are online)
 
-- **Anonymous ID.** On first use, Gridwell signs in with Firebase Anonymous Authentication. This creates a random identifier. It is not linked to your name, email, phone number or any other account.
+- **Anonymous ID.** On first use, Gridwell signs in with Firebase Anonymous Authentication. This creates a random identifier. Unless you choose to sign in (below), it is not linked to your name, email, phone number or any other account.
+- **Account (optional).** If you choose to sign in to keep your progress, we receive your email address and which sign-in you used (Google or email and password). With Google, Google shares your email address and basic profile with Firebase; we store only the email address. With email and password, your password is handled by Firebase Authentication and never reaches our server. Your progress so far moves into the account.
 - **Pen name.** A generated name such as "Quiet Heron 214" that appears on daily leaderboards. You can change it in Settings. Please don't use your real name.
 - **Puzzle progress.** Which puzzles you have solved, your best times, and when you last played, so progress can be restored and kept in step across reinstalls.
 - **Daily puzzle times.** Your time on each daily puzzle, for the leaderboard.
@@ -35,11 +36,12 @@ Your solved puzzles, best times, boards in progress, daily results, settings, an
 
 ### What we do not collect
 
-We do not collect your name, email address, phone number, contacts, photos, precise location, or payment card details. Payments are handled entirely by Google Play or the Apple App Store.
+We do not collect your name, phone number, contacts, photos, precise location, or payment card details. We collect your email address only if you choose to sign in. Payments are handled entirely by Google Play or the Apple App Store.
 
 ## 2. How we use it
 
-- To run the game's online features: restoring progress, the daily leaderboard, and checking purchases.
+- To run the game's online features: restoring progress (including on a new device when you sign in), the daily leaderboard, and checking purchases.
+- To send account emails you ask for, such as confirming your address or resetting your password. We do not send marketing email.
 - To understand which puzzles are too hard or too easy and to fix problems (analytics and crash reports).
 - To show ads that keep the game free, and to respect Remove Ads and Premium purchases.
 - To send an optional reminder or an occasional message, only if you allow notifications. The daily reminder at 7 PM is scheduled on your device and sends nothing to us.
@@ -64,7 +66,7 @@ We do not sell your personal information.
 
 | Service | Purpose | Their policy |
 |---|---|---|
-| Google Firebase (Authentication, Analytics, Crashlytics, Cloud Messaging) | Anonymous sign-in, analytics, crash reports, notifications | https://firebase.google.com/support/privacy |
+| Google Firebase (Authentication, Analytics, Crashlytics, Cloud Messaging) | Anonymous and optional Google or email sign-in, analytics, crash reports, notifications | https://firebase.google.com/support/privacy |
 | Google AdMob | Ads | https://policies.google.com/technologies/ads |
 | Google Play | Purchases and their verification | https://policies.google.com/privacy |
 | Apple App Store | Purchases and their verification | https://www.apple.com/legal/privacy/ |
@@ -79,7 +81,7 @@ Our server is located in the European Union (Finland). Google and Apple may proc
 | Data | Kept |
 |---|---|
 | Data on your device | Until you delete it in Settings, or uninstall the app |
-| Server account (anonymous ID, pen name, timezone offset, progress, daily times, achievements, settings) | Until you delete your data. Anonymous accounts that never played anything are removed automatically. |
+| Server account (anonymous ID, email address if you signed in, pen name, timezone offset, progress, daily times, achievements, settings) | Until you delete your data. Anonymous accounts that never played anything are removed automatically. |
 | Purchase records and entitlements | Until you delete your data, or longer where tax or accounting law requires it |
 | Notification tokens | Removed when they stop working, or after 90 days without use |
 | Firebase Analytics | 14 months |
@@ -88,8 +90,9 @@ Our server is located in the European Union (Finland). Google and Apple may proc
 
 ## 8. Deleting your data
 
-- **In the app:** open **Settings > Privacy > Delete my data**. This deletes your server account and everything linked to it (progress, times, pen name, achievements, notification tokens and the anonymous Firebase account), and clears the progress stored on your device. Your purchases belong to your Google Play or Apple account, so you can restore them afterwards.
-- **By email:** write to prantadutta1997@gmail.com and include your pen name. We will reply within 30 days.
+- **In the app:** open **Settings > Privacy > Delete my data**. This deletes your server account and everything linked to it (progress, times, pen name, email address, achievements, notification tokens and the Firebase account), and clears the progress stored on your device. Your purchases belong to your Google Play or Apple account, so you can restore them afterwards.
+- **Signing out** (Settings > Account) keeps your account; deleting your data removes it.
+- **By email:** write to prantadutta1997@gmail.com and include your pen name, or the email address you signed in with. We will reply within 30 days.
 
 ## 9. Your rights
 
