@@ -426,7 +426,11 @@ class BoardController extends Notifier<BoardSession> {
     final hint = peekHint();
     if (hint is! ResolvingHint) return HintOutcome.nothingToHint;
     if (!hintIsFree) {
+      // Time spent watching a video is not time spent solving.
+      final wasRunning = _clock.isRunning;
+      _clock.stop();
       final rewarded = await ref.read(adServiceProvider).showRewarded(AdPlacement.hint);
+      if (wasRunning && !state.solved) _clock.start();
       if (!rewarded) return HintOutcome.adNotWatched;
     }
     // Recompute in case the board changed while the video played.

@@ -32,6 +32,7 @@ abstract final class Explain {
 
   static String hintBody(DeducedCellHint h) {
     final line = lineName(h.line);
+    if (Clues.blocksOf(h.clue).isEmpty) return "$line's clue is 0, so none of its squares are filled.";
     final square = squareName(h.line, h.position);
     final blank = h.lineBefore.every((k) => k == Knowledge.unknown);
     final needs = '$line needs ${clueDescription(h.clue)}.';

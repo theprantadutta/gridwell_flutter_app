@@ -256,16 +256,23 @@ class _Footer extends ConsumerWidget {
         const SizedBox(height: 18),
         Row(children: [
           TextAction(label: 'Undo', enabled: session.canUndo, onPressed: controller.undo),
-          const Spacer(),
-          Segmented<InputMode>(
-            value: session.mode,
-            onChanged: controller.setMode,
-            options: [
-              (InputMode.fill, 'Fill', (c) => Container(width: 16, height: 16, color: c)),
-              (InputMode.cross, 'Cross', (c) => Icon(Icons.close, size: 22, color: c)),
-            ],
+          // The toggle takes the space between Undo and Hint and scales down
+          // on narrow phones or large system font sizes instead of overflowing.
+          Expanded(
+            child: Center(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Segmented<InputMode>(
+                  value: session.mode,
+                  onChanged: controller.setMode,
+                  options: [
+                    (InputMode.fill, 'Fill', (c) => Container(width: 16, height: 16, color: c)),
+                    (InputMode.cross, 'Cross', (c) => Icon(Icons.close, size: 22, color: c)),
+                  ],
+                ),
+              ),
+            ),
           ),
-          const Spacer(),
           TextAction(
             label: 'Hint',
             onPressed: onHint,

@@ -66,9 +66,10 @@ final class NoHint extends HintResult {
 /// Finds the next hint for [board].
 ///
 /// 1. If any mark is wrong, point at one (a proven one first).
-/// 2. Otherwise find the line that forces a new cell with the least reasoning:
-///    fewest unknown cells, then most cells forced. Within it, prefer a cell
-///    to fill over one to cross, since filling is what the player came for.
+/// 2. Otherwise find the line that forces a new cell, preferring a line that
+///    forces a filled square (filling is what the player came for), then the
+///    least reasoning: fewest unknown cells, then most cells forced. Within
+///    it, a cell to fill comes before one to cross.
 ///
 /// Deduction runs on the player's marks, and in step 2 all marks are correct,
 /// so the hint follows from what is on the board.
@@ -95,19 +96,26 @@ HintResult findHint(Clues clues, Solution solution, Board board, {LineSolver? so
     final before = knowledgeOf(board.line(ref));
     final unknown = before.where((k) => k == Knowledge.unknown).length;
     if (unknown == 0) return;
-    if (best != null && unknown > best!.unknown) return;
+    // (No early exit on unknowns: a fill elsewhere beats a cross here.)
     final after = lineSolver.solve(clue, before);
     if (after == null) return; // Cannot happen with all-correct marks.
     var forced = 0;
+    var fills = false;
     for (var i = 0; i < before.length; i++) {
-      if (before[i] == Knowledge.unknown && after[i] != Knowledge.unknown) forced++;
+      if (before[i] == Knowledge.unknown && after[i] != Knowledge.unknown) {
+        forced++;
+        if (after[i] == Knowledge.filled) fills = true;
+      }
     }
     if (forced == 0) return;
     final current = best;
+    // A line that forces a filled square beats one that only forces crosses;
+    // then the least reasoning (fewest unknowns), then the most forced.
     if (current == null ||
-        unknown < current.unknown ||
-        (unknown == current.unknown && forced > current.forced)) {
-      best = _Candidate(ref, clue, before, after, unknown, forced);
+        (fills && !current.fills) ||
+        (fills == current.fills &&
+            (unknown < current.unknown || (unknown == current.unknown && forced > current.forced)))) {
+      best = _Candidate(ref, clue, before, after, unknown, forced, fills);
     }
   }
 
@@ -141,7 +149,7 @@ HintResult findHint(Clues clues, Solution solution, Board board, {LineSolver? so
 }
 
 class _Candidate {
-  _Candidate(this.ref, this.clue, this.before, this.after, this.unknown, this.forced);
+  _Candidate(this.ref, this.clue, this.before, this.after, this.unknown, this.forced, this.fills);
 
   final LineRef ref;
   final List<int> clue;
@@ -149,4 +157,5 @@ class _Candidate {
   final List<Knowledge> after;
   final int unknown;
   final int forced;
+  final bool fills;
 }
