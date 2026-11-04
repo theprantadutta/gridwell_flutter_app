@@ -11,8 +11,9 @@ Facts every line below relies on (so an edit does not drift from the truth):
 - 150 campaign puzzles in four collections, 5x5 up to 20x20, plus a 90-day daily pool. All of it is bundled.
 - Every puzzle is verified at build time: solvable by pure line logic, exactly one solution, no guessing.
 - Fully offline. Only leaderboards, backup and purchase verification use the network, and none of them block play.
-- No accounts and no email. Players sign in anonymously and get a generated, editable pen name.
-- Ads: rewarded video and an interstitial after completed puzzles. No banners.
+- No sign-up needed. Players start as anonymous guests with a generated, editable pen name. Signing in with
+  Google or email is optional and keeps progress across devices.
+- Ads: rewarded video, plus an optional rewarded ad or an interstitial between puzzles. No banners.
 - Remove Ads ($1.99, one-time) turns off the interstitials. Rewarded videos for extra hints stay optional.
 - Premium ($2.99/month or $14.99/year, both with free trials): unlimited hints, no ads, free missed dailies,
   early access to new collections.
@@ -24,7 +25,7 @@ Facts every line below relies on (so an edit does not drift from the truth):
 ### Title (30 max): 26
 
 ```text
-Gridwell: Nonogram Picross
+Gridwell: Nonogram Puzzles
 ```
 
 ### Short description (80 max): 78
@@ -33,7 +34,7 @@ Gridwell: Nonogram Picross
 150 hand-drawn nonogram puzzles. Pure logic, no guessing. Plays fully offline.
 ```
 
-### Full description (4000 max): 2,971
+### Full description (4000 max): 3,045
 
 ```text
 Gridwell is a book of picture logic puzzles you can take anywhere. Each puzzle is a nonogram: the numbers beside every row and column tell you how many cells to fill, and in what runs. Fill the right ones and a small hand-drawn picture appears: a lighthouse, a fern, a snail, a teacup by lamplight.
@@ -68,11 +69,11 @@ MADE TO BE CALM
 • Three free hints per puzzle, each showing the next logical step and explaining why
 • A timer you can hide, with your best times kept
 
-NO ACCOUNT NEEDED
-No sign-up and no email address. Open the app and start solving.
+NO SIGN-UP NEEDED
+Open the app and start solving. If you want your progress on another device, you can sign in with Google or an email address, but you never have to.
 
 FREE TO PLAY
-Gridwell is free to play and supported by ads. There are no banner ads: you may see an ad after you finish a puzzle, and you can choose to watch a short video for an extra hint. Optional purchases:
+Gridwell is free to play and supported by ads. There are no banner ads: you may see an ad between puzzles, and you can choose to watch a short video for an extra hint. Optional purchases:
 • Remove Ads: a one-time purchase that turns off the ads between puzzles
 • Gridwell Premium, monthly or yearly, each with a free trial: unlimited hints, no ads, missed dailies unlocked for free, and early access to new collections
 
@@ -91,7 +92,7 @@ policy URL (see `LAUNCH_CHECKLIST.md`), "Contains ads" = Yes, "In-app purchases"
 ### Name (30 max): 26
 
 ```text
-Gridwell: Nonogram Picross
+Gridwell: Nonogram Puzzles
 ```
 
 ### Subtitle (30 max): 27
@@ -159,11 +160,11 @@ MADE TO BE CALM
 • A timer you can hide, with your best times kept
 • Made for iPhone and iPad
 
-NO ACCOUNT NEEDED
-No sign-up and no email address. Open the app and start solving.
+NO SIGN-UP NEEDED
+Open the app and start solving. If you want your progress on another device, you can sign in with Google or an email address, but you never have to.
 
 FREE TO PLAY
-Gridwell is free to play and supported by ads. There are no banner ads: you may see an ad after you finish a puzzle, and you can choose to watch a short video for an extra hint. Optional purchases:
+Gridwell is free to play and supported by ads. There are no banner ads: you may see an ad between puzzles, and you can choose to watch a short video for an extra hint. Optional purchases:
 • Remove Ads: a one-time purchase that turns off the ads between puzzles
 • Gridwell Premium, monthly or yearly, each with a free trial: unlimited hints, no ads, missed dailies unlocked for free, and early access to new collections
 
@@ -245,4 +246,4 @@ are already indexed, so the keyword list drops "art" and "wifi" and adds "offlin
 
 The project itself is named "Gridwell: Nonogram Picross" (in `CLAUDE.md` and elsewhere). That is
 internal and does not need to change, but the store-facing name is the owner's call:
-**[CONFIRM] store title: "Gridwell: Nonogram Picross" (as requested) or "Gridwell: Nonogram Puzzles" (safer).**
+**Decided 2026-11-04: the store title is "Gridwell: Nonogram Puzzles".**
