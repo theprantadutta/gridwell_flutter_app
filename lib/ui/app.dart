@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;
 
+import '../state/dev_seeder.dart';
 import '../state/monetization.dart';
 import '../state/online.dart';
 import '../state/reminders.dart';
@@ -31,6 +32,7 @@ class _GridwellAppState extends ConsumerState<GridwellApp> {
     // reminder schedule. Never awaited, never blocking play.
     _onForeground();
     ref.read(pushRegistrarProvider).listen();
+    ref.read(devDataSeederProvider).runIfRequested(); // debug builds only
     ref.read(purchaseControllerProvider);
     _lifecycle = AppLifecycleListener(onResume: _onForeground);
   }

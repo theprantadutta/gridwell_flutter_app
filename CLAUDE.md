@@ -98,6 +98,15 @@ picture (text art in `content/plates/`) → clue derivation → line-solvability
 - Firebase console must have the Anonymous, Email/Password and Google providers enabled. The SHA-1
   fingerprints of the debug key, upload key and Play app-signing key must be registered for Google sign-in.
 
+## Test accounts
+
+- Google Play review accounts, created by `dotnet run manage-test-users.cs` in the API repo:
+  `test.user@gridwell.app` (free) and `test.user.premium@gridwell.app` (premium).
+- `dotnet run grant-premium-to-user.cs -- grant <email>` in the API repo gives one existing user premium.
+  `realjohndoe276@gmail.com` is the premium test account on the A24 and the tablet, used for store shots.
+- `--dart-define=GW_SEED=true` (debug builds only, `lib/state/dev_seeder.dart`) solves plates for a signed-in
+  test account so screens look lived in. Only ever seed test accounts.
+
 ## Firebase and platform notes
 
 - Firebase client config (`google-services.json`, `GoogleService-Info.plist`, `firebase_options.dart`,
