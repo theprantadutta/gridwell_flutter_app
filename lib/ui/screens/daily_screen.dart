@@ -152,7 +152,11 @@ class _DailyScreenState extends ConsumerState<DailyScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("TODAY'S LEAF", style: FolioType.kicker(p)),
+                                  FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text("TODAY'S LEAF", maxLines: 1, style: FolioType.kicker(p)),
+                          ),
                                   const SizedBox(height: 8),
                                   Text(today.name, style: FolioType.plateTitle(p, size: 32)),
                                   const SizedBox(height: 4),

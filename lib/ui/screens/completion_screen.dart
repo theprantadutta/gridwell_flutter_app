@@ -135,11 +135,11 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
               final shownMs = (r.timeMs * time).round();
               return Column(children: [
                 FolioHeader(
-                  leading: 'Contents',
-                  onLeading: () => context.go('/contents'),
+                  leading: isDaily ? 'Daily' : 'Contents',
+                  onLeading: () => context.go(isDaily ? '/daily' : '/contents'),
                   center: collectionName,
                   trailing: isDaily
-                      ? Text(r.dailyDate!, style: FolioType.header(p))
+                      ? Text(_shortDate(r.dailyDate!), style: FolioType.header(p))
                       : Text('Plate ${puzzle.plateNumber} of ${r.collectionTotal}', style: FolioType.header(p)),
                 ),
                 Expanded(
@@ -251,6 +251,14 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
       ),
     );
   }
+}
+
+/// "2026-11-04" as "4 November".
+String _shortDate(String date) {
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+    'October', 'November', 'December'];
+  final d = DateTime.tryParse(date);
+  return d == null ? date : '${d.day} ${months[d.month - 1]}';
 }
 
 class _TimeLine extends StatelessWidget {
@@ -479,7 +487,7 @@ class _Leaderboard extends ConsumerWidget {
         Row(children: [
           Text("TODAY'S QUICKEST", style: FolioType.kicker(p)),
           const Spacer(),
-          Text('${board.total} solvers', style: FolioType.header(p)),
+          Text(board.total == 1 ? '1 solver' : '${board.total} solvers', style: FolioType.header(p)),
         ]),
         const SizedBox(height: 8),
         for (final e in board.entries) line(e),

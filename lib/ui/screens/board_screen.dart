@@ -116,7 +116,7 @@ class _BoardPageState extends ConsumerState<_BoardPage> with WidgetsBindingObser
     final big = puzzle.width >= 15;
     final note = session.note;
     final header = FolioHeader(
-      leading: 'Contents',
+      leading: isDaily ? 'Daily' : 'Contents',
       onLeading: () => context.pop(),
       center: headerTitle,
       trailing: settings.showTimer
