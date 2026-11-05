@@ -60,6 +60,16 @@ class SettingsScreen extends ConsumerWidget {
             value: s.dailyReminder,
             onChanged: (v) => notifier.update((x) => x.copyWith(dailyReminder: v)),
           ),
+          _Row(
+            label: 'Show walkthrough again',
+            trailing: '›',
+            onTap: () {
+              notifier.update((x) => x.copyWith(boardTourDone: false));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('The walkthrough will play on your next puzzle.')),
+              );
+            },
+          ),
           section('APPEARANCE'),
           Padding(
             padding: const EdgeInsets.only(top: 12, bottom: 12),

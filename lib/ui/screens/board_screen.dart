@@ -9,6 +9,8 @@ import '../../state/monetization.dart' show bonusHintsProvider;
 import '../../state/providers.dart';
 import '../../state/services.dart';
 import '../../state/settings.dart';
+import '../board/board_geometry.dart';
+import '../board/board_tour.dart';
 import '../board/board_view.dart';
 import '../theme/gridwell_theme.dart';
 import '../theme/typography.dart';
@@ -25,7 +27,9 @@ class BoardScreen extends ConsumerWidget {
     final saved = ref.watch(savedBoardProvider(puzzleId));
     return Scaffold(
       body: SafeArea(
-        child: saved.isLoading ? const SizedBox() : _BoardPage(puzzleId: puzzleId),
+        child: saved.isLoading
+            ? const SizedBox()
+            : _BoardPage(puzzleId: puzzleId),
       ),
     );
   }
@@ -40,17 +44,29 @@ class _BoardPage extends ConsumerStatefulWidget {
   ConsumerState<_BoardPage> createState() => _BoardPageState();
 }
 
-class _BoardPageState extends ConsumerState<_BoardPage> with WidgetsBindingObserver {
+class _BoardPageState extends ConsumerState<_BoardPage>
+    with WidgetsBindingObserver {
   late final BoardController _controller;
   Timer? _ticker;
   bool _navigated = false;
+
+  // What the first-game walkthrough points at.
+  final _boardKey = GlobalKey();
+  final _timerKey = GlobalKey();
+  final _readoutKey = GlobalKey();
+  final _undoKey = GlobalKey();
+  final _modeKey = GlobalKey();
+  final _hintKey = GlobalKey();
+
+  /// The clock waits until the walkthrough is over.
+  late bool _touring = !ref.read(settingsProvider).boardTourDone;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _controller = ref.read(boardControllerProvider(widget.puzzleId).notifier);
-    _controller.resume();
+    if (!_touring) _controller.resume();
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() {});
     });
@@ -75,7 +91,7 @@ class _BoardPageState extends ConsumerState<_BoardPage> with WidgetsBindingObser
         unawaited(ref.read(analyticsProvider).flush());
       case AppLifecycleState.resumed:
         _controller.resetAbandon();
-        _controller.resume();
+        if (!_touring) _controller.resume();
       default:
         break;
     }
@@ -91,6 +107,93 @@ class _BoardPageState extends ConsumerState<_BoardPage> with WidgetsBindingObser
     }
   }
 
+  void _endTour() {
+    setState(() => _touring = false);
+    _controller.resume();
+    unawaited(
+      ref
+          .read(settingsProvider.notifier)
+          .update((s) => s.copyWith(boardTourDone: true)),
+    );
+  }
+
+  Rect _rectOf(GlobalKey key, RenderBox overlay) {
+    final box = key.currentContext!.findRenderObject()! as RenderBox;
+    return box.localToGlobal(Offset.zero, ancestor: overlay) & box.size;
+  }
+
+  /// The grid and clue strips, found the way [BoardView] lays them out.
+  (Rect grid, List<Rect> clues) _boardParts(RenderBox overlay) {
+    final view = _rectOf(_boardKey, overlay);
+    final g = BoardGeometry.fit(
+      ref.read(boardControllerProvider(widget.puzzleId)).puzzle.clues,
+      view.size,
+    );
+    final origin =
+        view.topLeft +
+        Offset(
+          (view.width - g.totalSize.width) / 2,
+          (view.height - g.totalSize.height) / 2,
+        );
+    final grid = g.gridRect.shift(origin);
+    return (
+      grid,
+      [
+        Rect.fromLTRB(grid.left, origin.dy, grid.right, grid.top),
+        Rect.fromLTRB(origin.dx, grid.top, grid.left, grid.bottom),
+      ],
+    );
+  }
+
+  List<TourStep> _tourSteps(bool showTimer) => [
+    TourStep(
+      title: 'The clues',
+      body:
+          'Each number is a run of filled squares, in order. Numbers on top read down their '
+          'column, and numbers at the side read across their row.',
+      targets: (o) => _boardParts(o).$2,
+    ),
+    TourStep(
+      title: 'The grid',
+      body:
+          'Tap a square to mark it, or drag across several at once. '
+          'On the biggest boards, pinch to zoom in.',
+      targets: (o) => [_boardParts(o).$1],
+    ),
+    TourStep(
+      title: 'Fill or Cross',
+      body:
+          'Fill marks a square as part of the picture. Cross marks one you know is empty. '
+          'Crosses are only notes to yourself.',
+      targets: (o) => [_rectOf(_modeKey, o)],
+    ),
+    TourStep(
+      title: 'Row and column',
+      body:
+          'The clues for the square you touched appear here, large enough to read. '
+          'Finished clues are struck through.',
+      targets: (o) => [_rectOf(_readoutKey, o)],
+    ),
+    TourStep(
+      title: 'Undo',
+      body: 'Takes back your last move. Use it as often as you like.',
+      targets: (o) => [_rectOf(_undoKey, o)],
+    ),
+    TourStep(
+      title: 'Hint',
+      body:
+          'Stuck? A hint marks the next square logic can prove and explains why. '
+          'The number beside it shows how many you have left.',
+      targets: (o) => [_rectOf(_hintKey, o)],
+    ),
+    if (showTimer)
+      TourStep(
+        title: 'Your time',
+        body: 'The clock starts when you do and pauses when you leave. You can hide it in Settings.',
+        targets: (o) => [_rectOf(_timerKey, o)],
+      ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     final session = ref.watch(boardControllerProvider(widget.puzzleId));
@@ -105,7 +208,11 @@ class _BoardPageState extends ConsumerState<_BoardPage> with WidgetsBindingObser
 
     // Turn the page once the solve is recorded (not merely detected).
     ref.listen(lastCompletionProvider, (_, result) {
-      if (_navigated || result == null || result.puzzle.id != widget.puzzleId) return;
+      if (_navigated ||
+          result == null ||
+          result.puzzle.id != widget.puzzleId) {
+        return;
+      }
       _navigated = true;
       final router = GoRouter.of(context);
       Future.delayed(const Duration(milliseconds: 350), () {
@@ -114,28 +221,49 @@ class _BoardPageState extends ConsumerState<_BoardPage> with WidgetsBindingObser
     });
 
     final big = puzzle.width >= 15;
-    final note = session.note;
+    // The walkthrough points at the controls, so an open note waits behind it.
+    final note = _touring ? null : session.note;
     final header = FolioHeader(
       leading: isDaily ? 'Daily' : 'Contents',
       onLeading: () => context.pop(),
       center: headerTitle,
       trailing: settings.showTimer
-          ? Text(formatClock(_controller.elapsedMs), style: FolioType.header(p))
+          ? Text(
+              key: _timerKey,
+              formatClock(_controller.elapsedMs),
+              style: FolioType.header(p),
+            )
           : null,
     );
     final title = Padding(
       padding: const EdgeInsets.fromLTRB(folioMargin, 18, folioMargin, 0),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Text(isDaily ? "TODAY'S LEAF" : 'NO. ${puzzle.plateNumber}', style: FolioType.kicker(p)),
-          const Spacer(),
-          Text('${puzzle.width} × ${puzzle.height}', style: FolioType.header(p).copyWith(fontStyle: FontStyle.normal)),
-        ]),
-        const SizedBox(height: 4),
-        Text(puzzle.name, style: FolioType.plateTitle(p, size: big ? 36 : 40)),
-      ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                isDaily ? "TODAY'S LEAF" : 'NO. ${puzzle.plateNumber}',
+                style: FolioType.kicker(p),
+              ),
+              const Spacer(),
+              Text(
+                '${puzzle.width} × ${puzzle.height}',
+                style: FolioType.header(p)
+                    .copyWith(fontStyle: FontStyle.normal),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            puzzle.name,
+            style: FolioType.plateTitle(p, size: big ? 36 : 40),
+          ),
+        ],
+      ),
     );
     final board = BoardView(
+      key: _boardKey,
       clues: puzzle.clues,
       board: session.board,
       rowRetired: session.rowRetired,
@@ -150,44 +278,108 @@ class _BoardPageState extends ConsumerState<_BoardPage> with WidgetsBindingObser
       onStrokeEnd: _controller.strokeEnd,
       onStrokeCancel: _controller.strokeCancel,
     );
-    final controls = note != null
-        ? _NoteSheet(note: note, session: session, controller: _controller)
-        : _Footer(session: session, controller: _controller, onHint: _hint);
+    // The dock swaps its contents in place. Its size never depends on them, so
+    // nothing above it moves when a hint or mistake note appears.
+    final dock = AnimatedSwitcher(
+      duration: const Duration(milliseconds: 160),
+      layoutBuilder: (current, previous) =>
+          Stack(fit: StackFit.expand, children: [...previous, ?current]),
+      child: note != null
+          ? _NoteSheet(
+              key: const ValueKey('note'),
+              note: note,
+              session: session,
+              controller: _controller,
+            )
+          : Column(
+              key: const ValueKey('controls'),
+              children: [
+                Expanded(
+                  child: _LineReadout(key: _readoutKey, session: session),
+                ),
+                _Footer(
+                  session: session,
+                  controller: _controller,
+                  onHint: _hint,
+                  undoKey: _undoKey,
+                  modeKey: _modeKey,
+                  hintKey: _hintKey,
+                ),
+              ],
+            ),
+    );
 
-    return LayoutBuilder(builder: (context, c) {
-      // Tablets in landscape: board on the left, everything else beside it.
-      final sideBySide = c.maxWidth >= 840 && c.maxWidth > c.maxHeight * 1.15;
-      if (sideBySide) {
-        return Column(children: [
-          header,
-          Expanded(
-            child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Expanded(child: Padding(padding: const EdgeInsets.all(16), child: board)),
-              SizedBox(
-                width: 400,
-                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  title,
-                  if (note == null) _LineReadout(session: session),
-                  const Spacer(),
-                  controls,
-                ]),
+    final page = LayoutBuilder(
+      builder: (context, c) {
+        // Tablets in landscape: board on the left, everything else beside it.
+        final sideBySide = c.maxWidth >= 840 && c.maxWidth > c.maxHeight * 1.15;
+        if (sideBySide) {
+          return Column(
+            children: [
+              header,
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: board,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 400,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          title,
+                          const SizedBox(height: 12),
+                          Expanded(child: dock),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ]),
+            ],
+          );
+        }
+        final textScale = MediaQuery.textScalerOf(context).scale(1);
+        final dockHeight = (c.maxHeight * 0.36).clamp(
+          200 * textScale,
+          300 * textScale,
+        );
+        return Column(
+          children: [
+            header,
+            title,
+            const SizedBox(height: 12),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: big ? 8 : folioMargin,
+                ),
+                child: board,
+              ),
+            ),
+            SizedBox(height: dockHeight, child: dock),
+          ],
+        );
+      },
+    );
+
+    if (!_touring) return page;
+    return Stack(
+      children: [
+        page,
+        Positioned.fill(
+          child: BoardTour(
+            steps: _tourSteps(settings.showTimer),
+            onDone: _endTour,
           ),
-        ]);
-      }
-      return Column(children: [
-        header,
-        title,
-        const SizedBox(height: 12),
-        Expanded(
-          child: Padding(padding: EdgeInsets.symmetric(horizontal: big ? 8 : folioMargin), child: board),
         ),
-        // Always shown, so the board never shifts on the first tap.
-        if (note == null) _LineReadout(session: session),
-        controls,
-      ]);
-    });
+      ],
+    );
   }
 }
 
@@ -195,7 +387,7 @@ class _BoardPageState extends ConsumerState<_BoardPage> with WidgetsBindingObser
 /// be read at a comfortable size. Before the first tap it says how to play.
 
 class _LineReadout extends StatelessWidget {
-  const _LineReadout({required this.session});
+  const _LineReadout({super.key, required this.session});
 
   final BoardSession session;
 
@@ -204,58 +396,101 @@ class _LineReadout extends StatelessWidget {
     final p = context.palette;
     final r = session.cursorRow, c = session.cursorCol;
     Widget clue(String label, List<int> numbers, Set<int> retired) => Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(label, style: FolioType.kicker(p)),
-            const SizedBox(height: 6),
-            Wrap(spacing: 10, children: [
-              for (var j = 0; j < numbers.length; j++)
-                Text(
-                  '${numbers[j]}',
-                  style: FolioType.style(
-                    size: 28,
-                    weight: 600,
-                    color: retired.contains(j) ? p.clueRetired : p.clueText,
-                  ).copyWith(
-                    decoration: retired.contains(j) ? TextDecoration.lineThrough : null,
-                    decorationColor: p.clueRetired,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: FolioType.kicker(p)),
+          const SizedBox(height: 6),
+          // One line that scales down, so a long clue never adds a row.
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var j = 0; j < numbers.length; j++) ...[
+                  if (j > 0) const SizedBox(width: 10),
+                  Text(
+                    '${numbers[j]}',
+                    style:
+                        FolioType.style(
+                          size: 28,
+                          weight: 600,
+                          color: retired.contains(j)
+                              ? p.clueRetired
+                              : p.clueText,
+                        ).copyWith(
+                          decoration: retired.contains(j)
+                              ? TextDecoration.lineThrough
+                              : null,
+                          decorationColor: p.clueRetired,
+                        ),
                   ),
-                ),
-            ]),
-          ]),
-        );
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(folioMargin, 10, folioMargin, 0),
-      child: Column(children: [
-        const Hairline(),
-        const SizedBox(height: 12),
-        if (r == null || c == null)
-          SizedBox(
-            height: 66,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text('Tap or drag across the squares. The clues say how many are filled, and in what runs.',
-                  style: FolioType.bodyMuted(p, size: 16)),
+                ],
+              ],
             ),
-          )
-        else
-          IntrinsicHeight(
-            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              clue('ROW ${r + 1}', session.puzzle.clues.rows[r], session.rowRetired[r]),
-              VerticalDivider(color: p.rule, width: 32, thickness: 1),
-              clue('COLUMN ${c + 1}', session.puzzle.clues.columns[c], session.colRetired[c]),
-            ]),
           ),
-      ]),
+        ],
+      ),
+    );
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: folioMargin),
+      child: Column(
+        children: [
+          const Hairline(),
+          Expanded(
+            child: Center(
+              child: r == null || c == null
+                  ? Text(
+                      'Tap or drag across the squares. The clues say how many are filled, and in what runs.',
+                      style: FolioType.bodyMuted(p, size: 16),
+                    )
+                  : IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          clue(
+                            'ROW ${r + 1}',
+                            session.puzzle.clues.rows[r],
+                            session.rowRetired[r],
+                          ),
+                          VerticalDivider(
+                            color: p.rule,
+                            width: 32,
+                            thickness: 1,
+                          ),
+                          clue(
+                            'COLUMN ${c + 1}',
+                            session.puzzle.clues.columns[c],
+                            session.colRetired[c],
+                          ),
+                        ],
+                      ),
+                    ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
 class _Footer extends ConsumerWidget {
-  const _Footer({required this.session, required this.controller, required this.onHint});
+  const _Footer({
+    required this.session,
+    required this.controller,
+    required this.onHint,
+    required this.undoKey,
+    required this.modeKey,
+    required this.hintKey,
+  });
 
   final BoardSession session;
   final BoardController controller;
   final VoidCallback onHint;
+  final Key undoKey;
+  final Key modeKey;
+  final Key hintKey;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -264,46 +499,77 @@ class _Footer extends ConsumerWidget {
     final bonus = ref.watch(bonusHintsProvider);
     final hintsLeft = premium ? null : session.freeHintsLeft + bonus;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(folioMargin, 12, folioMargin, 18),
-      child: Column(children: [
-        const Hairline(),
-        const SizedBox(height: 18),
-        Row(children: [
-          TextAction(label: 'Undo', enabled: session.canUndo, onPressed: controller.undo),
-          // The toggle takes the space between Undo and Hint and scales down
-          // on narrow phones or large system font sizes instead of overflowing.
-          Expanded(
-            child: Center(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Segmented<InputMode>(
-                  value: session.mode,
-                  onChanged: controller.setMode,
-                  options: [
-                    (InputMode.fill, 'Fill', (c) => Container(width: 16, height: 16, color: c)),
-                    (InputMode.cross, 'Cross', (c) => Icon(Icons.close, size: 22, color: c)),
-                  ],
+      padding: const EdgeInsets.fromLTRB(folioMargin, 0, folioMargin, 18),
+      child: Column(
+        children: [
+          const Hairline(),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              TextAction(
+                key: undoKey,
+                label: 'Undo',
+                enabled: session.canUndo,
+                onPressed: controller.undo,
+              ),
+              // The toggle takes the space between Undo and Hint and scales down
+              // on narrow phones or large system font sizes instead of overflowing.
+              Expanded(
+                child: Center(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Segmented<InputMode>(
+                      key: modeKey,
+                      value: session.mode,
+                      onChanged: controller.setMode,
+                      options: [
+                        (
+                          InputMode.fill,
+                          'Fill',
+                          (c) => Container(width: 16, height: 16, color: c),
+                        ),
+                        (
+                          InputMode.cross,
+                          'Cross',
+                          (c) => Icon(Icons.close, size: 22, color: c),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
+              TextAction(
+                key: hintKey,
+                label: 'Hint',
+                onPressed: onHint,
+                // Fixed width, so the count changing never nudges the controls.
+                trailing: SizedBox(
+                  width: 18,
+                  child: Text(
+                    hintsLeft == null
+                        ? ''
+                        : (hintsLeft > 0 ? '$hintsLeft' : '▶'),
+                    maxLines: 1,
+                    style: FolioType.style(size: 16, color: p.accent),
+                  ),
+                ),
+              ),
+            ],
           ),
-          TextAction(
-            label: 'Hint',
-            onPressed: onHint,
-            trailing: Text(
-              hintsLeft == null ? '' : (hintsLeft > 0 ? '$hintsLeft' : '▶'),
-              style: FolioType.style(size: 16, color: p.accent),
-            ),
-          ),
-        ]),
-      ]),
+        ],
+      ),
     );
   }
 }
 
 /// The footnote sheet for a hint or a proven mistake.
 class _NoteSheet extends ConsumerWidget {
-  const _NoteSheet({required this.note, required this.session, required this.controller});
+  const _NoteSheet({
+    super.key,
+    required this.note,
+    required this.session,
+    required this.controller,
+  });
 
   final BoardNote note;
   final BoardSession session;
@@ -317,44 +583,76 @@ class _NoteSheet extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: p.surfaceRaised,
-        border: Border(top: BorderSide(color: isHint ? p.textPrimary : p.accent, width: 1.2)),
+        border: Border(
+          top: BorderSide(color: isHint ? p.textPrimary : p.accent, width: 1.2),
+        ),
       ),
-      padding: const EdgeInsets.fromLTRB(folioMargin, 20, folioMargin, 20),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Text(isHint ? 'HINT · ${note.title}' : 'A PROVEN MISTAKE · ${note.title}',
-              style: FolioType.kicker(p)),
-          const Spacer(),
-          if (isHint && !premium)
-            Text(
-              session.freeHintsLeft == 1 ? '1 hint left' : '${session.freeHintsLeft} hints left',
-              style: FolioType.header(p).copyWith(fontSize: 15),
-            ),
-        ]),
-        const SizedBox(height: 10),
-        Text(note.body, style: FolioType.body(p, size: 19)),
-        if (note.conclusion != null) ...[
+      padding: const EdgeInsets.fromLTRB(folioMargin, 16, folioMargin, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  isHint
+                      ? 'HINT · ${note.title}'
+                      : 'A PROVEN MISTAKE · ${note.title}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: FolioType.kicker(p),
+                ),
+              ),
+              if (isHint && !premium)
+                Text(
+                  session.freeHintsLeft == 1
+                      ? '1 hint left'
+                      : '${session.freeHintsLeft} hints left',
+                  style: FolioType.header(p).copyWith(fontSize: 15),
+                ),
+            ],
+          ),
           const SizedBox(height: 10),
-          Text(note.conclusion!, style: FolioType.bodyMuted(p)),
+          // A long explanation scrolls here; the dock itself never grows.
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(note.body, style: FolioType.body(p, size: 19)),
+                  if (note.conclusion != null) ...[
+                    const SizedBox(height: 10),
+                    Text(note.conclusion!, style: FolioType.bodyMuted(p)),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: InkButton(
+                  label: isHint ? 'Got it' : 'Clear the square',
+                  height: 54,
+                  onPressed: isHint
+                      ? controller.dismissNote
+                      : () => controller.clearSquare(note.row, note.col),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: OutlineButtonFolio(
+                  label: isHint ? 'Undo hint' : 'Undo to here',
+                  onPressed: isHint
+                      ? controller.undoHint
+                      : () => controller.undoToBeforeMark(note.row, note.col),
+                ),
+              ),
+            ],
+          ),
         ],
-        const SizedBox(height: 18),
-        Row(children: [
-          Expanded(
-            child: InkButton(
-              label: isHint ? 'Got it' : 'Clear the square',
-              height: 54,
-              onPressed: isHint ? controller.dismissNote : () => controller.clearSquare(note.row, note.col),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: OutlineButtonFolio(
-              label: isHint ? 'Undo hint' : 'Undo to here',
-              onPressed: isHint ? controller.undoHint : () => controller.undoToBeforeMark(note.row, note.col),
-            ),
-          ),
-        ]),
-      ]),
+      ),
     );
   }
 }

@@ -17,6 +17,7 @@ class Settings {
     this.showTimer = true,
     this.highContrast = false,
     this.onboardingDone = false,
+    this.boardTourDone = false,
     this.notificationsAsked = false,
     this.dailyReminder = true,
     this.shareAnalytics = true,
@@ -30,6 +31,9 @@ class Settings {
   final bool showTimer;
   final bool highContrast;
   final bool onboardingDone;
+
+  /// The first-game walkthrough has been finished or skipped on this device.
+  final bool boardTourDone;
   final bool notificationsAsked;
   final bool dailyReminder;
 
@@ -45,37 +49,39 @@ class Settings {
     bool? showTimer,
     bool? highContrast,
     bool? onboardingDone,
+    bool? boardTourDone,
     bool? notificationsAsked,
     bool? dailyReminder,
     bool? shareAnalytics,
-  }) =>
-      Settings(
-        themeMode: themeMode ?? this.themeMode,
-        sound: sound ?? this.sound,
-        haptics: haptics ?? this.haptics,
-        showProvenMistakes: showProvenMistakes ?? this.showProvenMistakes,
-        autoCross: autoCross ?? this.autoCross,
-        showTimer: showTimer ?? this.showTimer,
-        highContrast: highContrast ?? this.highContrast,
-        onboardingDone: onboardingDone ?? this.onboardingDone,
-        notificationsAsked: notificationsAsked ?? this.notificationsAsked,
-        dailyReminder: dailyReminder ?? this.dailyReminder,
-        shareAnalytics: shareAnalytics ?? this.shareAnalytics,
-      );
+  }) => Settings(
+    themeMode: themeMode ?? this.themeMode,
+    sound: sound ?? this.sound,
+    haptics: haptics ?? this.haptics,
+    showProvenMistakes: showProvenMistakes ?? this.showProvenMistakes,
+    autoCross: autoCross ?? this.autoCross,
+    showTimer: showTimer ?? this.showTimer,
+    highContrast: highContrast ?? this.highContrast,
+    onboardingDone: onboardingDone ?? this.onboardingDone,
+    boardTourDone: boardTourDone ?? this.boardTourDone,
+    notificationsAsked: notificationsAsked ?? this.notificationsAsked,
+    dailyReminder: dailyReminder ?? this.dailyReminder,
+    shareAnalytics: shareAnalytics ?? this.shareAnalytics,
+  );
 
   Map<String, String> toMap() => {
-        'theme_mode': themeMode.name,
-        'sound': '$sound',
-        'haptics': '$haptics',
-        'show_proven_mistakes': '$showProvenMistakes',
-        'auto_cross': '$autoCross',
-        'show_timer': '$showTimer',
-        'high_contrast': '$highContrast',
-        'onboarding_done': '$onboardingDone',
-        'notifications_asked': '$notificationsAsked',
-        'daily_reminder': '$dailyReminder',
-        'share_analytics': '$shareAnalytics',
-      };
+    'theme_mode': themeMode.name,
+    'sound': '$sound',
+    'haptics': '$haptics',
+    'show_proven_mistakes': '$showProvenMistakes',
+    'auto_cross': '$autoCross',
+    'show_timer': '$showTimer',
+    'high_contrast': '$highContrast',
+    'onboarding_done': '$onboardingDone',
+    'board_tour_done': '$boardTourDone',
+    'notifications_asked': '$notificationsAsked',
+    'daily_reminder': '$dailyReminder',
+    'share_analytics': '$shareAnalytics',
+  };
 
   factory Settings.fromMap(Map<String, String> m) {
     bool b(String k, bool d) => m[k] == null ? d : m[k] == 'true';
@@ -91,6 +97,7 @@ class Settings {
       showTimer: b('show_timer', true),
       highContrast: b('high_contrast', false),
       onboardingDone: b('onboarding_done', false),
+      boardTourDone: b('board_tour_done', false),
       notificationsAsked: b('notifications_asked', false),
       dailyReminder: b('daily_reminder', true),
       shareAnalytics: b('share_analytics', true),
@@ -116,10 +123,12 @@ class SettingsNotifier extends Notifier<Settings> {
       if (a[key] != b[key]) await repo.put(key, b[key]!, now);
     }
     if (syncedSettingKeys.any((k) => a[k] != b[k])) {
-      unawaited(ref.read(onlineSessionProvider).enqueue('settings', {
-        'values': {for (final k in syncedSettingKeys) k: b[k]},
-        'client_updated_at': now.toUtc().toIso8601String(),
-      }));
+      unawaited(
+        ref.read(onlineSessionProvider).enqueue('settings', {
+          'values': {for (final k in syncedSettingKeys) k: b[k]},
+          'client_updated_at': now.toUtc().toIso8601String(),
+        }),
+      );
     }
   }
 
@@ -153,4 +162,6 @@ const syncedSettingKeys = [
   'high_contrast',
 ];
 
-final settingsProvider = NotifierProvider<SettingsNotifier, Settings>(SettingsNotifier.new);
+final settingsProvider = NotifierProvider<SettingsNotifier, Settings>(
+  SettingsNotifier.new,
+);
