@@ -215,6 +215,13 @@ class BoardController extends Notifier<BoardSession> {
 
   @override
   BoardSession build() {
+    // build() also runs when the provider is invalidated for "Solve again",
+    // on this same object, so start clean.
+    _clock
+      ..stop()
+      ..reset();
+    _undo.clear();
+    _shownMistakes.clear();
     final set = ref.read(puzzleSetProvider);
     _puzzle = resolvePuzzle(ref, puzzleId)!;
     _setVersion = set.puzzleSetVersion;

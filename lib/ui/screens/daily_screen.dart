@@ -126,7 +126,7 @@ class _DailyScreenState extends ConsumerState<DailyScreen> {
                     padding: const EdgeInsets.all(10),
                     child: Container(
                       decoration: BoxDecoration(border: Border.all(color: p.ruleStrong)),
-                      padding: const EdgeInsets.all(22),
+                      padding: EdgeInsets.all(tablet ? 22 : 14),
                       child: today == null
                           ? Text(
                               _beginsText(ref.watch(puzzleSetProvider).dailyStartDate),
@@ -135,7 +135,7 @@ class _DailyScreenState extends ConsumerState<DailyScreen> {
                           : Row(
                               children: [
                                 SizedBox(
-                                  width: tablet ? 200 : 120,
+                                  width: tablet ? 200 : 100,
                                   child: todayState?.state == DayState.solved
                                       ? PlateThumb(puzzle: today, state: PlateState.solved)
                                       : AspectRatio(
@@ -164,7 +164,11 @@ class _DailyScreenState extends ConsumerState<DailyScreen> {
                                       FittedBox(
                                         fit: BoxFit.scaleDown,
                                         alignment: Alignment.centerLeft,
-                                        child: Text(today.name, maxLines: 1, style: FolioType.plateTitle(p, size: tablet ? 44 : 32)),
+                                        child: Text(
+                                          today.name,
+                                          maxLines: 1,
+                                          style: FolioType.plateTitle(p, size: tablet ? 44 : 32),
+                                        ),
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
@@ -224,10 +228,9 @@ class _DailyScreenState extends ConsumerState<DailyScreen> {
                   Row(
                     children: [
                       for (final (i, d) in ['M', 'T', 'W', 'T', 'F', 'S', 'S'].indexed) ...[
-                        if (i > 0) const SizedBox(width: 8),
+                        if (i > 0) const SizedBox(width: 6),
                         Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 6),
+                          child: Center(
                             child: Text(d, style: FolioType.style(size: 15, color: p.textMuted)),
                           ),
                         ),
@@ -240,7 +243,7 @@ class _DailyScreenState extends ConsumerState<DailyScreen> {
                   Expanded(
                     child: LayoutBuilder(
                       builder: (context, c) {
-                        const gap = 8.0;
+                        const gap = 6.0;
                         final rows = ((firstWeekday - 1 + days.length) / 7).ceil();
                         final cellW = (c.maxWidth - gap * 6) / 7;
                         final cellH = (c.maxHeight - gap * (rows - 1)) / rows;
@@ -341,34 +344,47 @@ class _DayCell extends StatelessWidget {
         child: switch (day.state) {
           DayState.solved => Container(
             color: p.textPrimary,
-            padding: const EdgeInsets.all(6),
-            alignment: Alignment.topLeft,
-            child: Text(n, style: FolioType.style(size: size, color: p.onInk, weight: 600)),
+            alignment: Alignment.center,
+            child: Text(
+              n,
+              style: FolioType.style(size: size, color: p.onInk, weight: 600),
+            ),
           ),
           DayState.today => Container(
             decoration: BoxDecoration(border: Border.all(color: p.accent, width: 1.5)),
-            padding: const EdgeInsets.all(6),
-            alignment: Alignment.topLeft,
-            child: Text(n, style: FolioType.style(size: size, color: p.accent, weight: 600)),
+            alignment: Alignment.center,
+            child: Text(
+              n,
+              style: FolioType.style(size: size, color: p.accent, weight: 600),
+            ),
           ),
           DayState.missed || DayState.unlocked => Container(
             decoration: BoxDecoration(
               color: p.surfaceRaised,
               border: Border.all(color: p.ruleStrong),
             ),
-            padding: const EdgeInsets.all(6),
             child: Stack(
               children: [
-                Text(n, style: FolioType.style(size: size, color: p.textMuted)),
-                if (day.state == DayState.missed) Center(child: Icon(Icons.close, size: 26, color: p.accent)),
+                Center(
+                  child: Text(
+                    n,
+                    style: FolioType.style(size: size, color: p.textMuted),
+                  ),
+                ),
+                if (day.state == DayState.missed)
+                  Center(
+                    child: Icon(Icons.close, size: size + 11, color: p.accent.withValues(alpha: 0.7)),
+                  ),
               ],
             ),
           ),
           _ => Container(
             decoration: BoxDecoration(border: Border.all(color: p.rule)),
-            padding: const EdgeInsets.all(6),
-            alignment: Alignment.topLeft,
-            child: Text(n, style: FolioType.style(size: size, color: p.textFaint)),
+            alignment: Alignment.center,
+            child: Text(
+              n,
+              style: FolioType.style(size: size, color: p.textFaint),
+            ),
           ),
         },
       ),
