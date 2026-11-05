@@ -18,6 +18,8 @@ class Settings {
     this.highContrast = false,
     this.onboardingDone = false,
     this.boardTourDone = false,
+    this.reviewAskedMs = 0,
+    this.updateDeclinedMs = 0,
     this.notificationsAsked = false,
     this.dailyReminder = true,
     this.shareAnalytics = true,
@@ -34,6 +36,12 @@ class Settings {
 
   /// The first-game walkthrough has been finished or skipped on this device.
   final bool boardTourDone;
+
+  /// When the review sheet was last requested. 0 is never.
+  final int reviewAskedMs;
+
+  /// When a Play update offer was last declined. 0 is never.
+  final int updateDeclinedMs;
   final bool notificationsAsked;
   final bool dailyReminder;
 
@@ -50,6 +58,8 @@ class Settings {
     bool? highContrast,
     bool? onboardingDone,
     bool? boardTourDone,
+    int? reviewAskedMs,
+    int? updateDeclinedMs,
     bool? notificationsAsked,
     bool? dailyReminder,
     bool? shareAnalytics,
@@ -63,6 +73,8 @@ class Settings {
     highContrast: highContrast ?? this.highContrast,
     onboardingDone: onboardingDone ?? this.onboardingDone,
     boardTourDone: boardTourDone ?? this.boardTourDone,
+        reviewAskedMs: reviewAskedMs ?? this.reviewAskedMs,
+        updateDeclinedMs: updateDeclinedMs ?? this.updateDeclinedMs,
     notificationsAsked: notificationsAsked ?? this.notificationsAsked,
     dailyReminder: dailyReminder ?? this.dailyReminder,
     shareAnalytics: shareAnalytics ?? this.shareAnalytics,
@@ -78,6 +90,8 @@ class Settings {
     'high_contrast': '$highContrast',
     'onboarding_done': '$onboardingDone',
     'board_tour_done': '$boardTourDone',
+        'review_asked_ms': '$reviewAskedMs',
+        'update_declined_ms': '$updateDeclinedMs',
     'notifications_asked': '$notificationsAsked',
     'daily_reminder': '$dailyReminder',
     'share_analytics': '$shareAnalytics',
@@ -98,6 +112,8 @@ class Settings {
       highContrast: b('high_contrast', false),
       onboardingDone: b('onboarding_done', false),
       boardTourDone: b('board_tour_done', false),
+      reviewAskedMs: int.tryParse(m['review_asked_ms'] ?? '') ?? 0,
+      updateDeclinedMs: int.tryParse(m['update_declined_ms'] ?? '') ?? 0,
       notificationsAsked: b('notifications_asked', false),
       dailyReminder: b('daily_reminder', true),
       shareAnalytics: b('share_analytics', true),

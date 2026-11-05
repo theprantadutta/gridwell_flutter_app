@@ -13,6 +13,7 @@ import '../../state/online.dart';
 import '../../state/reminders.dart';
 import '../../state/settings.dart';
 import '../../state/providers.dart';
+import '../../state/store_prompts.dart';
 import '../theme/gridwell_theme.dart';
 import '../theme/typography.dart';
 import '../widgets/folio.dart';
@@ -48,6 +49,7 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
       ..forward();
     if (r != null) {
       ref.read(interstitialPolicyProvider).recordCompletion();
+      ref.read(reviewPrompterProvider).onCompletion(r);
       // Board state lives for the whole session, so a finished board would come
       // back dead on "Solve again". Drop it once the route transition is over:
       // nothing watches it then, so no empty board flashes and no new session starts.

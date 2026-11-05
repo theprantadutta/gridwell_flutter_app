@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +8,7 @@ import '../../state/app_info.dart';
 import '../../state/online.dart';
 import '../../state/progress_actions.dart';
 import '../../state/settings.dart';
+import '../../state/store_prompts.dart';
 import '../theme/gridwell_theme.dart';
 import '../theme/typography.dart';
 import '../widgets/folio.dart';
@@ -97,6 +99,8 @@ class SettingsScreen extends ConsumerWidget {
           ),
           _Row(label: 'Remove ads & premium', trailing: '›', onTap: () => context.push('/store')),
           _Row(label: 'Restore purchase', trailing: '›', onTap: () => context.push('/store?restore=1')),
+          if (defaultTargetPlatform == TargetPlatform.android)
+            _Row(label: 'Check for updates', trailing: '›', onTap: () => _checkForUpdates(context, ref)),
           _Row(label: 'Privacy & your data', trailing: '›', onTap: () => context.push('/privacy')),
           _Row(
             label: 'Reset progress',
@@ -169,6 +173,29 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
     if (ok == true) await ref.read(progressActionsProvider).resetAll();
+  }
+}
+
+Future<void> _checkForUpdates(BuildContext context, WidgetRef ref) async {
+  final updates = ref.read(updateReadyProvider.notifier);
+  final messenger = ScaffoldMessenger.of(context)..hideCurrentSnackBar();
+  messenger.showSnackBar(const SnackBar(content: Text('Checking for updates…')));
+  final result = await updates.check(manual: true);
+  messenger.hideCurrentSnackBar();
+  switch (result) {
+    case UpdateCheck.upToDate:
+      messenger.showSnackBar(const SnackBar(content: Text('You have the latest version.')));
+    case UpdateCheck.ready:
+      messenger.showSnackBar(SnackBar(
+        content: const Text('An update is ready.'),
+        action: SnackBarAction(label: 'Restart', onPressed: updates.install),
+      ));
+    case UpdateCheck.failed:
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Could not check. Updates come through Google Play.')),
+      );
+    case UpdateCheck.offered:
+      break; // Google Play shows its own screen.
   }
 }
 

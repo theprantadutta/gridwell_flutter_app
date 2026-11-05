@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../engine/model/puzzle.dart';
 import '../../state/providers.dart';
+import '../../state/store_prompts.dart';
 import '../theme/gridwell_theme.dart';
 import '../theme/typography.dart';
 import '../widgets/folio.dart';
@@ -23,6 +24,7 @@ class ContentsScreen extends ConsumerWidget {
     final set = ref.watch(puzzleSetProvider);
     final progress = ref.watch(progressProvider).value ?? const <String, PuzzleProgressData>{};
     final inProgress = ref.watch(inProgressProvider).value ?? const <BoardSave>[];
+    final updateReady = ref.watch(updateReadyProvider);
     final solvedTotal = set.puzzles.where((x) => progress[x.id]?.isSolved ?? false).length;
 
     // Bookmark: the most recent board in progress, if any.
@@ -47,7 +49,13 @@ class ContentsScreen extends ConsumerWidget {
       minHeight: bookmark == null ? 560 : 620,
       child: Column(
         children: [
-          WordmarkHeader(trailing: '$solvedTotal of ${set.puzzles.length} solved'),
+          // Takes the same line as the solved count, so nothing moves.
+          updateReady
+              ? WordmarkHeader(
+                  trailing: 'Update ready · Restart',
+                  onTrailing: ref.read(updateReadyProvider.notifier).install,
+                )
+              : WordmarkHeader(trailing: '$solvedTotal of ${set.puzzles.length} solved'),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(folioMargin, 28, folioMargin, 20),

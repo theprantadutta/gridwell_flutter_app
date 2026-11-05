@@ -9,6 +9,7 @@ import '../state/monetization.dart';
 import '../state/online.dart';
 import '../state/reminders.dart';
 import '../state/settings.dart';
+import '../state/store_prompts.dart';
 import 'router.dart';
 import 'theme/gridwell_theme.dart';
 import 'theme/palette.dart';
@@ -35,6 +36,10 @@ class _GridwellAppState extends ConsumerState<GridwellApp> {
     ref.read(devDataSeederProvider).runIfRequested(); // debug builds only
     ref.read(purchaseControllerProvider);
     _lifecycle = AppLifecycleListener(onResume: _onForeground);
+    // After the splash, so an update offer never lands on top of it.
+    Future<void>.delayed(const Duration(seconds: 3), () {
+      if (mounted) ref.read(updateReadyProvider.notifier).check();
+    });
   }
 
   void _onForeground() {

@@ -151,9 +151,12 @@ class FolioHeader extends StatelessWidget {
 
 /// Header for tab pages: "GRIDWELL ..... 86 of 240 solved".
 class WordmarkHeader extends StatelessWidget {
-  const WordmarkHeader({super.key, this.trailing});
+  const WordmarkHeader({super.key, this.trailing, this.onTrailing});
 
   final String? trailing;
+
+  /// Makes [trailing] a link, drawn in the accent color.
+  final VoidCallback? onTrailing;
 
   @override
   Widget build(BuildContext context) {
@@ -170,10 +173,18 @@ class WordmarkHeader extends StatelessWidget {
             const SizedBox(width: 16),
             if (trailing != null)
               Expanded(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerRight,
-                  child: Text(trailing!, maxLines: 1, style: FolioType.header(p)),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: onTrailing,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      trailing!,
+                      maxLines: 1,
+                      style: onTrailing == null ? FolioType.header(p) : FolioType.header(p).copyWith(color: p.accent),
+                    ),
+                  ),
                 ),
               ),
           ]),
