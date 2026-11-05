@@ -117,7 +117,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                 const SizedBox(height: 12),
                 LayoutBuilder(
                   builder: (context, c) {
-                    final columns = c.maxWidth > 700 ? 8 : (c.maxWidth > 500 ? 6 : 5);
+                    final columns = c.maxWidth > 500 ? 6 : 5;
                     return GridView.count(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),

@@ -128,7 +128,7 @@ class _CollectionScreenState extends ConsumerState<CollectionScreen> {
                   ),
                 ),
               LayoutBuilder(builder: (context, c) {
-                final columns = c.maxWidth > 700 ? 8 : (c.maxWidth > 500 ? 6 : 5);
+                const columns = 5; // larger plates on tablets fill the page
                 // Square plate plus a caption line, sized for the system font
                 // scale (a fixed aspect ratio overflows on enlarged text).
                 final tile = (c.maxWidth - 12 * (columns - 1)) / columns;

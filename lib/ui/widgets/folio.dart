@@ -9,6 +9,50 @@ import 'gridwell_mark.dart';
 /// Horizontal page margin used across Folio screens.
 const folioMargin = 24.0;
 
+/// A page that fills the screen: [builder] gets at least [minHeight] of real
+/// height to share out with Expanded and spacing, so tall screens have no
+/// dead space at the bottom. On short screens or with large text the page
+/// keeps [minHeight] and scrolls instead of squeezing.
+class FolioFillPage extends StatelessWidget {
+  const FolioFillPage({super.key, required this.minHeight, required this.child});
+
+  final double minHeight;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final scaled = MediaQuery.textScalerOf(context).scale(minHeight);
+    return LayoutBuilder(
+      builder: (context, c) => SingleChildScrollView(
+        child: SizedBox(height: c.maxHeight > scaled ? c.maxHeight : scaled, child: child),
+      ),
+    );
+  }
+}
+
+/// A short page: its content sits in the middle with equal space above and
+/// below, and scrolls if it does not fit.
+class FolioCenteredPage extends StatelessWidget {
+  const FolioCenteredPage({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+        builder: (context, c) => SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: c.maxHeight),
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: folioMargin, vertical: 24),
+                child: child,
+              ),
+            ),
+          ),
+        ),
+      );
+}
+
 /// Page body for pushed screens: a [SafeArea] whose content is centered and
 /// held to a comfortable reading width, so tablets get a page rather than
 /// lines stretched edge to edge. Phones are narrower than [maxWidth] and are

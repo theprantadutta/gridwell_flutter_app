@@ -40,8 +40,8 @@ const sizes = <String, Size>{
   'a24-384': Size(384, 832),
   'phone-412': Size(412, 915),
   'tablet-600': Size(600, 960),
-  'tab-a9-800': Size(800, 1280),
-  'tab-a9-land': Size(1280, 800),
+  'tab-a9-800': Size(800, 1340),
+  'tab-a9-land': Size(1340, 800),
   'ipad-1024': Size(1024, 1366),
   'ipad-land': Size(1366, 1024),
 };
@@ -170,7 +170,7 @@ Future<void> _pumpScreen(WidgetTester tester, PuzzleSet set, String route, Size 
   }
 
   // Scroll every scrollable to its end so content below the fold is laid out too.
-  for (final s in find.byType(Scrollable).evaluate().toList()) {
+  for (final s in Platform.environment['SHOTS'] != null ? const <Element>[] : find.byType(Scrollable).evaluate().toList()) {
     final state = (s as StatefulElement).state as ScrollableState;
     final pos = state.position;
     if (pos.hasContentDimensions && pos.maxScrollExtent > 0) pos.jumpTo(pos.maxScrollExtent);

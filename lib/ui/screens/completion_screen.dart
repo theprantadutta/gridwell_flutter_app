@@ -46,7 +46,18 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
     final full = r != null && (r.outcome.isPersonalBest && !r.outcome.isFirstSolve || r.completedCollection || r.beatSizeBest);
     _t = AnimationController(vsync: this, duration: Duration(milliseconds: full ? 3200 : 1700))
       ..forward();
-    if (r != null) ref.read(interstitialPolicyProvider).recordCompletion();
+    if (r != null) {
+      ref.read(interstitialPolicyProvider).recordCompletion();
+      // Board state lives for the whole session, so a finished board would come
+      // back dead on "Solve again". Drop it once the route transition is over:
+      // nothing watches it then, so no empty board flashes and no new session starts.
+      final container = ProviderScope.containerOf(context, listen: false);
+      final id = r.puzzle.id;
+      Future<void>.delayed(const Duration(milliseconds: 600), () {
+        container.invalidate(boardControllerProvider(id));
+        container.invalidate(savedBoardProvider(id));
+      });
+    }
   }
 
   @override

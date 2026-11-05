@@ -42,9 +42,8 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
           FolioHeader(leading: 'Account', center: _create ? 'New account' : 'Sign in'),
           Expanded(
             child: AutofillGroup(
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(folioMargin, 24, folioMargin, 32),
-                children: [
+              child: FolioCenteredPage(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                   Segmented<bool>(
                     options: const [(false, 'Sign in', null), (true, 'Create account', null)],
                     value: _create,
@@ -100,7 +99,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                       style: FolioType.bodyMuted(p, size: 15),
                     ),
                   ],
-                ],
+                ]),
               ),
             ),
           ),

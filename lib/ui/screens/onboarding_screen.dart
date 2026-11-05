@@ -178,15 +178,29 @@ class _Page extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    return SingleChildScrollView(
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const SizedBox(height: 40),
-        Text(kicker, style: FolioType.kicker(p)),
-        const SizedBox(height: 12),
-        Text(title, style: FolioType.plateTitle(p, size: 38).copyWith(fontWeight: FontWeight.w400)),
-        const SizedBox(height: 32),
-        ...body,
-      ]),
+    // Centered with equal space above and below; scrolls if it cannot fit.
+    return LayoutBuilder(
+      builder: (context, c) => SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: c.maxHeight),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
+                Text(kicker, style: FolioType.kicker(p)),
+                const SizedBox(height: 12),
+                Text(title, style: FolioType.plateTitle(p, size: 38).copyWith(fontWeight: FontWeight.w400)),
+                const SizedBox(height: 32),
+                ...body,
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

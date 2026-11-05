@@ -167,7 +167,7 @@ class _BoardPageState extends ConsumerState<_BoardPage> with WidgetsBindingObser
                 width: 400,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                   title,
-                  if (session.cursorRow != null && note == null) _LineReadout(session: session),
+                  if (note == null) _LineReadout(session: session),
                   const Spacer(),
                   controls,
                 ]),
@@ -183,15 +183,17 @@ class _BoardPageState extends ConsumerState<_BoardPage> with WidgetsBindingObser
         Expanded(
           child: Padding(padding: EdgeInsets.symmetric(horizontal: big ? 8 : folioMargin), child: board),
         ),
-        if (big && note == null && session.cursorRow != null) _LineReadout(session: session),
+        // Always shown, so the board never shifts on the first tap.
+        if (note == null) _LineReadout(session: session),
         controls,
       ]);
     });
   }
 }
 
-/// "ROW 12  4  |  COLUMN 9  4 2̶ 1 2̶" under big boards, so the active clues
-/// can be read at a comfortable size.
+/// "ROW 12  4  |  COLUMN 9  4 2̶ 1 2̶" under the board, so the active clues can
+/// be read at a comfortable size. Before the first tap it says how to play.
+
 class _LineReadout extends StatelessWidget {
   const _LineReadout({required this.session});
 
@@ -200,7 +202,7 @@ class _LineReadout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    final r = session.cursorRow!, c = session.cursorCol!;
+    final r = session.cursorRow, c = session.cursorCol;
     Widget clue(String label, List<int> numbers, Set<int> retired) => Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(label, style: FolioType.kicker(p)),
@@ -226,13 +228,23 @@ class _LineReadout extends StatelessWidget {
       child: Column(children: [
         const Hairline(),
         const SizedBox(height: 12),
-        IntrinsicHeight(
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            clue('ROW ${r + 1}', session.puzzle.clues.rows[r], session.rowRetired[r]),
-            VerticalDivider(color: p.rule, width: 32, thickness: 1),
-            clue('COLUMN ${c + 1}', session.puzzle.clues.columns[c], session.colRetired[c]),
-          ]),
-        ),
+        if (r == null || c == null)
+          SizedBox(
+            height: 66,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text('Tap or drag across the squares. The clues say how many are filled, and in what runs.',
+                  style: FolioType.bodyMuted(p, size: 16)),
+            ),
+          )
+        else
+          IntrinsicHeight(
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              clue('ROW ${r + 1}', session.puzzle.clues.rows[r], session.rowRetired[r]),
+              VerticalDivider(color: p.rule, width: 32, thickness: 1),
+              clue('COLUMN ${c + 1}', session.puzzle.clues.columns[c], session.colRetired[c]),
+            ]),
+          ),
       ]),
     );
   }

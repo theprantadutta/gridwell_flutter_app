@@ -33,9 +33,11 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
           Column(children: [
             const FolioHeader(leading: 'Back', center: 'Account'),
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(folioMargin, 28, folioMargin, 32),
-                children: account.isGuest ? _guest(context, p) : _signedIn(context, p, account),
+              child: FolioCenteredPage(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: account.isGuest ? _guest(context, p) : _signedIn(context, p, account),
+                ),
               ),
             ),
           ]),
