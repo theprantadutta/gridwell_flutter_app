@@ -1,13 +1,15 @@
 # Splash images
 
-`splash/` holds the native splash images, derived from the logo kit:
+`splash/` holds the native splash images, drawn by `make_splash.py` from the mark's geometry:
 
-- `splash-{light,dark}.png`: the mark at 512 px (4x, renders at 128 dp)
-- `android12-{light,dark}.png`: the same 512 px mark centered on a 1152 px transparent canvas,
-  inside Android 12's 768 px crop circle
+- `splash.png`: the transparent cream mark at 512 px (4x, renders at 128 dp)
+- `android12.png`: the same 512 px mark centered on a 1152 px transparent canvas, inside
+  Android 12's 768 px crop circle
 
-To regenerate after changing the mark: resize `01-mark/png/gridwell-mark-{theme}-1024.png` to
-512 px (Lanczos), paste it centered on a 1152 px transparent canvas for the Android 12 variant, then run
+The ground is ink (`#201914`) in both themes, set in `flutter_native_splash.yaml` and in
+`SplashScreen.ground`. Keep the two the same.
+
+To regenerate after changing the mark: from the app root, run `python brand/make_splash.py`, then
 `dart run flutter_native_splash:create`.
 
 After regenerating, check that `windowDrawsSystemBarBackgrounds` is still `true` in

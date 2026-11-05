@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -47,22 +46,28 @@ Future<void> main() async {
     ], await rootBundle.loadString('assets/fonts/OFL.txt'));
   });
 
-  // Firebase is enrichment only: the game must start without it.
+  // Firebase is enrichment only: the game must start without it. Analytics
+  // and crash reporting run in profile and release builds, never in debug.
   AnalyticsService analytics = MemoryAnalytics();
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    analytics = FirebaseAnalyticsService(FirebaseAnalytics.instance);
-    // Crash reporting: Flutter framework errors and uncaught async errors.
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
       !kDebugMode,
     );
-    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-    PlatformDispatcher.instance.onError = (error, stack) {
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-      return true;
-    };
+    if (kDebugMode) {
+      await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(false);
+    } else {
+      analytics = FirebaseAnalyticsService(FirebaseAnalytics.instance);
+      // Crash reporting: Flutter framework errors and uncaught async errors.
+      FlutterError.onError =
+          FirebaseCrashlytics.instance.recordFlutterFatalError;
+      PlatformDispatcher.instance.onError = (error, stack) {
+        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+        return true;
+      };
+    }
   } catch (e) {
     debugPrint('Firebase unavailable: $e');
   }
@@ -85,9 +90,9 @@ Future<void> main() async {
         ...overrides,
         feedbackProvider.overrideWithValue(feedback),
         analyticsProvider.overrideWithValue(analytics),
-      adServiceProvider.overrideWithValue(ads),
-      storeServiceProvider.overrideWithValue(store),
-      notificationServiceProvider.overrideWithValue(notifications),
+        adServiceProvider.overrideWithValue(ads),
+        storeServiceProvider.overrideWithValue(store),
+        notificationServiceProvider.overrideWithValue(notifications),
       ],
       child: const _FeedbackSettingsSync(child: GridwellApp()),
     ),

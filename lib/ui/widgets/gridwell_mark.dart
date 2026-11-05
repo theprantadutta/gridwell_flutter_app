@@ -20,17 +20,24 @@ class GridwellMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Semantics(
-        label: 'Gridwell',
-        image: true,
-        child: CustomPaint(size: Size.square(size), painter: GridwellMarkPainter(context.palette, mono: mono)),
-      );
+    label: 'Gridwell',
+    image: true,
+    child: CustomPaint(
+      size: Size.square(size),
+      painter: GridwellMarkPainter(context.palette, mono: mono),
+    ),
+  );
 }
 
 class GridwellMarkPainter extends CustomPainter {
-  GridwellMarkPainter(this.palette, {this.mono = false});
+  GridwellMarkPainter(this.palette, {this.mono = false, this.knockout = false});
 
   final GridwellPalette palette;
   final bool mono;
+
+  /// Draws only the frame, filled squares and cross, so the ground shows
+  /// through everything else. The splash uses this on its ink ground.
+  final bool knockout;
 
   static const _rows = ['.####', '#....', '#..##', '#...#', '.###.'];
   static const _units = 131.0, _cell = 24.0, _gap = 1.5, _frame = 2.5;
@@ -39,13 +46,30 @@ class GridwellMarkPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final u = size.shortestSide / _units;
     final ink = Paint()..color = palette.textPrimary;
-    // Frame, then the gap color beneath the cells.
-    canvas.drawRect(Offset.zero & Size.square(_units * u), ink);
-    canvas.drawRect(
-      Rect.fromLTWH(_frame * u, _frame * u, (_units - 2 * _frame) * u, (_units - 2 * _frame) * u),
-      Paint()..color = mono ? palette.surface : palette.rule,
+    final inner = Rect.fromLTWH(
+      _frame * u,
+      _frame * u,
+      (_units - 2 * _frame) * u,
+      (_units - 2 * _frame) * u,
     );
-    final empty = Paint()..color = mono ? palette.surface : palette.surfaceRaised;
+    if (knockout) {
+      canvas.drawPath(
+        Path()
+          ..fillType = PathFillType.evenOdd
+          ..addRect(Offset.zero & Size.square(_units * u))
+          ..addRect(inner),
+        ink,
+      );
+    } else {
+      // Frame, then the gap color beneath the cells.
+      canvas.drawRect(Offset.zero & Size.square(_units * u), ink);
+      canvas.drawRect(
+        inner,
+        Paint()..color = mono ? palette.surface : palette.rule,
+      );
+    }
+    final empty = Paint()
+      ..color = mono ? palette.surface : palette.surfaceRaised;
     for (var r = 0; r < 5; r++) {
       for (var c = 0; c < 5; c++) {
         final rect = Rect.fromLTWH(
@@ -54,7 +78,8 @@ class GridwellMarkPainter extends CustomPainter {
           _cell * u,
           _cell * u,
         );
-        canvas.drawRect(rect, _rows[r][c] == '#' ? ink : empty);
+        final filled = _rows[r][c] == '#';
+        if (filled || !knockout) canvas.drawRect(rect, filled ? ink : empty);
       }
     }
     // The cross: two 2.5-unit strokes at 45°, each 16 units long, in row 3, column 2.
@@ -65,10 +90,19 @@ class GridwellMarkPainter extends CustomPainter {
       ..color = mono ? palette.textPrimary : palette.accent
       ..strokeWidth = 2.5 * u
       ..strokeCap = StrokeCap.butt;
-    canvas.drawLine(Offset(cx - half, cy - half), Offset(cx + half, cy + half), cross);
-    canvas.drawLine(Offset(cx + half, cy - half), Offset(cx - half, cy + half), cross);
+    canvas.drawLine(
+      Offset(cx - half, cy - half),
+      Offset(cx + half, cy + half),
+      cross,
+    );
+    canvas.drawLine(
+      Offset(cx + half, cy - half),
+      Offset(cx - half, cy + half),
+      cross,
+    );
   }
 
   @override
-  bool shouldRepaint(GridwellMarkPainter old) => old.palette != palette || old.mono != mono;
+  bool shouldRepaint(GridwellMarkPainter old) =>
+      old.palette != palette || old.mono != mono || old.knockout != knockout;
 }
