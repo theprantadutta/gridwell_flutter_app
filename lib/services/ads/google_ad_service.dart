@@ -127,6 +127,11 @@ class GoogleAdService implements AdService {
   @override
   bool get rewardedReady => _rewarded != null;
 
+  int _freeGrants = 0;
+
+  @override
+  int get freeGrants => _freeGrants;
+
   @override
   bool get rewardedInterstitialReady => _rewardedInterstitial != null;
 
@@ -186,6 +191,7 @@ class GoogleAdService implements AdService {
     final ad = _canRequestAds ? await _awaitRewarded(const Duration(seconds: 5)) : null;
     if (ad == null) {
       // Offline or no fill: never block the player.
+      _freeGrants++;
       onUnavailableGrant?.call(placement);
       return true;
     }
@@ -200,6 +206,7 @@ class GoogleAdService implements AdService {
       },
       onAdFailedToShowFullScreenContent: (a, _) {
         a.dispose();
+        _freeGrants++;
         onUnavailableGrant?.call(placement);
         if (!done.isCompleted) done.complete(true);
         _loadRewarded();

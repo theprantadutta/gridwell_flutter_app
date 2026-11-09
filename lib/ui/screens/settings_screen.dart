@@ -8,6 +8,7 @@ import '../../state/app_info.dart';
 import '../../state/monetization.dart';
 import '../../state/online.dart';
 import '../../state/progress_actions.dart';
+import '../../state/reminders.dart';
 import '../../state/services.dart';
 import '../../state/settings.dart';
 import '../../state/store_prompts.dart';
@@ -56,15 +57,28 @@ class SettingsScreen extends ConsumerWidget {
           label: 'Daily reminder',
           detail: "At 7 pm, if today's puzzle is still open",
           value: s.dailyReminder,
-          onChanged: (v) => set((x) => x.copyWith(dailyReminder: v)),
+          onChanged: (v) async {
+            if (!v) {
+              set((x) => x.copyWith(dailyReminder: false));
+              tallyToast(context, 'Daily reminder off.');
+              return;
+            }
+            // Turning it on asks for notification permission if needed.
+            final granted = await ref.read(reminderSchedulerProvider).optIn();
+            if (!context.mounted) return;
+            tallyToast(
+              context,
+              granted
+                  ? "Daily reminder on. A note at 7 pm when the day's puzzle is still open."
+                  : 'Notifications are off for Gridwell. Allow them in system settings to get the reminder.',
+            );
+          },
         ),
         SettingsRow.link(
           label: 'Show walkthrough again',
           onTap: () {
             set((x) => x.copyWith(boardTourDone: false));
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('The walkthrough will play on your next puzzle.')),
-            );
+            tallyToast(context, 'The walkthrough will play on your next puzzle.');
           },
         ),
       ]),
@@ -147,7 +161,7 @@ class SettingsScreen extends ConsumerWidget {
     if (name == null || name.trim().isEmpty || !context.mounted) return;
     final error = await ref.read(onlineSessionProvider).rename(name);
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error ?? 'Saved.')));
+    tallyToast(context, error ?? 'Pen name saved.');
   }
 
   Future<void> _confirmReset(BuildContext context, WidgetRef ref) async {
@@ -163,28 +177,25 @@ class SettingsScreen extends ConsumerWidget {
       destructive: true,
       onConfirm: () => true,
     );
-    if (ok == true) await ref.read(progressActionsProvider).resetAll();
+    if (ok == true) {
+      await ref.read(progressActionsProvider).resetAll();
+      if (context.mounted) tallyToast(context, 'Progress reset. Every puzzle is fresh again.');
+    }
   }
 }
 
 Future<void> _checkForUpdates(BuildContext context, WidgetRef ref) async {
   final updates = ref.read(updateReadyProvider.notifier);
-  final messenger = ScaffoldMessenger.of(context)..hideCurrentSnackBar();
-  messenger.showSnackBar(const SnackBar(content: Text('Checking for updates…')));
+  tallyToast(context, 'Checking for updates…');
   final result = await updates.check(manual: true);
-  messenger.hideCurrentSnackBar();
+  if (!context.mounted) return;
   switch (result) {
     case UpdateCheck.upToDate:
-      messenger.showSnackBar(const SnackBar(content: Text('You have the latest version.')));
+      tallyToast(context, 'You have the latest version.');
     case UpdateCheck.ready:
-      messenger.showSnackBar(SnackBar(
-        content: const Text('An update is ready.'),
-        action: SnackBarAction(label: 'Restart', onPressed: updates.install),
-      ));
+      tallyToast(context, 'An update is ready.', action: SnackBarAction(label: 'Restart', onPressed: updates.install));
     case UpdateCheck.failed:
-      messenger.showSnackBar(
-        const SnackBar(content: Text('Could not check. Updates come through Google Play.')),
-      );
+      tallyToast(context, 'Could not check. Updates come through Google Play.');
     case UpdateCheck.offered:
       break; // Google Play shows its own screen.
   }

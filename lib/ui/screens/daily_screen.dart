@@ -46,8 +46,18 @@ class _DailyScreenState extends ConsumerState<DailyScreen> {
     if (day.state == DayState.missed) {
       final ok = await _confirmUnlock(day);
       if (ok != true) return;
-      final unlocked = await ref.read(dailyActionsProvider).unlockMissed(day);
-      if (!unlocked || !mounted) return;
+      final result = await ref.read(dailyActionsProvider).unlockMissed(day);
+      if (!mounted) return;
+      final message = switch (result) {
+        MissedUnlock.watched => 'Thanks for watching. ${shortDate(day.date)} is open.',
+        MissedUnlock.free => 'No video right now, so this one is on us. ${shortDate(day.date)} is open.',
+        MissedUnlock.premium => '${shortDate(day.date)} is open.',
+        MissedUnlock.notWatched => 'The video was closed early, so the day stays locked.',
+        MissedUnlock.failed => 'That day could not be opened. Please try again.',
+        MissedUnlock.alreadyOpen => null,
+      };
+      if (message != null) tallyToast(context, message);
+      if (!result.unlocked) return;
     }
     if (mounted) context.push('/play/${puzzle.id}');
   }

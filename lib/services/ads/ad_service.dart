@@ -19,6 +19,11 @@ abstract interface class AdService {
 
   bool get rewardedReady;
 
+  /// How many rewards were granted without a video (none could load, or it
+  /// failed to show). Compare before and after [showRewarded] to tell the
+  /// player "this one's on us" rather than "thanks for watching".
+  int get freeGrants;
+
   /// Rewarded interstitial: offered between puzzles behind an intro screen
   /// (shown by the caller, as Google requires). Never shown without one.
   bool get rewardedInterstitialReady;
@@ -46,6 +51,9 @@ class InstantRewardAds implements AdService {
 
   @override
   bool get rewardedReady => true;
+
+  @override
+  int get freeGrants => 0;
 
   @override
   bool get rewardedInterstitialReady => false;

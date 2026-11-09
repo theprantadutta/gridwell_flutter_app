@@ -92,9 +92,12 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
         );
         if (accepted == true) {
           final earned = await policy.playRewardedInterstitial();
-          if (earned && mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('A bonus hint is waiting for you.')),
+          if (mounted) {
+            tallyToast(
+              context,
+              earned
+                  ? 'Thanks for watching. A bonus hint is waiting for you.'
+                  : 'No bonus hint this time. On to the next one.',
             );
           }
         } else {
@@ -455,9 +458,21 @@ class _ReminderOptIn extends ConsumerWidget {
       kicker: 'A quiet reminder?',
       body: "A single note at 7 in the evening when the day's puzzle is still open. Nothing else.",
       primary: 'Remind me',
-      onPrimary: scheduler.optIn,
+      onPrimary: () async {
+        final granted = await scheduler.optIn();
+        if (!context.mounted) return;
+        tallyToast(
+          context,
+          granted
+              ? "Reminder set. A note at 7 pm when the day's puzzle is still open."
+              : 'Notifications are off, so no reminder. You can turn it on in Settings.',
+        );
+      },
       secondary: 'No thanks',
-      onSecondary: scheduler.decline,
+      onSecondary: () async {
+        await scheduler.decline();
+        if (context.mounted) tallyToast(context, 'No reminder. You can turn it on in Settings any time.');
+      },
     );
   }
 }

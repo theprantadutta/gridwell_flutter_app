@@ -195,7 +195,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
 
   void _show(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    tallyToast(context, message);
   }
 }
 

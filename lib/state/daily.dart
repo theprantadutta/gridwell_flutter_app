@@ -66,19 +66,44 @@ class DailyActions {
 
   /// Unlocks a missed day: free for premium, otherwise one rewarded video.
   /// Returns true if the day can now be played.
-  Future<bool> unlockMissed(DailyDay day) async {
+  Future<MissedUnlock> unlockMissed(DailyDay day) async {
     final puzzle = day.puzzle;
-    if (puzzle == null) return false;
+    if (puzzle == null) return MissedUnlock.failed;
     if (day.state == DayState.unlocked || day.state == DayState.solved || day.state == DayState.today) {
-      return true;
+      return MissedUnlock.alreadyOpen;
     }
+    var outcome = MissedUnlock.premium;
     if (!_ref.read(entitlementsProvider).premium) {
-      final ok = await _ref.read(adServiceProvider).showRewarded(AdPlacement.missedDaily);
-      if (!ok) return false;
+      final ads = _ref.read(adServiceProvider);
+      final grantsBefore = ads.freeGrants;
+      final ok = await ads.showRewarded(AdPlacement.missedDaily);
+      if (!ok) return MissedUnlock.notWatched;
+      outcome = ads.freeGrants > grantsBefore ? MissedUnlock.free : MissedUnlock.watched;
     }
     await _ref.read(dailyRepositoryProvider).unlock(day.key, puzzle.id);
-    return true;
+    return outcome;
   }
+}
+
+/// How unlocking a missed day went, so the screen can say so.
+enum MissedUnlock {
+  /// It was already playable.
+  alreadyOpen,
+
+  /// Premium: unlocked with no video.
+  premium,
+
+  /// Unlocked after a rewarded video.
+  watched,
+
+  /// No video could load, so it was unlocked anyway.
+  free,
+
+  /// The video was closed before it finished.
+  notWatched,
+  failed;
+
+  bool get unlocked => this != notWatched && this != failed;
 }
 
 final dailyActionsProvider = Provider((ref) => DailyActions(ref));

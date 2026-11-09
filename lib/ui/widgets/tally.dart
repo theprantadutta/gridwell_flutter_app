@@ -796,6 +796,128 @@ TextSpan clockSpan(String clock, TextStyle style) {
   ]);
 }
 
+/// A short message saying what just happened (signed in, hint earned,
+/// purchase restored). It slides in at the top, under the status bar, so it
+/// never covers the slabs at the foot of the screen (FILL, APPLY, NEXT
+/// PUZZLE), and a new one replaces the old so they never queue up. Tap to
+/// dismiss.
+void tallyToast(BuildContext context, String message, {SnackBarAction? action}) {
+  final overlay = Overlay.maybeOf(context, rootOverlay: true);
+  if (overlay == null) return;
+  _TallyToast.current?.remove();
+  late final OverlayEntry entry;
+  entry = OverlayEntry(
+    builder: (_) => _TallyToast(
+      message: message,
+      action: action,
+      onGone: () {
+        if (_TallyToast.current == entry) _TallyToast.current = null;
+        if (entry.mounted) entry.remove();
+      },
+    ),
+  );
+  _TallyToast.current = entry;
+  overlay.insert(entry);
+}
+
+class _TallyToast extends StatefulWidget {
+  const _TallyToast({required this.message, required this.onGone, this.action});
+
+  static OverlayEntry? current;
+
+  final String message;
+  final SnackBarAction? action;
+  final VoidCallback onGone;
+
+  @override
+  State<_TallyToast> createState() => _TallyToastState();
+}
+
+class _TallyToastState extends State<_TallyToast> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 220));
+
+  @override
+  void initState() {
+    super.initState();
+    _c.forward();
+    Future<void>.delayed(const Duration(seconds: 3), _hide);
+  }
+
+  Future<void> _hide() async {
+    if (!mounted) return;
+    await _c.reverse();
+    widget.onGone();
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final curve = CurvedAnimation(parent: _c, curve: Curves.easeOutCubic);
+    return Positioned(
+      left: 0,
+      right: 0,
+      top: 0,
+      child: SafeArea(
+        bottom: false,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+              child: FadeTransition(
+                opacity: curve,
+                child: SlideTransition(
+                  position: Tween(begin: const Offset(0, -0.4), end: Offset.zero).animate(curve),
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: Semantics(
+                      liveRegion: true,
+                      child: GestureDetector(
+                        onTap: _hide,
+                        child: Container(
+                          color: p.ink,
+                          padding: const EdgeInsets.fromLTRB(16, 14, 8, 14),
+                          child: Row(children: [
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: Text(widget.message, style: TallyType.body(p.bg).copyWith(height: 1.3)),
+                              ),
+                            ),
+                            if (widget.action != null)
+                              GestureDetector(
+                                onTap: () {
+                                  widget.action!.onPressed();
+                                  _hide();
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  child: Text(widget.action!.label.toUpperCase(),
+                                      style: TallyType.overline(p.lime).copyWith(fontSize: 13)),
+                                ),
+                              ),
+                          ]),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 String formatClock(int ms) {
   final total = ms ~/ 1000;
   final h = total ~/ 3600, m = (total % 3600) ~/ 60, s = total % 60;

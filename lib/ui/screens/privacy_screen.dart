@@ -87,10 +87,11 @@ class PrivacyScreen extends ConsumerWidget {
     if (ok != true || !context.mounted) return;
     final outcome = await ref.read(progressActionsProvider).deleteEverything();
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(outcome == DeleteOutcome.deleted
+    tallyToast(
+      context,
+      outcome == DeleteOutcome.deleted
           ? 'Your data has been deleted.'
-          : 'Cleared on this device. We could not reach our server; email prantadutta1997@gmail.com to finish.'),
-    ));
+          : 'Cleared on this device. We could not reach our server; email prantadutta1997@gmail.com to finish.',
+    );
   }
 }

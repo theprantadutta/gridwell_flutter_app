@@ -105,11 +105,15 @@ class _BoardPageState extends ConsumerState<_BoardPage> with WidgetsBindingObser
   Future<void> _hint() async {
     final outcome = await _controller.requestHint();
     if (!mounted) return;
-    if (outcome == HintOutcome.nothingToHint) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nothing left to hint here.')),
-      );
-    }
+    final message = switch (outcome) {
+      HintOutcome.nothingToHint => 'Nothing left to hint here.',
+      HintOutcome.shownAfterAd => "Thanks for watching. Here's your hint.",
+      HintOutcome.shownFree => "No video right now, so this hint is on us.",
+      HintOutcome.shownFromBonus => 'Bonus hint used. Here it is.',
+      HintOutcome.adNotWatched => 'The video was closed early, so no hint this time.',
+      HintOutcome.shown => null,
+    };
+    if (message != null) tallyToast(context, message);
   }
 
   void _endTour() {

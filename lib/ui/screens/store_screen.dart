@@ -32,6 +32,10 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
   Widget build(BuildContext context) {
     final p = context.palette;
     final store = ref.watch(purchaseControllerProvider);
+    // Purchases and restores also say how they went at the foot of the screen.
+    ref.listen(purchaseControllerProvider.select((s) => s.message), (previous, message) {
+      if (message != null && message != previous) tallyToast(context, message);
+    });
     final ent = ref.watch(entitlementsProvider);
     final controller = ref.read(purchaseControllerProvider.notifier);
     final canBuy = store.available;

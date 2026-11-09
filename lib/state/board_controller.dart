@@ -24,7 +24,24 @@ enum InputMode { fill, cross }
 
 /// What happened when the player asked for a hint. [shown]: the reasoning is
 /// on screen, waiting for Apply or Close.
-enum HintOutcome { shown, nothingToHint, adNotWatched }
+/// What the Hint button did, so the screen can say so.
+enum HintOutcome {
+  /// A free (or premium) hint is on screen.
+  shown,
+
+  /// A banked bonus hint (from a between-puzzle video) was used.
+  shownFromBonus,
+
+  /// The player watched a rewarded video and the hint is on screen.
+  shownAfterAd,
+  nothingToHint,
+
+  /// The video was closed before it finished: no hint.
+  adNotWatched,
+
+  /// No video could load, so the hint was given anyway (never block play).
+  shownFree,
+}
 
 enum _StrokeAction { fill, erase, cross, uncross }
 
@@ -483,13 +500,20 @@ class BoardController extends Notifier<BoardSession> {
         return HintOutcome.nothingToHint;
       }
       _show(fresh);
-      return HintOutcome.shown;
+      return HintOutcome.shownFromBonus;
     }
-    if (!hintIsFree) {
+    // Decided before the hint is spent: spending the last free one would
+    // otherwise make it look paid for.
+    final free = hintIsFree;
+    var freeGrant = false;
+    if (!free) {
       // Time spent watching a video is not time spent solving.
       final wasRunning = _clock.isRunning;
       _clock.stop();
-      final rewarded = await ref.read(adServiceProvider).showRewarded(AdPlacement.hint);
+      final ads = ref.read(adServiceProvider);
+      final grantsBefore = ads.freeGrants;
+      final rewarded = await ads.showRewarded(AdPlacement.hint);
+      freeGrant = ads.freeGrants > grantsBefore;
       if (wasRunning && !state.solved) _clock.start();
       if (!rewarded) return HintOutcome.adNotWatched;
     }
@@ -497,7 +521,7 @@ class BoardController extends Notifier<BoardSession> {
     final fresh = peekHint();
     if (fresh is! ResolvingHint) return HintOutcome.nothingToHint;
     _show(fresh);
-    return HintOutcome.shown;
+    return free ? HintOutcome.shown : (freeGrant ? HintOutcome.shownFree : HintOutcome.shownAfterAd);
   }
 
   /// Spends a hint and puts its reasoning on screen.
