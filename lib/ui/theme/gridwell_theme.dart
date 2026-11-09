@@ -58,6 +58,13 @@ class GridwellTheme extends ThemeExtension<GridwellTheme> {
         shape: square,
         behavior: SnackBarBehavior.fixed,
       ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: p.surface,
+        modalBackgroundColor: p.surface,
+        shape: square,
+        showDragHandle: false,
+      ),
+      progressIndicatorTheme: ProgressIndicatorThemeData(color: p.accent),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(foregroundColor: p.ink, shape: square, textStyle: TallyType.body(p.ink)),
       ),
