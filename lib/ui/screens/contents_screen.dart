@@ -32,7 +32,10 @@ class ContentsScreen extends ConsumerWidget {
     final todayResult = (ref.watch(dailyResultsProvider).value ?? const {})[localDateString(DateTime.now())];
     bool isSolved(PuzzleRecord x) => progress[x.id]?.isSolved ?? false;
     final solvedTotal = set.puzzles.where(isSolved).length;
-    final percent = set.puzzles.isEmpty ? 0 : (100 * solvedTotal / set.puzzles.length).floor();
+    // Floor, so 100% means everything; but any progress at all shows as 1%.
+    final percent = set.puzzles.isEmpty
+        ? 0
+        : math.max(solvedTotal > 0 ? 1 : 0, (100 * solvedTotal / set.puzzles.length).floor());
 
     // The most recent board in progress, if any (book plates only).
     final bookmark = inProgress

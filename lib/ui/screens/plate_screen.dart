@@ -108,7 +108,7 @@ class _Fact extends StatelessWidget {
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
-            child: Text(value, maxLines: 1, style: TallyType.tabular(TallyType.bodyL(p.ink))),
+            child: Text.rich(clockSpan(value, TallyType.tabular(TallyType.bodyL(p.ink))), maxLines: 1),
           ),
         ]),
       ),

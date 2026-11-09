@@ -55,7 +55,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final picture = set.puzzles.where((x) => x.id == 'coastline-lighthouse').firstOrNull ??
         set.puzzles.where((x) => x.colorLayer != null).firstOrNull;
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: p.isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+      value: tallyOverlay(p.isDark),
       child: Scaffold(
         body: TallyBody(
           bottom: false,

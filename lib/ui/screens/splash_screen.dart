@@ -66,7 +66,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
   Widget build(BuildContext context) {
     final p = context.palette;
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: p.isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+      value: tallyOverlay(p.isDark),
       child: Scaffold(
         backgroundColor: p.bg,
         body: LayoutBuilder(

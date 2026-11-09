@@ -87,9 +87,11 @@ class DailySlab extends StatelessWidget {
             ]),
           ),
           const SizedBox(width: 12),
-          Text(
-            solved && solvedTimeMs != null ? formatClock(solvedTimeMs!) : size,
-            style: TallyType.tabular(TallyType.bodyL(fg).copyWith(fontWeight: FontWeight.w900)),
+          Text.rich(
+            clockSpan(
+              solved && solvedTimeMs != null ? formatClock(solvedTimeMs!) : size,
+              TallyType.tabular(TallyType.bodyL(fg).copyWith(fontWeight: FontWeight.w900)),
+            ),
           ),
           if (!solved) ...[const SizedBox(width: 14), const RoundArrow()],
         ]),

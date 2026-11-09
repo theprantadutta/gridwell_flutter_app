@@ -720,7 +720,7 @@ class _LineDiagram extends StatelessWidget {
     final p = context.palette;
     return LayoutBuilder(builder: (context, c) {
       final n = diagram.cells.length;
-      final cell = math.min(21.0, (c.maxWidth - 8) / n);
+      final cell = math.min(28.0, (c.maxWidth - 8) / n);
       final h = 16 + cell + (diagram.spans.isEmpty ? 4 : 22);
       return SizedBox(
         height: h,
@@ -744,12 +744,17 @@ class _DiagramPainter extends CustomPainter {
     const top = 16.0;
     const x0 = 4.0;
     final inner = cell - 2;
-    final sep = Paint()..color = p.track;
+    final sep = Paint()
+      ..color = p.outline
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
     final ink = Paint()..color = p.ink;
     final mark = Paint()..color = p.mark;
     for (var i = 0; i < d.cells.length; i++) {
       final r = Rect.fromLTWH(x0 + i * cell, top, inner, inner);
-      if (i > 0) canvas.drawRect(Rect.fromLTWH(r.left - 1.5, top + inner * 0.2, 1, inner * 0.6), sep);
+      // Every square gets an outline, so a short line reads as squares and
+      // not as scattered marks.
+      canvas.drawRect(r.deflate(0.5), sep);
       final state = i == d.target ? result : d.cells[i];
       switch (state) {
         case CellState.filled:

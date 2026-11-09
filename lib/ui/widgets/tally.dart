@@ -162,12 +162,24 @@ class TallyTopBar extends StatelessWidget {
             const SizedBox(width: tallyMargin - 6),
           if (title != null)
             Flexible(
-              child: Text(
-                title!,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: titleStyle ?? TallyType.titleS(p.ink),
-              ),
+              // Long names shrink a little before they are cut short.
+              child: LayoutBuilder(builder: (context, c) {
+                final style = titleStyle ?? TallyType.titleS(p.ink);
+                final natural = (TextPainter(
+                  text: TextSpan(text: title, style: style),
+                  textDirection: TextDirection.ltr,
+                  textScaler: MediaQuery.textScalerOf(context),
+                  maxLines: 1,
+                )..layout())
+                    .width;
+                final scale = natural <= c.maxWidth ? 1.0 : (c.maxWidth / natural).clamp(0.72, 1.0);
+                return Text(
+                  title!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: style.copyWith(fontSize: (style.fontSize ?? 22) * scale - (scale < 1 ? 0.5 : 0)),
+                );
+              }),
             ),
           if (chip != null) ...[const SizedBox(width: 14), SizeChip(chip!)],
           const Spacer(),
@@ -776,7 +788,8 @@ class SectionHeader extends StatelessWidget {
 /// A clock reading with tabular digits (no jitter as it ticks) but a
 /// proportional colon: Schibsted's tabular colon is as wide as a digit.
 TextSpan clockSpan(String clock, TextStyle style) {
-  final plain = style.copyWith(fontFeatures: const []);
+  // An empty list would inherit the parent's tnum; switch it off outright.
+  final plain = style.copyWith(fontFeatures: const [FontFeature('tnum', 0)]);
   return TextSpan(children: [
     for (final part in clock.split(RegExp(r'(?=:)|(?<=:)')))
       TextSpan(text: part, style: part == ':' ? plain : style),

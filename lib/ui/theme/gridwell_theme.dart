@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'palette.dart';
 import 'typography.dart';
@@ -77,3 +78,13 @@ class GridwellTheme extends ThemeExtension<GridwellTheme> {
 extension GridwellThemeContext on BuildContext {
   GridwellPalette get palette => Theme.of(this).extension<GridwellTheme>()!.palette;
 }
+
+/// System bar style for a page: transparent bars (the app draws edge to
+/// edge) with icons that read on the theme's page color.
+SystemUiOverlayStyle tallyOverlay(bool dark) =>
+    (dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark).copyWith(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+      systemNavigationBarContrastEnforced: false,
+    );

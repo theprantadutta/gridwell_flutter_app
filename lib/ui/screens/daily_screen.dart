@@ -218,8 +218,8 @@ class _DailyScreenState extends ConsumerState<DailyScreen> {
   static const _gap = 4.0;
 }
 
-/// Holds the calendar to phone proportions on tablets: days stop growing at
-/// 64 pt and the month sits at the left margin.
+/// Holds the calendar to sensible proportions on tablets: days stop growing
+/// at 80 pt and the month is centered.
 class _CalendarWidth extends StatelessWidget {
   const _CalendarWidth({required this.child});
 
@@ -229,8 +229,8 @@ class _CalendarWidth extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: tallyMargin),
         child: Align(
-          alignment: Alignment.centerLeft,
-          child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 64 * 7 + 4 * 6), child: child),
+          alignment: Alignment.center,
+          child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 80 * 7 + 4 * 6), child: child),
         ),
       );
 }

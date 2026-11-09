@@ -66,13 +66,7 @@ class _GridwellAppState extends ConsumerState<GridwellApp> {
       builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
         // Edge to edge (main.dart): transparent bars, so the tab bar and
         // bottom slabs run under the navigation bar as in the kit.
-        value: (Theme.of(context).brightness == Brightness.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark)
-            .copyWith(
-          statusBarColor: Colors.transparent,
-          systemNavigationBarColor: Colors.transparent,
-          systemNavigationBarDividerColor: Colors.transparent,
-          systemNavigationBarContrastEnforced: false,
-        ),
+        value: tallyOverlay(Theme.of(context).brightness == Brightness.dark),
         child: child ?? const SizedBox(),
       ),
       themeMode: settings.themeMode,

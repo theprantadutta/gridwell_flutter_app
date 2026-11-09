@@ -139,7 +139,7 @@ class _Picture extends StatelessWidget {
             Expanded(child: Text(puzzle.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: style)),
             if (timeMs != null) ...[
               const SizedBox(width: 6),
-              Text(formatClock(timeMs!), style: TallyType.tabular(style.copyWith(color: p.ink2))),
+              Text(formatClock(timeMs!), style: style.copyWith(color: p.ink2)),
             ],
           ]),
         ]),

@@ -37,7 +37,11 @@ class BoardGeometry {
   static const colClueGap = 8.0;
 
   /// Largest pitch, so a 5×5 on a tablet stays a board, not a wall.
-  static const maxPitch = 64.0;
+  static const maxPitch = 88.0;
+
+  /// Room left of the row clues: the row's 4 pt lime edge tick plus a margin,
+  /// so clues never touch the screen edge.
+  static const leadIn = 16.0;
 
   /// Fits a [clues] board into [available].
   factory BoardGeometry.fit(Clues clues, Size available, {double maxCell = maxPitch}) {
@@ -102,11 +106,14 @@ class BoardGeometry {
 
   /// Where the board sits in a viewport of [size]: against the right edge
   /// with up to [rightMargin] to spare (the grid runs to the edge, clues sit
-  /// outside it), and at the top. With [center], centered both ways.
+  /// outside it), and at the top. When the board is much narrower than the
+  /// viewport (tablets, small boards at maximum pitch) it is centered
+  /// horizontally instead. With [center], centered both ways.
   Offset originIn(Size size, {bool center = false, double rightMargin = 14}) {
     final spareX = size.width - totalSize.width;
     final spareY = size.height - totalSize.height;
     if (center) return Offset(spareX / 2, math.max(0, spareY / 2));
+    if (spareX > rightMargin * 4) return Offset(spareX / 2, 0);
     return Offset(spareX - spareX.clamp(0.0, rightMargin), 0);
   }
 
@@ -158,7 +165,7 @@ class _Metrics {
       clueGap,
       clueLine,
       spacing,
-      rowWidth + clueGap + 6, // 6: room for the row's lime edge tick
+      rowWidth + clueGap + BoardGeometry.leadIn,
       BoardGeometry.tickBand + colSlots * clueLine + BoardGeometry.colClueGap,
     );
   }

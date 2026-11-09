@@ -32,6 +32,9 @@ class CompletionScreen extends ConsumerStatefulWidget {
 
 class _CompletionScreenState extends ConsumerState<CompletionScreen>
     with SingleTickerProviderStateMixin {
+  /// Whether the picture gave up height for a card, fixed on first build.
+  bool? _heroMadeRoom;
+
   late final AnimationController _t;
   late final CompletionResult? _result;
   DateTime _acceptNextAfter = DateTime.now();
@@ -149,7 +152,15 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
               // The picture runs edge to edge under the status bar; on short
               // screens it gives up height before the details do.
               final pictureHeight = c.maxWidth * puzzle.height / puzzle.width;
-              final heroHeight = (pad.top + pictureHeight).clamp(0.0, c.maxHeight * 0.5);
+              // Tablets are wide, so a full-width picture would take half the
+              // page and push the details below the fold.
+              // A card (reminder or account offer) needs room too, so the
+              // picture gives some up rather than push the card off screen.
+              // Decided once: answering the card must not resize the picture.
+              final card = _heroMadeRoom ??= (r.outcome.isFirstSolve && !ref.read(settingsProvider).notificationsAsked) ||
+                  ref.read(showAccountOfferProvider);
+              final share = c.maxWidth >= 600 ? 0.38 : (card ? 0.28 : 0.5);
+              final heroHeight = (pad.top + pictureHeight).clamp(0.0, c.maxHeight * share);
               return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                 Container(
                   height: heroHeight,
@@ -303,14 +314,20 @@ class _TimeLine extends StatelessWidget {
           child: Text(sizeBest ? 'NEW BEST $size' : 'NEW BEST', style: TallyType.overline(p.onLime).copyWith(fontSize: 12)),
         ),
         const SizedBox(height: 7),
-        Text('was ${formatClock(was)} · −${formatClock(was - r.timeMs)}', style: TallyType.tabular(TallyType.label(p.ink2))),
+        Text('was ${formatClock(was)} · −${formatClock(was - r.timeMs)}', style: TallyType.label(p.ink2)),
       ]);
     }
     final hints = switch (r.hintsUsed) { 0 => 'No hints', 1 => '1 hint', final n => '$n hints' };
     final best = r.sizeBestMs == null ? 'first $size' : 'best ${formatClock(r.sizeBestMs!)}';
+    // Tabular while the time counts up (no jitter); proportional once it
+    // settles, since Schibsted's tabular 1 leaves wide gaps ("1 : 30").
+    final settled = shownMs >= r.timeMs;
+    final clockStyle = settled
+        ? TallyType.displayL(p.ink).copyWith(fontFeatures: const [FontFeature('tnum', 0)])
+        : TallyType.displayL(p.ink);
     return BigStat(
-      value: clockSpan(formatClock(shownMs), TallyType.displayL(p.ink)),
-      style: TallyType.displayL(p.ink),
+      value: clockSpan(formatClock(shownMs), clockStyle),
+      style: clockStyle,
       gap: 16,
       label: '$hints\n$best',
       labelColor: p.ink,
@@ -481,7 +498,7 @@ class _Leaderboard extends ConsumerWidget {
           child: Row(children: [
             SizedBox(width: 34, child: Text('${e.rank}', style: TallyType.bodyS(p.ink2))),
             Expanded(child: Text(e.penName, maxLines: 1, overflow: TextOverflow.ellipsis, style: TallyType.body(p.ink))),
-            Text(formatClock(e.timeMs), style: TallyType.bodyS(e.isYou ? p.accent : p.ink)),
+            Text.rich(clockSpan(formatClock(e.timeMs), TallyType.bodyS(e.isYou ? p.accent : p.ink))),
           ]),
         );
     final rows = [
