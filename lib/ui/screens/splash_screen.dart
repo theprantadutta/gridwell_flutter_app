@@ -4,42 +4,39 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../state/app_info.dart';
 import '../../state/settings.dart';
 import '../theme/gridwell_theme.dart';
-import '../theme/palette.dart';
 import '../theme/typography.dart';
 import '../widgets/gridwell_mark.dart';
 
-/// Picks up exactly where the native splash leaves off: the same ink ground in
-/// either theme, the mark at the same 128 dp in the same place. The wordmark
-/// and tagline then rise beneath it, and the ground fades to the book's paper.
+/// Picks up exactly where the native splash leaves off: the theme's `--bg`
+/// with the mark at [markSize], centered in the full window. The wordmark
+/// rises beneath it while a row of ticks fills, then the app turns to Home
+/// (or onboarding the first time).
 ///
 /// About a second; static under reduced motion. Never waits on the network.
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
-  static const markSize = 128.0;
+  /// Matches the native splash image (brand/make_splash.py).
+  static const markSize = 104.0;
 
-  /// Matches `color` in flutter_native_splash.yaml.
-  static const ground = Color(0xFF201914);
+  /// The wordmark's font size and its gap below the mark.
+  static const wordmarkSize = 46.0, wordmarkGap = 26.0;
+
+  static const ticks = 20;
 
   @override
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends ConsumerState<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 1100),
-  );
-  double _leave = 1;
+class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1000));
 
   @override
   void initState() {
     super.initState();
-    // The Flutter splash is now drawn identically: hand over from the native one.
+    // The Flutter splash is drawn identically: hand over from the native one.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FlutterNativeSplash.remove();
       _run();
@@ -53,16 +50,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       await Future<void>.delayed(const Duration(milliseconds: 300));
     } else {
       await _c.forward().orCancel.catchError((_) {});
-      await Future<void>.delayed(const Duration(milliseconds: 250));
+      await Future<void>.delayed(const Duration(milliseconds: 150));
     }
     if (!mounted) return;
-    // Fade the ink away to the book's paper, then turn to it.
-    setState(() => _leave = 0);
-    await Future<void>.delayed(const Duration(milliseconds: 220));
-    if (!mounted) return;
-    context.go(
-      ref.read(settingsProvider).onboardingDone ? '/contents' : '/onboarding',
-    );
+    context.go(ref.read(settingsProvider).onboardingDone ? '/contents' : '/onboarding');
   }
 
   @override
@@ -71,118 +62,68 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     super.dispose();
   }
 
-  double _seg(double t, double from, double to) =>
-      Curves.easeOutCubic.transform(((t - from) / (to - from)).clamp(0.0, 1.0));
-
   @override
   Widget build(BuildContext context) {
-    final paper = context.palette.surface;
-    // Cream type on ink in both themes, like the native splash.
-    final p = GridwellPalette.of(Brightness.dark, highContrast: false);
-    final version = ref.watch(appVersionProvider).value?.split(' ').first;
+    final p = context.palette;
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
+      value: p.isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
       child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          color: _leave == 1 ? SplashScreen.ground : paper,
-          child: AnimatedOpacity(
-            opacity: _leave,
-            duration: const Duration(milliseconds: 200),
-            child: LayoutBuilder(
-              builder: (context, c) {
-                // Centered in the full window, as the native splash is.
-                final cx = c.maxWidth / 2, cy = c.maxHeight / 2;
-                const m = SplashScreen.markSize;
-                return AnimatedBuilder(
-                  animation: _c,
-                  builder: (context, _) {
-                    final t = _c.value;
-                    final word = _seg(t, 0.12, 0.50);
-                    final tag = _seg(t, 0.30, 0.68);
-                    final foot = _seg(t, 0.50, 0.85);
-                    return Stack(
-                      children: [
-                        const Positioned.fill(child: SizedBox()),
-                        Positioned(
-                          left: cx - m / 2,
-                          top: cy - m / 2,
-                          child: CustomPaint(
-                            size: const Size.square(m),
-                            painter: GridwellMarkPainter(p, knockout: true),
-                          ),
-                        ),
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          top: cy + m / 2 + 30,
-                          child: Column(
-                            children: [
-                              Opacity(
-                                opacity: word,
-                                child: Transform.translate(
-                                  offset: Offset(0, 10 * (1 - word)),
-                                  child: Text(
-                                    'Gridwell',
-                                    style: FolioType.style(
-                                      size: 46,
-                                      color: p.textPrimary,
-                                      weight: 500,
-                                      letterSpacing: -0.92,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Opacity(
-                                opacity: tag,
-                                child: Text(
-                                  'NONOGRAM · PICROSS',
-                                  style: FolioType.style(
-                                    size: 12.5,
-                                    color: p.accent,
-                                    weight: 500,
-                                    letterSpacing: 3,
-                                  ),
-                                ),
-                              ),
+        backgroundColor: p.bg,
+        body: LayoutBuilder(
+          builder: (context, c) {
+            // Centered in the full window, as the native splash is.
+            final cx = c.maxWidth / 2, cy = c.maxHeight / 2;
+            const m = SplashScreen.markSize;
+            return AnimatedBuilder(
+              animation: _c,
+              builder: (context, _) {
+                final t = _c.value;
+                final word = Curves.easeOutCubic.transform((t / 0.45).clamp(0.0, 1.0));
+                final foot = Curves.easeOut.transform(((t - 0.1) / 0.3).clamp(0.0, 1.0));
+                final lit = (Curves.easeInOut.transform(t) * SplashScreen.ticks).round();
+                return Stack(children: [
+                  Positioned(
+                    left: cx - m / 2,
+                    top: cy - m / 2,
+                    child: const GridwellMark(size: m),
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: cy + m / 2 + SplashScreen.wordmarkGap,
+                    child: Opacity(
+                      opacity: word,
+                      child: Transform.translate(
+                        offset: Offset(0, 8 * (1 - word)),
+                        child: const Center(child: GridwellWordmark(size: SplashScreen.wordmarkSize)),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 40 + MediaQuery.paddingOf(context).bottom,
+                    child: Opacity(
+                      opacity: foot,
+                      child: Column(children: [
+                        Semantics(
+                          label: 'Loading',
+                          child: Row(mainAxisSize: MainAxisSize.min, children: [
+                            for (var i = 0; i < SplashScreen.ticks; i++) ...[
+                              if (i > 0) const SizedBox(width: 2),
+                              Container(width: 8, height: 6, color: i < lit ? p.lime : p.track),
                             ],
-                          ),
+                          ]),
                         ),
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: 40 + MediaQuery.paddingOf(context).bottom,
-                          child: Opacity(
-                            opacity: foot,
-                            child: Column(
-                              children: [
-                                Text(
-                                  'Setting the type…',
-                                  style: FolioType.bodyMuted(p, size: 16),
-                                ),
-                                if (version != null) ...[
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    version,
-                                    style: FolioType.style(
-                                      size: 13,
-                                      color: p.textFaint,
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
+                        const SizedBox(height: 18),
+                        Text('NONOGRAM · PICROSS', style: TallyType.overline(p.ink2).copyWith(fontSize: 11.5)),
+                      ]),
+                    ),
+                  ),
+                ]);
               },
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

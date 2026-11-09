@@ -1,5 +1,5 @@
 // Renders every screen at phone and tablet sizes, portrait and landscape, at
-// normal and enlarged text, with the real Literata font. Any overflow or
+// normal and enlarged text, with the real Schibsted Grotesk font. Any overflow or
 // layout exception fails the test, so a screen that only fits one device
 // cannot ship.
 //
@@ -9,6 +9,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
 
+import '../support/fonts.dart';
 import 'package:drift/drift.dart' show driftRuntimeOptions;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -53,13 +54,7 @@ final _shotKey = GlobalKey();
 // Phones are portrait-only (main.dart locks them), so landscape sizes are
 // tablet sizes only.
 
-Future<void> _loadFonts() async {
-  Future<ByteData> read(String path) async => ByteData.sublistView(File(path).readAsBytesSync());
-  final literata = FontLoader('Literata')
-    ..addFont(read('assets/fonts/Literata.ttf'))
-    ..addFont(read('assets/fonts/Literata-Italic.ttf'));
-  await literata.load();
-}
+Future<void> _loadFonts() => loadTallyFonts();
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;

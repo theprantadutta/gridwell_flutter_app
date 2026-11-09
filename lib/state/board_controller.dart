@@ -7,6 +7,7 @@ import '../engine/hints/hint.dart';
 import '../engine/hints/proven_mistake.dart';
 import '../engine/model/board.dart';
 import '../engine/model/cell_state.dart';
+import '../engine/model/clues.dart';
 import '../engine/model/puzzle.dart';
 import '../engine/rules/rules.dart';
 import '../engine/solver/line_solver.dart';
@@ -21,25 +22,29 @@ import 'settings.dart';
 
 enum InputMode { fill, cross }
 
-/// What happened when the player asked for a hint.
-enum HintOutcome { applied, nothingToHint, adNotWatched }
+/// What happened when the player asked for a hint. [shown]: the reasoning is
+/// on screen, waiting for Apply or Close.
+enum HintOutcome { shown, nothingToHint, adNotWatched }
 
 enum _StrokeAction { fill, erase, cross, uncross }
 
 /// Free hints per puzzle before a rewarded video is needed.
 const freeHintsPerPuzzle = 3;
 
-/// A footnote sheet under the board: a hint or a proven mistake.
+/// A sheet under the board: a hint waiting to be applied, or a proven mistake.
 class BoardNote {
   const BoardNote({
     required this.kind,
     required this.row,
     required this.col,
     required this.title,
+    required this.headline,
     required this.body,
     this.conclusion,
     this.lineAxisIsRow = true,
     this.lineIndex = 0,
+    this.result,
+    this.diagram,
   });
 
   final BoardNoteKind kind;
@@ -48,10 +53,32 @@ class BoardNote {
 
   /// e.g. "ROW 5".
   final String title;
+
+  /// One short sentence: "This square is filled."
+  final String headline;
   final String body;
   final String? conclusion;
   final bool lineAxisIsRow;
   final int lineIndex;
+
+  /// For a hint: what Apply will set the square to.
+  final CellState? result;
+
+  /// For a hint: the line it reasons about, drawn as one row of squares.
+  final HintDiagram? diagram;
+}
+
+/// One line of the board for the hint sheet: its squares as they stand, the
+/// square the hint is about, and where the deciding run can sit (pushed fully
+/// one way, then fully the other).
+class HintDiagram {
+  const HintDiagram({required this.cells, required this.target, this.spans = const []});
+
+  final List<CellState> cells;
+  final int target;
+
+  /// Inclusive (first, last) squares of each extreme placement.
+  final List<(int, int)> spans;
 }
 
 enum BoardNoteKind { hint, mistake }
@@ -194,6 +221,7 @@ class BoardController extends Notifier<BoardSession> {
   final String puzzleId;
 
   final _undo = <(Board, int?)>[]; // board before a step, and hint cell then
+  ResolvingHint? _pending; // a hint on screen, waiting for Apply
   final _solver = LineSolver();
   final _clock = Stopwatch();
   var _baseElapsedMs = 0;
@@ -221,6 +249,7 @@ class BoardController extends Notifier<BoardSession> {
       ..stop()
       ..reset();
     _undo.clear();
+    _pending = null;
     _shownMistakes.clear();
     final set = ref.read(puzzleSetProvider);
     _puzzle = resolvePuzzle(ref, puzzleId)!;
@@ -282,7 +311,12 @@ class BoardController extends Notifier<BoardSession> {
 
   void toggleMode() => setMode(state.mode == InputMode.fill ? InputMode.cross : InputMode.fill);
 
-  void dismissNote() => state = state.copyWith(note: () => null);
+  /// Close on the hint sheet, Carry on on a mistake: the sheet goes, the board
+  /// stays as it is.
+  void dismissNote() {
+    _pending = null;
+    state = state.copyWith(note: () => null);
+  }
 
   // ---- Strokes ------------------------------------------------------------
 
@@ -301,6 +335,7 @@ class BoardController extends Notifier<BoardSession> {
     _lockRow = null;
     _strokeBefore = state.board;
     _strokeCells.clear();
+    _pending = null;
     state = state.copyWith(cursorRow: () => row, cursorCol: () => col, note: () => null);
     _paint([(row, col)]);
   }
@@ -412,6 +447,7 @@ class BoardController extends Notifier<BoardSession> {
   void undo() {
     if (_undo.isEmpty || state.solved) return;
     final (board, hintCell) = _undo.removeLast();
+    _pending = null;
     ref.read(feedbackProvider).tap();
     unawaited(ref.read(analyticsProvider).log(AnalyticsEvents.undoUsed));
     state = state.copyWith(hintCell: () => hintCell, note: () => null);
@@ -428,20 +464,26 @@ class BoardController extends Notifier<BoardSession> {
   bool get hintIsFree =>
       state.freeHintsLeft > 0 || ref.read(entitlementsProvider).premium;
 
-  /// The Hint button: free hints first, then a rewarded video. The video is
-  /// only offered when a hint would actually resolve a cell.
+  /// The Hint button: free hints first, then a banked bonus hint, then a
+  /// rewarded video. The video is only offered when a hint would actually
+  /// resolve a cell.
+  ///
+  /// The hint is spent when its reasoning is shown, not when it is applied:
+  /// the reasoning names the square and what it is, so it is the hint. Apply
+  /// then places it and Close leaves the board as it is. Either way it stays
+  /// spent, as an undone hint always has.
   Future<HintOutcome> requestHint() async {
+    if (_pending != null) return HintOutcome.shown;
     final hint = peekHint();
     if (hint is! ResolvingHint) return HintOutcome.nothingToHint;
-    // After the free allowance: a banked bonus hint first, then a video.
     if (!hintIsFree && ref.read(bonusHintsProvider.notifier).spend()) {
       final fresh = peekHint();
       if (fresh is! ResolvingHint) {
         ref.read(bonusHintsProvider.notifier).add(1); // nothing to hint: give it back
         return HintOutcome.nothingToHint;
       }
-      applyHint(fresh);
-      return HintOutcome.applied;
+      _show(fresh);
+      return HintOutcome.shown;
     }
     if (!hintIsFree) {
       // Time spent watching a video is not time spent solving.
@@ -454,46 +496,13 @@ class BoardController extends Notifier<BoardSession> {
     // Recompute in case the board changed while the video played.
     final fresh = peekHint();
     if (fresh is! ResolvingHint) return HintOutcome.nothingToHint;
-    applyHint(fresh);
-    return HintOutcome.applied;
+    _show(fresh);
+    return HintOutcome.shown;
   }
 
-  /// Applies a hint. Only a [ResolvingHint] can be applied, so a rewarded
-  /// video is never granted for a hint that changes nothing.
-  void applyHint(ResolvingHint hint) {
-    final before = state.board;
-    final i = hint.row * before.width + hint.col;
-    final (board, note) = switch (hint) {
-      DeducedCellHint h => (
-          before.withCell(h.row, h.col, h.value),
-          BoardNote(
-            kind: BoardNoteKind.hint,
-            row: h.row,
-            col: h.col,
-            title: Explain.hintTitle(h),
-            body: Explain.hintBody(h),
-            conclusion: Explain.hintConclusion(h),
-            lineAxisIsRow: h.line.axis == LineAxis.row,
-            lineIndex: h.line.index,
-          ),
-        ),
-      WrongMarkHint h => (
-          before.withCell(h.row, h.col, CellState.empty),
-          BoardNote(
-            kind: BoardNoteKind.mistake,
-            row: h.row,
-            col: h.col,
-            title: h.proof == null ? 'THIS SQUARE' : Explain.mistakeTitle(h.proof!),
-            body: h.proof == null
-                ? 'This square does not belong to the picture, so it has been cleared.'
-                : Explain.mistakeBody(h.proof!,
-                    filled: before.at(h.row, h.col) == CellState.filled),
-            lineAxisIsRow: h.proof?.line.axis != LineAxis.column,
-            lineIndex: h.proof?.line.index ?? h.row,
-          ),
-        ),
-    };
-    _undo.add((before, state.hintCell));
+  /// Spends a hint and puts its reasoning on screen.
+  void _show(ResolvingHint hint) {
+    _pending = hint;
     final used = state.hintsUsed + 1;
     unawaited(ref.read(analyticsProvider).log(AnalyticsEvents.hintUsed, {
       'puzzle_id': puzzleId,
@@ -501,8 +510,75 @@ class BoardController extends Notifier<BoardSession> {
     }));
     state = state.copyWith(
       hintsUsed: used,
+      note: () => _hintNote(hint, state.board),
+      cursorRow: () => hint.row,
+      cursorCol: () => hint.col,
+    );
+    unawaited(_save());
+  }
+
+  /// Apply on the hint sheet: places the hint that is on screen.
+  void applyShownHint() {
+    final hint = _pending;
+    if (hint == null) return;
+    _pending = null;
+    _place(hint);
+  }
+
+  BoardNote _hintNote(ResolvingHint hint, Board board) {
+    switch (hint) {
+      case DeducedCellHint h:
+        final line = h.line.axis == LineAxis.row ? board.row(h.line.index) : board.column(h.line.index);
+        return BoardNote(
+          kind: BoardNoteKind.hint,
+          row: h.row,
+          col: h.col,
+          title: Explain.hintTitle(h),
+          headline: h.value == CellState.filled ? 'This square is filled.' : 'This square stays empty.',
+          body: Explain.hintBody(h),
+          conclusion: Explain.hintConclusion(h),
+          lineAxisIsRow: h.line.axis == LineAxis.row,
+          lineIndex: h.line.index,
+          result: h.value,
+          diagram: HintDiagram(
+            cells: line,
+            target: h.position,
+            spans: h.value == CellState.filled
+                ? _extremeSpans(Clues.blocksOf(h.clue), h.lineBefore, h.position)
+                : const [],
+          ),
+        );
+      case WrongMarkHint h:
+        final filled = board.at(h.row, h.col) == CellState.filled;
+        return BoardNote(
+          kind: BoardNoteKind.hint,
+          row: h.row,
+          col: h.col,
+          title: h.proof == null ? 'THIS SQUARE' : Explain.mistakeTitle(h.proof!),
+          headline: filled ? 'This square stays empty.' : 'This square is filled.',
+          body: h.proof == null
+              ? "This mark doesn't belong to the picture. Apply clears it."
+              : Explain.mistakeBody(h.proof!, filled: filled),
+          lineAxisIsRow: h.proof?.line.axis != LineAxis.column,
+          lineIndex: h.proof?.line.index ?? h.row,
+          result: CellState.empty,
+        );
+    }
+  }
+
+  /// Places a hint on the board. Only a [ResolvingHint] can be placed, so a
+  /// rewarded video is never granted for a hint that changes nothing.
+  void _place(ResolvingHint hint) {
+    final before = state.board;
+    final i = hint.row * before.width + hint.col;
+    final board = switch (hint) {
+      DeducedCellHint h => before.withCell(h.row, h.col, h.value),
+      WrongMarkHint h => before.withCell(h.row, h.col, CellState.empty),
+    };
+    _undo.add((before, state.hintCell));
+    state = state.copyWith(
       hintCell: () => i,
-      note: () => note,
+      note: () => null,
       cursorRow: () => hint.row,
       cursorCol: () => hint.col,
     );
@@ -533,6 +609,7 @@ class BoardController extends Notifier<BoardSession> {
   void undoToBeforeMark(int row, int col) {
     final mark = state.board.at(row, col);
     if (mark == CellState.empty) return;
+    _pending = null;
     Board? target;
     int? hint;
     while (_undo.isNotEmpty) {
@@ -569,8 +646,11 @@ class BoardController extends Notifier<BoardSession> {
               row: proof.row,
               col: proof.col,
               title: Explain.mistakeTitle(proof),
+              headline: board.at(proof.row, proof.col) == CellState.filled
+                  ? "Row ${proof.row + 1}, column ${proof.col + 1} can't be filled."
+                  : 'Row ${proof.row + 1}, column ${proof.col + 1} must be filled.',
               body: Explain.mistakeBody(proof, filled: board.at(proof.row, proof.col) == CellState.filled),
-              conclusion: 'Only squares the clues rule out are flagged. You can turn this off in Settings.',
+              conclusion: 'Undo it, or keep going and fix it later.',
               lineAxisIsRow: proof.line.axis == LineAxis.row,
               lineIndex: proof.line.index,
             ),
@@ -733,4 +813,62 @@ class BoardController extends Notifier<BoardSession> {
 
   /// A new session after returning from the background can be logged again.
   void resetAbandon() => _abandonLogged = false;
+}
+
+/// The two extreme placements of the run that decides [target]: every run
+/// pushed as far left as the line allows, then as far right. Empty when no
+/// single run covers [target] in both (the reasoning was subtler than that).
+List<(int, int)> _extremeSpans(List<int> blocks, List<Knowledge> line, int target) {
+  if (blocks.isEmpty) return const [];
+  final left = _leftmostStarts(blocks, line);
+  final rightRev = _leftmostStarts(blocks.reversed.toList(), line.reversed.toList());
+  if (left == null || rightRev == null) return const [];
+  final n = line.length, k = blocks.length;
+  for (var j = 0; j < k; j++) {
+    final len = blocks[j];
+    final l = left[j];
+    final r = n - rightRev[k - 1 - j] - len;
+    if (r <= target && target < l + len) return [(l, l + len - 1), (r, r + len - 1)];
+  }
+  return const [];
+}
+
+/// Earliest start of each run consistent with [line], or null if none fits.
+List<int>? _leftmostStarts(List<int> blocks, List<Knowledge> line) {
+  final n = line.length;
+  final failed = <int>{};
+  final starts = List<int>.filled(blocks.length, 0);
+  bool fail(int key) {
+    failed.add(key);
+    return false;
+  }
+
+  bool place(int j, int from) {
+    final key = j * (n + 2) + from;
+    if (failed.contains(key)) return false;
+    if (j == blocks.length) {
+      for (var i = from; i < n; i++) {
+        if (line[i] == Knowledge.filled) return fail(key);
+      }
+      return true;
+    }
+    final len = blocks[j];
+    for (var s = from; s + len <= n; s++) {
+      if (s > from && line[s - 1] == Knowledge.filled) break; // a filled square left uncovered
+      var fits = true;
+      for (var i = s; i < s + len; i++) {
+        if (line[i] == Knowledge.empty) {
+          fits = false;
+          break;
+        }
+      }
+      if (!fits) continue;
+      if (s + len < n && line[s + len] == Knowledge.filled) continue;
+      starts[j] = s;
+      if (place(j + 1, s + len + 1)) return true;
+    }
+    return fail(key);
+  }
+
+  return place(0, 0) ? starts : null;
 }

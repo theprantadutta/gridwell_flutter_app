@@ -6,7 +6,7 @@ import '../engine/model/puzzle.dart';
 import '../engine/model/solution.dart';
 
 /// Picture palette indices stored per cell. 0 is background (empty in the
-/// solution). The UI maps these to the Folio art tokens.
+/// solution). The UI maps these to the Tally picture palette.
 abstract final class PictureColor {
   static const background = 0;
   static const ink = 1; // art-b

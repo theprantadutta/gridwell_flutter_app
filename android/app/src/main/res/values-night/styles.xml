@@ -9,6 +9,9 @@
         <item name="android:windowFullscreen">false</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <!-- Tally dark page (#071A13) behind the system bars on the splash. -->
+        <item name="android:statusBarColor">#071A13</item>
+        <item name="android:navigationBarColor">#071A13</item>
     </style>
     <!-- Theme applied to the Android Window as soon as the process has started.
          This theme determines the color of the Android Window while your

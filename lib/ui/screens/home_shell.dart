@@ -3,10 +3,11 @@ import 'package:go_router/go_router.dart';
 
 import '../theme/gridwell_theme.dart';
 import '../theme/typography.dart';
-import '../widgets/folio.dart';
+import '../widgets/tally.dart';
 
-/// The four tabs: Contents, Daily, Gallery, Settings. Text tabs over a
-/// hairline, with a short accent bar over the current one.
+/// The four tabs: Play, Daily, Gallery, Settings. Text tabs on a `--surface`
+/// bar under a 1 pt `--sunk` rule, with a 22 × 3 pt lime bar over the current
+/// one. 84 pt tall including the home-indicator inset.
 class HomeShell extends StatelessWidget {
   const HomeShell({super.key, required this.location, required this.child});
 
@@ -14,82 +15,52 @@ class HomeShell extends StatelessWidget {
   final Widget child;
 
   static const _tabs = [
-    ('/contents', 'Contents'),
+    ('/contents', 'Play'),
     ('/daily', 'Daily'),
     ('/gallery', 'Gallery'),
     ('/settings', 'Settings'),
   ];
 
+  /// Content width on tablets.
+  static const maxWidth = 760.0;
+
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
+    final inset = MediaQuery.paddingOf(context).bottom;
     return Scaffold(
-      // Book pages keep a reading width on tablets.
       body: SafeArea(
         bottom: false,
         child: Center(
-          child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 760), child: child),
+          child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: maxWidth), child: child),
         ),
       ),
-      bottomNavigationBar: SafeArea(
-        top: false,
-        // Same centered width as the page above it.
-        child: Center(
-          heightFactor: 1,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 760),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: folioMargin),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Hairline(),
-                  // Grows with the text size instead of clipping; never shorter than 64.
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(minHeight: 64),
-                    child: Row(
-                      children: [
-                        for (final (path, label) in _tabs)
-                          Expanded(
-                            child: Semantics(
-                              button: true,
-                              selected: location.startsWith(path),
-                              label: label,
-                              child: GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: () => context.go(path),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(bottom: 10),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Container(
-                                        width: 40,
-                                        height: 3,
-                                        color: location.startsWith(path) ? p.accent : Colors.transparent,
-                                      ),
-                                      const SizedBox(height: 12),
-                                      FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          label,
-                                          maxLines: 1,
-                                          style: FolioType.tab(
-                                            location.startsWith(path) ? p.textPrimary : p.textMuted,
-                                            selected: location.startsWith(path),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
+      bottomNavigationBar: DecoratedBox(
+        decoration: BoxDecoration(
+          color: p.surface,
+          border: Border(top: BorderSide(color: p.sunk, width: tallyDivider)),
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(bottom: inset),
+          child: Center(
+            heightFactor: 1,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: maxWidth),
+              // Grows with the text size instead of clipping.
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: (84 - inset).clamp(62, 84).toDouble()),
+                child: Row(
+                  children: [
+                    for (final (path, label) in _tabs)
+                      Expanded(
+                        child: _Tab(
+                          label: label,
+                          selected: location.startsWith(path),
+                          onTap: () => context.go(path),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -99,24 +70,43 @@ class HomeShell extends StatelessWidget {
   }
 }
 
-/// Stand-in for tabs still being built.
-class TabPlaceholder extends StatelessWidget {
-  const TabPlaceholder(this.title, {super.key});
+class _Tab extends StatelessWidget {
+  const _Tab({required this.label, required this.selected, required this.onTap});
 
-  final String title;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const WordmarkHeader(),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(folioMargin, 28, folioMargin, 0),
-          child: Text(title, style: FolioType.display(p)),
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      excludeSemantics: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 18, bottom: 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(width: 22, height: 3, color: selected ? p.lime : Colors.transparent),
+              const SizedBox(height: 9),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  style: TallyType.body(selected ? p.ink : p.ink2).copyWith(fontSize: 14, fontWeight: selected ? FontWeight.w800 : FontWeight.w700),
+                ),
+              ),
+            ],
+          ),
         ),
-      ],
+      ),
     );
   }
 }

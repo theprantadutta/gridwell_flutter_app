@@ -24,7 +24,9 @@ class BoardView extends StatefulWidget {
     required this.onStrokeCancel,
     this.cursorRow,
     this.cursorCol,
-    this.flashCell,
+    this.hint,
+    this.errorLine,
+    this.center = false,
     this.enabled = true,
   });
 
@@ -36,8 +38,15 @@ class BoardView extends StatefulWidget {
   final int? cursorRow;
   final int? cursorCol;
 
-  /// (row, col) to ring, e.g. the hinted cell.
-  final (int, int)? flashCell;
+  /// A hint on screen, waiting for Apply.
+  final HintMark? hint;
+
+  /// The clue line that proves the mistake on screen.
+  final ErrorLine? errorLine;
+
+  /// Center the board in its box. Otherwise it sits at the top, against the
+  /// right edge (phones), as [BoardGeometry.originIn] describes.
+  final bool center;
   final bool enabled;
   final void Function(int row, int col) onStrokeStart;
   final void Function(int row, int col) onStrokeMove;
@@ -78,15 +87,14 @@ class _BoardViewState extends State<BoardView> {
   void _clampOffset() {
     final g = _geometry;
     if (g == null) return;
-    final content = g.totalSize * _scale;
-    double clampAxis(double v, double contentExtent, double viewExtent) {
-      if (contentExtent <= viewExtent) return (viewExtent - contentExtent) / 2;
-      return v.clamp(viewExtent - contentExtent, 0);
+    if (_scale == 1) {
+      _offset = g.originIn(_viewport, center: widget.center);
+      return;
     }
-
+    final content = g.totalSize * _scale;
     _offset = Offset(
-      clampAxis(_offset.dx, content.width, _viewport.width),
-      clampAxis(_offset.dy, content.height, _viewport.height),
+      _offset.dx.clamp(math.min(0.0, _viewport.width - content.width), 0.0),
+      _offset.dy.clamp(math.min(0.0, _viewport.height - content.height), 0.0),
     );
   }
 
@@ -150,13 +158,12 @@ class _BoardViewState extends State<BoardView> {
     return LayoutBuilder(builder: (context, constraints) {
       final available = Size(constraints.maxWidth, constraints.maxHeight);
       final g = BoardGeometry.fit(widget.clues, available);
-      if (_geometry?.cell != g.cell || _viewport != available) {
+      if (_geometry?.cell != g.cell || _viewport != available || _scale == 1) {
         _geometry = g;
         _viewport = available;
         if (_maxScale <= 1) _scale = 1;
         _clampOffset();
       }
-      final flash = widget.flashCell;
       return Listener(
         behavior: HitTestBehavior.opaque,
         onPointerDown: _down,
@@ -173,6 +180,8 @@ class _BoardViewState extends State<BoardView> {
                 alignment: Alignment.topLeft,
                 child: SizedBox.fromSize(
                   size: g.totalSize,
+                  // Painted bands may reach left of the board (the row band
+                  // runs to the screen edge); the outer ClipRect bounds them.
                   child: Stack(children: [
                     RepaintBoundary(
                       child: CustomPaint(
@@ -184,7 +193,8 @@ class _BoardViewState extends State<BoardView> {
                           mistakes: widget.mistakes,
                           cursorRow: widget.cursorRow,
                           cursorCol: widget.cursorCol,
-                          flashRect: flash == null ? null : g.cellRect(flash.$1, flash.$2),
+                          hint: widget.hint,
+                          bleedLeft: _offset.dx / _scale,
                         ),
                       ),
                     ),
@@ -197,8 +207,7 @@ class _BoardViewState extends State<BoardView> {
                           palette: palette,
                           rowRetired: widget.rowRetired,
                           colRetired: widget.colRetired,
-                          activeRow: widget.cursorRow,
-                          activeCol: widget.cursorCol,
+                          errorLine: widget.errorLine,
                         ),
                       ),
                     ),

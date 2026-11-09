@@ -9,11 +9,28 @@ import '../theme/palette.dart';
 import '../theme/typography.dart';
 import 'board_geometry.dart';
 
-/// Paints cells, marks, highlight, grid lines and cursor.
+/// A hint on screen, before Apply: the square and what it will become.
+class HintMark {
+  const HintMark(this.row, this.col, this.result);
+
+  final int row;
+  final int col;
+  final CellState result;
+
+  @override
+  bool operator ==(Object other) => other is HintMark && other.row == row && other.col == col && other.result == result;
+
+  @override
+  int get hashCode => Object.hash(row, col, result);
+}
+
+/// Paints cells, marks, the active line band, rules and rings (DESIGN-SPEC
+/// section 5).
 ///
-/// States are structural: filled is a solid square edge to edge, crossed is a
-/// thin accent × on an untouched cell, untouched is empty. A proven mistake is
-/// a filled cell hatched in accent with an accent ring.
+/// States are told apart by shape: filled is a solid `--ink` square, crossed
+/// is a short `--mark` dash, empty is the bare `--cell`. A proven mistake is
+/// hatched in `--error` with an `--error` ring; a hint waiting to be applied
+/// shows what it will place, ringed in lime inside and out.
 class GridPainter extends CustomPainter {
   GridPainter({
     required this.geometry,
@@ -22,7 +39,8 @@ class GridPainter extends CustomPainter {
     required this.mistakes,
     this.cursorRow,
     this.cursorCol,
-    this.flashRect,
+    this.hint,
+    this.bleedLeft = 0,
   });
 
   final BoardGeometry geometry;
@@ -31,102 +49,125 @@ class GridPainter extends CustomPainter {
   final Set<int> mistakes;
   final int? cursorRow;
   final int? cursorCol;
+  final HintMark? hint;
 
-  /// Extra ring (hint cell or flagged mistake), in board coordinates.
-  final Rect? flashRect;
+  /// How far left of this canvas the viewport begins. The active row's band
+  /// and lime tick run out to the viewport's edge.
+  final double bleedLeft;
 
   @override
   void paint(Canvas canvas, Size size) {
     final g = geometry;
     final p = palette;
     final grid = g.gridRect;
-    final cell = g.cell;
+    final pitch = g.cell;
+    final inner = g.inner;
 
-    // Untouched cells.
-    canvas.drawRect(grid, Paint()..color = p.cellEmpty);
+    // The gaps show --sunk.
+    canvas.drawRect(grid, Paint()..color = p.sunk);
 
-    // Highlight band under the marks (multiply keeps ink black in light mode).
-    if (cursorRow != null && cursorCol != null) {
-      final hl = Paint()
-        ..color = p.highlight
-        ..blendMode = p.highlightBlend;
-      canvas.drawRect(Rect.fromLTWH(grid.left - g.rowClueWidth, grid.top + cursorRow! * cell,
-          grid.width + g.rowClueWidth, cell), hl);
-      canvas.drawRect(Rect.fromLTWH(grid.left + cursorCol! * cell, grid.top - g.colClueHeight,
-          cell, grid.height + g.colClueHeight), hl);
-    }
-
-    final fill = Paint()..color = p.cellFilled;
-    final cross = Paint()
-      ..color = p.cellCrossed
-      ..strokeWidth = math.max(1.2, cell * 0.075)
-      ..strokeCap = StrokeCap.round;
-    final inset = cell * 0.28;
+    final empty = Paint()..color = p.cell;
+    final fill = Paint()..color = p.ink;
+    final dash = Paint()..color = p.mark;
     final cells = board.cells;
     final w = board.width;
     for (var i = 0; i < cells.length; i++) {
-      final state = cells[i];
-      if (state == CellState.empty) continue;
-      final r = g.cellRect(i ~/ w, i % w);
-      if (state == CellState.filled) {
-        canvas.drawRect(r, fill);
-        if (mistakes.contains(i)) _hatch(canvas, r);
-      } else {
-        canvas.drawLine(r.topLeft + Offset(inset, inset), r.bottomRight - Offset(inset, inset), cross);
-        canvas.drawLine(r.topRight + Offset(-inset, inset), r.bottomLeft + Offset(inset, -inset), cross);
-        if (mistakes.contains(i)) {
-          canvas.drawRect(r.deflate(1), Paint()
-            ..color = p.accent
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.5);
-        }
-      }
+      canvas.drawRect(g.cellSquare(i ~/ w, i % w), cells[i] == CellState.filled ? fill : empty);
     }
 
-    // Grid lines: minor hairlines, then every fifth line and the border in ink.
-    final minor = Paint()
-      ..color = p.gridLine
-      ..strokeWidth = p.gridLineWidth;
-    final major = Paint()
-      ..color = p.gridLineMajor
-      ..strokeWidth = p.gridLineMajorWidth;
-    for (var c = 1; c < g.columns; c++) {
-      final x = grid.left + c * cell;
-      canvas.drawLine(Offset(x, grid.top), Offset(x, grid.bottom), c % 5 == 0 ? major : minor);
+    // Major rules: every fifth gap becomes a --rule line.
+    final rule = Paint()..color = p.rule;
+    final rw = math.max(g.gap, p.majorRuleWidth);
+    for (var c = 5; c < g.columns; c += 5) {
+      final x = grid.left + c * pitch - g.gap / 2;
+      canvas.drawRect(Rect.fromLTWH(x - rw / 2, grid.top, rw, grid.height), rule);
     }
-    for (var r = 1; r < g.rows; r++) {
-      final y = grid.top + r * cell;
-      canvas.drawLine(Offset(grid.left, y), Offset(grid.right, y), r % 5 == 0 ? major : minor);
+    for (var r = 5; r < g.rows; r += 5) {
+      final y = grid.top + r * pitch - g.gap / 2;
+      canvas.drawRect(Rect.fromLTWH(grid.left, y - rw / 2, grid.width, rw), rule);
     }
-    canvas.drawRect(grid, Paint()
-      ..color = p.gridLineMajor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = p.gridLineMajorWidth);
 
-    // Mistake rings and the cursor.
-    final ring = Paint()
-      ..color = p.accent
+    // The active row and column: a band over everything, lime ticks at the
+    // outer edges, an --accent ring round the square.
+    final cr = cursorRow, cc = cursorCol;
+    if (cr != null && cc != null) {
+      final band = Paint()..color = p.hl;
+      final rowTop = grid.top + cr * pitch;
+      final colLeft = grid.left + cc * pitch;
+      canvas.drawRect(Rect.fromLTRB(-bleedLeft, rowTop, grid.right, rowTop + inner), band);
+      canvas.drawRect(Rect.fromLTRB(colLeft, BoardGeometry.tickBand, colLeft + inner, rowTop), band);
+      canvas.drawRect(Rect.fromLTRB(colLeft, rowTop + inner, colLeft + inner, grid.bottom), band);
+      final lime = Paint()..color = p.lime;
+      canvas.drawRect(Rect.fromLTWH(-bleedLeft, rowTop, 4, inner), lime);
+      canvas.drawRect(Rect.fromLTWH(colLeft, BoardGeometry.tickBand - 4, inner, 4), lime);
+    }
+
+    // Dashes above the band. Inside it they use --ink-2: --mark over the dark
+    // theme's band falls just short of 3:1.
+    final bandDash = Paint()..color = p.ink2;
+    for (var i = 0; i < cells.length; i++) {
+      if (cells[i] != CellState.crossed) continue;
+      final r = i ~/ w, c = i % w;
+      _dash(canvas, g.cellSquare(r, c), r == cr || c == cc ? bandDash : dash);
+    }
+
+    // Proven mistakes.
+    final errorRing = Paint()
+      ..color = p.error
       ..style = PaintingStyle.stroke
-      ..strokeWidth = math.max(1.5, cell * 0.08);
+      ..strokeWidth = 2;
     for (final i in mistakes) {
+      final r = g.cellSquare(i ~/ w, i % w);
       if (cells[i] == CellState.filled) {
-        canvas.drawRect(g.cellRect(i ~/ w, i % w).inflate(cell * 0.06), ring);
+        canvas.drawRect(r, empty);
+        _hatch(canvas, r.deflate(2));
       }
+      canvas.drawRect(r.deflate(1), errorRing);
     }
-    if (cursorRow != null && cursorCol != null) {
-      canvas.drawRect(g.cellRect(cursorRow!, cursorCol!).inflate(cell * 0.04), ring);
+
+    // A hint waiting for Apply: what it will place, ringed in lime.
+    final h = hint;
+    if (h != null) {
+      final r = g.cellSquare(h.row, h.col);
+      if (h.result == CellState.filled) {
+        canvas.drawRect(r, fill);
+      } else {
+        canvas.drawRect(r, empty);
+        if (h.result == CellState.crossed) _dash(canvas, r, dash);
+      }
+      final ring = Paint()
+        ..color = p.lime
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2;
+      canvas.drawRect(r.deflate(1), ring);
+      canvas.drawRect(r.inflate(2), ring);
+    } else if (cr != null && cc != null) {
+      canvas.drawRect(
+        g.cellSquare(cr, cc).inflate(2),
+        Paint()
+          ..color = p.accent
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2,
+      );
     }
-    if (flashRect != null) canvas.drawRect(flashRect!.inflate(cell * 0.06), ring);
   }
 
+  /// A crossed square: a short horizontal dash, 40% of the cell wide.
+  void _dash(Canvas canvas, Rect r, Paint paint) {
+    final t = r.width >= 30 ? 3.0 : 2.0;
+    final len = r.width * 0.4;
+    canvas.drawRect(Rect.fromCenter(center: r.center, width: len, height: t), paint);
+  }
+
+  /// 45° hatch, 2 pt lines with a 5 pt period.
   void _hatch(Canvas canvas, Rect r) {
     canvas.save();
     canvas.clipRect(r);
     final paint = Paint()
-      ..color = palette.accent
-      ..strokeWidth = r.width * 0.14;
-    final step = r.width / 3;
-    for (var d = -r.height; d < r.width; d += step) {
+      ..color = palette.error
+      ..strokeWidth = 2;
+    const period = 5.0 * 1.41421356; // 5 pt measured across the lines
+    for (var d = -r.height; d < r.width; d += period) {
       canvas.drawLine(Offset(r.left + d, r.bottom), Offset(r.left + d + r.height, r.top), paint);
     }
     canvas.restore();
@@ -139,12 +180,28 @@ class GridPainter extends CustomPainter {
       old.cursorRow != cursorRow ||
       old.cursorCol != cursorCol ||
       old.mistakes != mistakes ||
-      old.flashRect != flashRect ||
+      old.hint != hint ||
+      old.bleedLeft != bleedLeft ||
       old.geometry.cell != geometry.cell;
 }
 
-/// Paints row and column clues. Repaints only when retirement or the active
-/// line changes, so drags do not re-lay text.
+/// Which clue line to ring in `--error`: the line that proves a mistake.
+class ErrorLine {
+  const ErrorLine({required this.isRow, required this.index});
+
+  final bool isRow;
+  final int index;
+
+  @override
+  bool operator ==(Object other) => other is ErrorLine && other.isRow == isRow && other.index == index;
+
+  @override
+  int get hashCode => Object.hash(isRow, index);
+}
+
+/// Paints row and column clues: 700 `--ink` while open, 500 `--ink-3` once
+/// satisfied. Repaints only when retirement or the ringed line changes, so
+/// drags do not re-lay text.
 class CluePainter extends CustomPainter {
   CluePainter({
     required this.geometry,
@@ -152,8 +209,7 @@ class CluePainter extends CustomPainter {
     required this.palette,
     required this.rowRetired,
     required this.colRetired,
-    this.activeRow,
-    this.activeCol,
+    this.errorLine,
   });
 
   final BoardGeometry geometry;
@@ -161,75 +217,75 @@ class CluePainter extends CustomPainter {
   final GridwellPalette palette;
   final List<Set<int>> rowRetired;
   final List<Set<int>> colRetired;
-  final int? activeRow;
-  final int? activeCol;
+  final ErrorLine? errorLine;
 
   static final _cache = <String, TextPainter>{};
 
-  TextPainter _text(int n, bool retired, bool active) {
-    final key = '$n|$retired|$active|${geometry.clueSize}|${palette.brightness}|${palette.clueRetired.toARGB32()}';
-    return _cache.putIfAbsent(key, () {
-      final color = retired ? palette.clueRetired : palette.clueText;
-      final style = FolioType.clue(color, geometry.clueSize).copyWith(
-        fontWeight: active && !retired ? FontWeight.w700 : null,
-      );
-      return TextPainter(
-        text: TextSpan(text: '$n', style: style),
+  TextPainter _text(int n, bool retired) {
+    final color = retired ? palette.ink3 : palette.ink;
+    final key = '$n|$retired|${geometry.clueSize}|${color.toARGB32()}';
+    return _cache.putIfAbsent(
+      key,
+      () => TextPainter(
+        text: TextSpan(text: '$n', style: TallyType.clue(color, geometry.clueSize, retired: retired)),
         textDirection: TextDirection.ltr,
-      )..layout();
-    });
+        textScaler: TextScaler.noScaling,
+      )..layout(),
+    );
   }
 
   @override
   void paint(Canvas canvas, Size size) {
     final g = geometry;
-    final cell = g.cell;
-    final strike = Paint()
-      ..color = palette.clueRetired
-      ..strokeWidth = math.max(1, g.clueSize * 0.08);
+    final pitch = g.cell;
+    final grid = g.gridRect;
+    Rect? ring;
 
-    // Zebra bands behind column clues on big boards, to keep columns apart.
-    if (g.columns >= 15) {
-      final band = Paint()..color = palette.rule.withValues(alpha: palette.isDark ? 0.35 : 0.45);
-      for (var c = 0; c < g.columns; c += 2) {
-        canvas.drawRect(Rect.fromLTWH(g.rowClueWidth + c * cell, 0, cell, g.colClueHeight - g.clueGap * 0.5), band);
-      }
-    }
-
-    // Row clues: right-aligned, left of the grid.
-    final rowStep = g.clueSize * 1.05;
+    // Row clues: right-aligned, ending clueGap left of the grid.
     for (var r = 0; r < g.rows; r++) {
       final clue = clues.rows[r];
-      var x = g.rowClueWidth - g.clueGap;
+      final zero = Clues.blocksOf(clue).isEmpty;
+      var x = grid.left - g.clueGap;
+      final top = grid.top + r * pitch;
+      var left = x;
       for (var j = clue.length - 1; j >= 0; j--) {
-        final tp = _text(clue[j], rowRetired.length > r && rowRetired[r].contains(j), r == activeRow);
+        final retired = zero || (rowRetired.length > r && rowRetired[r].contains(j));
+        final tp = _text(clue[j], retired);
         final dx = x - tp.width;
-        final dy = g.colClueHeight + r * cell + (cell - tp.height) / 2;
-        tp.paint(canvas, Offset(dx, dy));
-        if (rowRetired.length > r && rowRetired[r].contains(j)) {
-          final y = dy + tp.height * 0.55;
-          canvas.drawLine(Offset(dx - 1, y), Offset(dx + tp.width + 1, y), strike);
-        }
-        x = dx - (rowStep - tp.width).clamp(g.clueSize * 0.35, rowStep);
+        tp.paint(canvas, Offset(dx, top + (g.inner - tp.height) / 2));
+        left = dx;
+        x = dx - g.clueSpacing;
+      }
+      if (errorLine == ErrorLine(isRow: true, index: r)) {
+        ring = Rect.fromLTRB(left - 4, top - 2, grid.left - g.clueGap + 4, top + g.inner + 2);
       }
     }
 
-    // Column clues: bottom-aligned, above the grid.
-    final colStep = g.clueSize * 1.12;
+    // Column clues: bottom-aligned, ending colClueGap above the grid.
     for (var c = 0; c < g.columns; c++) {
       final clue = clues.columns[c];
-      var y = g.colClueHeight - g.clueGap;
+      final zero = Clues.blocksOf(clue).isEmpty;
+      final left = grid.left + c * pitch;
+      var bottom = grid.top - BoardGeometry.colClueGap;
       for (var j = clue.length - 1; j >= 0; j--) {
-        final tp = _text(clue[j], colRetired.length > c && colRetired[c].contains(j), c == activeCol);
-        final dx = g.rowClueWidth + c * cell + (cell - tp.width) / 2;
-        final dy = y - tp.height;
-        tp.paint(canvas, Offset(dx, dy));
-        if (colRetired.length > c && colRetired[c].contains(j)) {
-          final ly = dy + tp.height * 0.55;
-          canvas.drawLine(Offset(dx - 1, ly), Offset(dx + tp.width + 1, ly), strike);
-        }
-        y -= colStep;
+        final retired = zero || (colRetired.length > c && colRetired[c].contains(j));
+        final tp = _text(clue[j], retired);
+        tp.paint(canvas, Offset(left + (g.inner - tp.width) / 2, bottom - g.clueLine + (g.clueLine - tp.height) / 2));
+        bottom -= g.clueLine;
       }
+      if (errorLine == ErrorLine(isRow: false, index: c)) {
+        ring = Rect.fromLTRB(left - 2, bottom - 4, left + g.inner + 2, grid.top - BoardGeometry.colClueGap + 4);
+      }
+    }
+
+    if (ring != null) {
+      canvas.drawRect(
+        ring,
+        Paint()
+          ..color = palette.error
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2,
+      );
     }
   }
 
@@ -238,7 +294,6 @@ class CluePainter extends CustomPainter {
       old.rowRetired != rowRetired ||
       old.colRetired != colRetired ||
       old.palette != palette ||
-      old.activeRow != activeRow ||
-      old.activeCol != activeCol ||
+      old.errorLine != errorLine ||
       old.geometry.cell != geometry.cell;
 }

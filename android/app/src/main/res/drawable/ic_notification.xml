@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Notification small icon: the Gridwell mark (frame and the filled cells
-     that form the G) as a white silhouette, generated from the logo kit geometry. -->
+<!-- Notification small icon: the Tally mark (logo kit v2.0) as a white
+     silhouette. The inked and solved cells are solid; the two empty cells sit
+     at 35% so the 2 x 2 grid still reads at status-bar size. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp" android:height="24dp"
-    android:viewportWidth="157.20" android:viewportHeight="157.20">
-    <path android:fillColor="#FFFFFFFF" android:fillType="evenOdd" android:pathData="M13.10,13.10h131.00v131.00h-131.00zM15.60,15.60h126.00v126.00h-126.00z"/>
-    <path android:fillColor="#FFFFFFFF" android:fillType="nonZero" android:pathData="M41.10,15.60h24.00v24.00h-24.00zM66.60,15.60h24.00v24.00h-24.00zM92.10,15.60h24.00v24.00h-24.00zM117.60,15.60h24.00v24.00h-24.00zM15.60,41.10h24.00v24.00h-24.00zM15.60,66.60h24.00v24.00h-24.00zM92.10,66.60h24.00v24.00h-24.00zM117.60,66.60h24.00v24.00h-24.00zM15.60,92.10h24.00v24.00h-24.00zM117.60,92.10h24.00v24.00h-24.00zM41.10,117.60h24.00v24.00h-24.00zM66.60,117.60h24.00v24.00h-24.00zM92.10,117.60h24.00v24.00h-24.00z"/>
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF" android:pathData="M2.75,2.75h8.6v8.6h-8.6zM12.65,12.65h8.6v8.6h-8.6z"/>
+    <path android:fillColor="#FFFFFFFF" android:fillAlpha="0.35" android:pathData="M12.65,2.75h8.6v8.6h-8.6zM2.75,12.65h8.6v8.6h-8.6z"/>
 </vector>

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -60,6 +61,12 @@ class _GridwellAppState extends ConsumerState<GridwellApp> {
       title: 'Gridwell',
       debugShowCheckedModeBanner: false,
       routerConfig: _router,
+      // Status and navigation bar icons follow the theme (light icons on the
+      // dark Tally green, dark icons on paper). Screens may override.
+      builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+        value: Theme.of(context).brightness == Brightness.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+        child: child ?? const SizedBox(),
+      ),
       themeMode: settings.themeMode,
       theme: GridwellTheme.themeData(
           GridwellPalette.of(Brightness.light, highContrast: settings.highContrast)),

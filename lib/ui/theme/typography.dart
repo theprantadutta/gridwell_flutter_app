@@ -1,77 +1,87 @@
-
 import 'package:flutter/painting.dart';
 
-import 'palette.dart';
-
-/// Folio type: Literata for everything, lining tabular figures for every
-/// number so clues, timers and counts line up in columns.
+/// Tally type: Schibsted Grotesk (bundled static weights 500, 700, 800, 900).
 ///
-/// Literata is a variable font with weight and optical-size axes. Optical size
-/// follows the font size, which gives small clue numbers sturdier strokes.
-abstract final class FolioType {
-  static const family = 'Literata';
+/// Numbers use tabular figures so timers and counts never jitter. Schibsted's
+/// `tnum` also widens `.` and `,`, so running text keeps proportional
+/// figures: number styles (display, clue, chip, micro, body-s) are tabular,
+/// and [tabular] makes any other style tabular for a number set in it.
+///
+/// Every style takes its color; sizes, weights, line heights and tracking are
+/// the kit's (`DESIGN-SPEC.md` section 3).
+abstract final class TallyType {
+  static const family = 'Schibsted Grotesk';
 
-  static const figures = [FontFeature.tabularFigures(), FontFeature.liningFigures()];
+  static const figures = [FontFeature.tabularFigures()];
 
   static TextStyle style({
     required double size,
     required Color color,
-    double weight = 400,
-    bool italic = false,
-    double letterSpacing = 0,
+    FontWeight weight = FontWeight.w700,
+    double tracking = 0,
     double? height,
+    bool tabular = false,
   }) =>
       TextStyle(
         fontFamily: family,
         fontSize: size,
         color: color,
-        fontStyle: italic ? FontStyle.italic : FontStyle.normal,
-        fontWeight: _nearestWeight(weight),
-        fontVariations: [
-          FontVariation('wght', weight),
-          FontVariation('opsz', size.clamp(7, 72).toDouble()),
-        ],
-        fontFeatures: figures,
-        letterSpacing: letterSpacing,
+        fontWeight: weight,
+        fontFeatures: tabular ? figures : null,
+        letterSpacing: size * tracking,
         height: height,
       );
 
-  static FontWeight _nearestWeight(double w) =>
-      FontWeight.values[((w / 100).round() - 1).clamp(0, 8)];
+  /// [base] with tabular figures, for a number set in a text style (a timer
+  /// in the top bar, a count in a row).
+  static TextStyle tabular(TextStyle base) => base.copyWith(fontFeatures: figures);
 
-  /// Screen titles: "Contents", "Gallery".
-  static TextStyle display(GridwellPalette p) =>
-      style(size: 44, color: p.textPrimary, height: 1.05);
+  /// 92 / 900: the overall percent on Home.
+  static TextStyle displayXl(Color c) => style(size: 92, color: c, weight: FontWeight.w900, height: 0.8, tracking: -0.05, tabular: true);
 
-  /// Plate name on the board and the completion page.
-  static TextStyle plateTitle(GridwellPalette p, {double size = 40}) =>
-      style(size: size, color: p.textPrimary, weight: 500, height: 1.05);
+  /// 72 / 900: the solve time on Complete, the price on the store.
+  static TextStyle displayL(Color c) => style(size: 72, color: c, weight: FontWeight.w900, height: 0.8, tracking: -0.05, tabular: true);
 
-  /// Small capitals in accent: "NO. 6", "TODAY · SUNDAY 1 NOVEMBER".
-  static TextStyle kicker(GridwellPalette p, {Color? color}) =>
-      style(size: 12.5, color: color ?? p.accent, weight: 600, letterSpacing: 3);
+  /// 60 / 900: the live timer on the board.
+  static TextStyle displayM(Color c) => style(size: 60, color: c, weight: FontWeight.w900, height: 0.85, tracking: -0.04, tabular: true);
 
-  /// Brand wordmark in the header: "GRIDWELL".
-  static TextStyle wordmark(GridwellPalette p) =>
-      style(size: 13, color: p.textPrimary, weight: 600, letterSpacing: 4);
+  /// 40 / 900: screen titles, the puzzle name on Complete.
+  static TextStyle titleL(Color c) => style(size: 40, color: c, weight: FontWeight.w900, height: 1, tracking: -0.035);
 
-  /// Header bar text: "‹ Contents", "Coastline", "6:18".
-  static TextStyle header(GridwellPalette p) =>
-      style(size: 17, color: p.textMuted, italic: true);
+  /// 32 / 900: the daily puzzle name, section heroes.
+  static TextStyle titleM(Color c) => style(size: 32, color: c, weight: FontWeight.w900, height: 1, tracking: -0.03);
 
-  static TextStyle body(GridwellPalette p, {double size = 17}) =>
-      style(size: size, color: p.textPrimary, height: 1.35);
+  /// 26 / 900 uppercase: FILL, MARK, NEXT PUZZLE.
+  static TextStyle slab(Color c) => style(size: 26, color: c, weight: FontWeight.w900, height: 1, tracking: -0.01);
 
-  static TextStyle bodyMuted(GridwellPalette p, {double size = 16}) =>
-      style(size: size, color: p.textMuted, italic: true, height: 1.35);
+  /// 22 / 800: the board's top bar title.
+  static TextStyle titleS(Color c) => style(size: 22, color: c, weight: FontWeight.w800, height: 1, tracking: -0.02);
 
-  static TextStyle button(Color color, {double size = 18}) =>
-      style(size: size, color: color, weight: 600);
+  /// 18 / 800: section headers, collection names.
+  static TextStyle bodyL(Color c) => style(size: 18, color: c, weight: FontWeight.w800, height: 1, tracking: -0.01);
 
-  static TextStyle tab(Color color, {bool selected = false}) =>
-      style(size: 17, color: color, weight: selected ? 500 : 400);
+  /// 16 / 700: buttons, list rows.
+  static TextStyle body(Color c) => style(size: 16, color: c, weight: FontWeight.w700, height: 1);
 
-  /// Clue numbers. Weight goes up a step for small sizes.
-  static TextStyle clue(Color color, double size) =>
-      style(size: size, color: color, weight: size < 12 ? 650 : 600, height: 1);
+  /// 15 / 800: progress row labels and counts.
+  static TextStyle bodyS(Color c) => style(size: 15, color: c, weight: FontWeight.w800, height: 1, tabular: true);
+
+  /// Running text: explanations, blurbs (14-16 / 700, comfortable leading).
+  static TextStyle prose(Color c, {double size = 15}) => style(size: size, color: c, weight: FontWeight.w700, height: 1.4);
+
+  /// 13 / 700: captions and secondary info.
+  static TextStyle label(Color c) => style(size: 13, color: c, weight: FontWeight.w700, height: 1.35);
+
+  /// 12 / 700: size chips.
+  static TextStyle chip(Color c) => style(size: 12, color: c, weight: FontWeight.w700, height: 1, tabular: true);
+
+  /// 11 / 800 uppercase, tracked +14%: DAILY · MON 9 NOV.
+  static TextStyle overline(Color c) => style(size: 11, color: c, weight: FontWeight.w800, height: 1, tracking: 0.14);
+
+  /// 9 / 700: plate numbers.
+  static TextStyle micro(Color c) => style(size: 9, color: c, weight: FontWeight.w700, height: 1, tabular: true);
+
+  /// Clue numbers: 700 open, 500 retired.
+  static TextStyle clue(Color c, double size, {bool retired = false}) =>
+      style(size: size, color: c, weight: retired ? FontWeight.w500 : FontWeight.w700, height: 1.07, tabular: true);
 }

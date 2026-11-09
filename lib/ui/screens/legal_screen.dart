@@ -3,7 +3,7 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import '../theme/gridwell_theme.dart';
 import '../theme/typography.dart';
-import '../widgets/folio.dart';
+import '../widgets/tally.dart';
 
 /// Legal documents bundled in assets/legal (also served at
 /// `legal.pranta.dev/gridwell/<doc>`).
@@ -26,18 +26,18 @@ class LegalScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FolioBody(
+      body: TallyBody(
         maxWidth: 720,
-        child: Column(children: [
-          FolioHeader(leading: 'Privacy', center: doc.title),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          TallyTopBar(title: doc.title),
           Expanded(
             child: FutureBuilder<String>(
               future: rootBundle.loadString(doc.asset),
               builder: (context, snap) => snap.hasData
                   ? SelectionArea(
                       child: ListView(
-                        padding: const EdgeInsets.fromLTRB(folioMargin, 20, folioMargin, 40),
-                        children: FolioMarkdown.render(context, snap.data!),
+                        padding: const EdgeInsets.fromLTRB(tallyMargin, 16, tallyMargin, 40),
+                        children: TallyMarkdown.render(context, snap.data!),
                       ),
                     )
                   : const SizedBox(),
@@ -51,7 +51,7 @@ class LegalScreen extends StatelessWidget {
 
 /// A small markdown renderer for the legal documents: headings, paragraphs,
 /// bullet lists, **bold**, and simple tables. Enough for our own files.
-abstract final class FolioMarkdown {
+abstract final class TallyMarkdown {
   static List<Widget> render(BuildContext context, String source) {
     final p = context.palette;
     final out = <Widget>[];
@@ -62,7 +62,7 @@ abstract final class FolioMarkdown {
       if (paragraph.isEmpty) return;
       out.add(Padding(
         padding: const EdgeInsets.only(bottom: 12),
-        child: Text.rich(_inline(paragraph.join().replaceAll('  ', ' ').trim(), FolioType.body(p, size: 16.5))),
+        child: Text.rich(_inline(paragraph.join().replaceAll('  ', ' ').trim(), TallyType.prose(p.ink2, size: 15))),
       ));
       paragraph = [];
     }
@@ -75,19 +75,19 @@ abstract final class FolioMarkdown {
         flush();
         out.add(Padding(
           padding: const EdgeInsets.only(bottom: 14),
-          child: Text(line.substring(2), style: FolioType.plateTitle(p, size: 30)),
+          child: Text(line.substring(2), style: TallyType.titleM(p.ink).copyWith(height: 1.1)),
         ));
       } else if (line.startsWith('## ')) {
         flush();
         out.add(Padding(
           padding: const EdgeInsets.only(top: 18, bottom: 8),
-          child: Text(line.substring(3).toUpperCase(), style: FolioType.kicker(p)),
+          child: Text(line.substring(3).toUpperCase(), style: TallyType.overline(p.accent)),
         ));
       } else if (line.startsWith('### ')) {
         flush();
         out.add(Padding(
           padding: const EdgeInsets.only(top: 10, bottom: 6),
-          child: Text(line.substring(4), style: FolioType.body(p, size: 18).copyWith(fontWeight: FontWeight.w600)),
+          child: Text(line.substring(4), style: TallyType.bodyL(p.ink).copyWith(height: 1.2)),
         ));
       } else if (line.trimLeft().startsWith('- ')) {
         flush();
@@ -96,9 +96,9 @@ abstract final class FolioMarkdown {
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Padding(
               padding: const EdgeInsets.only(top: 8, right: 10),
-              child: Container(width: 5, height: 5, color: p.textMuted),
+              child: Container(width: 6, height: 6, color: p.lime),
             ),
-            Expanded(child: Text.rich(_inline(line.trimLeft().substring(2), FolioType.body(p, size: 16.5)))),
+            Expanded(child: Text.rich(_inline(line.trimLeft().substring(2), TallyType.prose(p.ink2, size: 15)))),
           ]),
         ));
       } else if (line.startsWith('|')) {
@@ -117,7 +117,7 @@ abstract final class FolioMarkdown {
           child: Column(children: [
             for (var r = 0; r < rows.length; r++)
               Container(
-                decoration: BoxDecoration(border: Border(bottom: BorderSide(color: p.rule))),
+                decoration: BoxDecoration(border: Border(bottom: BorderSide(color: p.sunk))),
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   for (var c = 0; c < rows[r].length; c++)
@@ -126,8 +126,8 @@ abstract final class FolioMarkdown {
                       child: Text.rich(_inline(
                         rows[r][c],
                         r == 0 || c == 0
-                            ? FolioType.body(p, size: 15.5).copyWith(fontWeight: FontWeight.w600)
-                            : FolioType.body(p, size: 15.5).copyWith(color: p.textMuted),
+                            ? TallyType.prose(p.ink, size: 14).copyWith(fontWeight: FontWeight.w800)
+                            : TallyType.prose(p.ink2, size: 14),
                       )),
                     ),
                 ]),
@@ -151,7 +151,7 @@ abstract final class FolioMarkdown {
     for (final m in re.allMatches(text)) {
       if (m.start > last) spans.add(TextSpan(text: text.substring(last, m.start)));
       if (m.group(1) != null) {
-        spans.add(TextSpan(text: m.group(1), style: const TextStyle(fontWeight: FontWeight.w600)));
+        spans.add(TextSpan(text: m.group(1), style: const TextStyle(fontWeight: FontWeight.w900)));
       } else if (m.group(2) != null) {
         spans.add(TextSpan(text: m.group(2), style: const TextStyle(fontStyle: FontStyle.italic)));
       } else {

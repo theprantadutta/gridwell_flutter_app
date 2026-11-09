@@ -82,3 +82,43 @@ class DailyActions {
 }
 
 final dailyActionsProvider = Provider((ref) => DailyActions(ref));
+
+/// Daily streak: [current] counts consecutive days solved on their own date,
+/// ending today (or yesterday while today is still open); [best] is the
+/// longest such run ever.
+class DailyStreak {
+  const DailyStreak({required this.current, required this.best});
+
+  final int current;
+  final int best;
+}
+
+final dailyStreakProvider = Provider<DailyStreak>((ref) {
+  final results = ref.watch(dailyResultsProvider).value ?? const {};
+  final days = <DateTime>{
+    for (final r in results.values)
+      if (r.solved && r.solvedOnDay) ?DateTime.tryParse(r.date),
+  };
+  return dailyStreakOf(days, DateTime.now());
+});
+
+/// Pure streak arithmetic over local calendar days (time of day ignored).
+DailyStreak dailyStreakOf(Set<DateTime> solvedDays, DateTime now) {
+  final keys = {for (final d in solvedDays) DateTime(d.year, d.month, d.day)};
+  final sorted = keys.toList()..sort();
+  var best = 0, run = 0;
+  DateTime? prev;
+  for (final d in sorted) {
+    run = prev != null && DateTime(prev.year, prev.month, prev.day + 1) == d ? run + 1 : 1;
+    if (run > best) best = run;
+    prev = d;
+  }
+  var day = DateTime(now.year, now.month, now.day);
+  if (!keys.contains(day)) day = DateTime(day.year, day.month, day.day - 1);
+  var current = 0;
+  while (keys.contains(day)) {
+    current++;
+    day = DateTime(day.year, day.month, day.day - 1);
+  }
+  return DailyStreak(current: current, best: best);
+}

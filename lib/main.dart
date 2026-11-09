@@ -42,7 +42,7 @@ Future<void> main() async {
 
   LicenseRegistry.addLicense(() async* {
     yield LicenseEntryWithLineBreaks([
-      'Literata',
+      'Schibsted Grotesk',
     ], await rootBundle.loadString('assets/fonts/OFL.txt'));
   });
 

@@ -6,7 +6,7 @@ import '../../state/account.dart';
 import '../theme/gridwell_theme.dart';
 import '../theme/palette.dart';
 import '../theme/typography.dart';
-import '../widgets/folio.dart';
+import '../widgets/tally.dart';
 
 /// Email and password: sign in to an existing account or create one, with a
 /// password reset. Pops with the [SignInOutcome] on success.
@@ -37,71 +37,78 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
   Widget build(BuildContext context) {
     final p = context.palette;
     return Scaffold(
-      body: FolioBody(
-        child: Column(children: [
-          FolioHeader(leading: 'Account', center: _create ? 'New account' : 'Sign in'),
+      body: TallyBody(
+        bottom: false,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          TallyTopBar(title: _create ? 'New account' : 'Sign in'),
           Expanded(
             child: AutofillGroup(
-              child: FolioCenteredPage(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  Segmented<bool>(
-                    options: const [(false, 'Sign in', null), (true, 'Create account', null)],
-                    value: _create,
-                    onChanged: (v) => setState(() {
-                      _create = v;
-                      _error = null;
-                      _info = null;
-                    }),
-                    height: 52,
-                    expand: true,
-                  ),
-                  const SizedBox(height: 24),
-                  _field(p, 'Email', _email,
-                      keyboard: TextInputType.emailAddress,
-                      autofill: const [AutofillHints.email],
-                      action: TextInputAction.next),
-                  const SizedBox(height: 16),
-                  _field(p, 'Password', _password,
-                      obscure: _hidePassword,
-                      autofill: [_create ? AutofillHints.newPassword : AutofillHints.password],
-                      action: TextInputAction.done,
-                      onSubmitted: (_) => _submit(),
-                      suffix: IconButton(
-                        tooltip: _hidePassword ? 'Show password' : 'Hide password',
-                        icon: Icon(_hidePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                            color: p.textMuted),
-                        onPressed: () => setState(() => _hidePassword = !_hidePassword),
-                      )),
-                  if (_create) ...[
-                    const SizedBox(height: 6),
-                    Text('At least 6 characters.', style: FolioType.bodyMuted(p, size: 14)),
-                  ],
-                  if (_error != null) ...[
-                    const SizedBox(height: 14),
-                    Text(_error!, style: FolioType.body(p, size: 16).copyWith(color: p.accent)),
-                  ],
-                  if (_info != null) ...[
-                    const SizedBox(height: 14),
-                    Text(_info!, style: FolioType.body(p, size: 16)),
-                  ],
-                  const SizedBox(height: 24),
-                  InkButton(
-                    label: _busy ? 'One moment…' : (_create ? 'Create account' : 'Sign in'),
-                    onPressed: _busy ? null : _submit,
-                    height: 60,
-                  ),
-                  if (!_create)
-                    Center(child: TextAction(label: 'Forgot password?', onPressed: _busy ? null : _reset)),
-                  if (_create) ...[
-                    const SizedBox(height: 14),
-                    Text(
-                      'Your progress on this device moves into the new account.',
-                      style: FolioType.bodyMuted(p, size: 15),
+              child: ListView(padding: const EdgeInsets.fromLTRB(tallyMargin, 20, tallyMargin, 24), children: [
+                TallySegmented<bool>(
+                  options: const [(false, 'Sign in'), (true, 'Create account')],
+                  value: _create,
+                  onChanged: (v) => setState(() {
+                    _create = v;
+                    _error = null;
+                    _info = null;
+                  }),
+                  expand: true,
+                ),
+                const SizedBox(height: 24),
+                _field(p, 'Email', _email,
+                    keyboard: TextInputType.emailAddress,
+                    autofill: const [AutofillHints.email],
+                    action: TextInputAction.next),
+                const SizedBox(height: 14),
+                _field(p, 'Password', _password,
+                    obscure: _hidePassword,
+                    autofill: [_create ? AutofillHints.newPassword : AutofillHints.password],
+                    action: TextInputAction.done,
+                    onSubmitted: (_) => _submit(),
+                    suffix: IconButton(
+                      tooltip: _hidePassword ? 'Show password' : 'Hide password',
+                      icon: Icon(_hidePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined, color: p.ink2),
+                      onPressed: () => setState(() => _hidePassword = !_hidePassword),
+                    )),
+                if (_create) ...[
+                  const SizedBox(height: 8),
+                  Text('At least 6 characters.', style: TallyType.label(p.ink2)),
+                ],
+                if (_error != null) ...[
+                  const SizedBox(height: 14),
+                  Text(_error!, style: TallyType.prose(p.error, size: 15)),
+                ],
+                if (_info != null) ...[
+                  const SizedBox(height: 14),
+                  Text(_info!, style: TallyType.prose(p.ink, size: 15)),
+                ],
+                if (!_create)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Semantics(
+                      button: true,
+                      label: 'Forgot password?',
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: _busy ? null : _reset,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Text('Forgot password?', style: TallyType.body(p.ink2).copyWith(fontSize: 15)),
+                        ),
+                      ),
                     ),
-                  ],
-                ]),
-              ),
+                  ),
+                if (_create) ...[
+                  const SizedBox(height: 16),
+                  Text('Your progress on this device moves into the new account.', style: TallyType.prose(p.ink2, size: 14)),
+                ],
+              ]),
             ),
+          ),
+          PrimarySlab(
+            label: _busy ? 'One moment…' : (_create ? 'Create account' : 'Sign in'),
+            onPressed: _busy ? null : _submit,
+            height: 78,
           ),
         ]),
       ),
@@ -118,30 +125,24 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
     TextInputAction? action,
     ValueChanged<String>? onSubmitted,
     Widget? suffix,
-  }) {
-    OutlineInputBorder border(Color c) =>
-        OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide(color: c, width: 1.2));
-    return TextField(
-      controller: controller,
-      keyboardType: keyboard,
-      obscureText: obscure,
-      autocorrect: false,
-      enableSuggestions: !obscure,
-      autofillHints: autofill,
-      textInputAction: action,
-      onSubmitted: onSubmitted,
-      style: FolioType.body(p, size: 18),
-      cursorColor: p.textPrimary,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: FolioType.bodyMuted(p, size: 16),
-        floatingLabelStyle: FolioType.body(p, size: 16),
-        suffixIcon: suffix,
-        enabledBorder: border(p.ruleStrong),
-        focusedBorder: border(p.textPrimary),
-      ),
-    );
-  }
+  }) =>
+      TextField(
+        controller: controller,
+        keyboardType: keyboard,
+        obscureText: obscure,
+        autocorrect: false,
+        enableSuggestions: !obscure,
+        autofillHints: autofill,
+        textInputAction: action,
+        onSubmitted: onSubmitted,
+        style: TallyType.body(p.ink).copyWith(fontSize: 17),
+        cursorColor: p.accent,
+        decoration: InputDecoration(
+          labelText: label,
+          floatingLabelStyle: TallyType.label(p.accent),
+          suffixIcon: suffix,
+        ),
+      );
 
   bool _validate() {
     if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(_email.text.trim())) {

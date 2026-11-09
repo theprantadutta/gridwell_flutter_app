@@ -20,7 +20,7 @@ class NotificationService {
     importance: Importance.defaultImportance,
     priority: Priority.defaultPriority,
     icon: '@drawable/ic_notification',
-    color: Color(0xFFC44323),
+    color: Color(0xFF3C740D), // Tally accent (light); matches res/values/notification_colors.xml
   );
 
   Future<void> initialize() async {

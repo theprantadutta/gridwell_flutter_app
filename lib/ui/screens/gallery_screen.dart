@@ -3,15 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../engine/model/puzzle.dart';
+import '../../state/daily.dart';
+import '../../state/online.dart';
 import '../../state/providers.dart';
 import '../theme/gridwell_theme.dart';
 import '../theme/typography.dart';
-import '../widgets/folio.dart';
 import '../widgets/plate_thumb.dart';
+import '../widgets/tally.dart';
 
-enum _View { collection, size, latest }
-
-/// Every picture solved, pressed in order.
+/// Every picture you've solved, in color, filtered by collection.
 class GalleryScreen extends ConsumerStatefulWidget {
   const GalleryScreen({super.key});
 
@@ -20,238 +20,204 @@ class GalleryScreen extends ConsumerStatefulWidget {
 }
 
 class _GalleryScreenState extends ConsumerState<GalleryScreen> {
-  var _view = _View.collection;
+  /// Collection id, or null for all.
+  String? _filter;
+
+  static const _gap = 10.0;
 
   @override
   Widget build(BuildContext context) {
-    final p = context.palette;
     final set = ref.watch(puzzleSetProvider);
     final progress = ref.watch(progressProvider).value ?? const <String, PuzzleProgressData>{};
     final solved = set.puzzles.where((x) => progress[x.id]?.isSolved ?? false).toList();
+    final caption = solved.length == 1 ? '1 picture' : '${solved.length} pictures';
 
-    if (solved.isEmpty) return _Empty(firstPlateId: set.puzzles.first.id);
+    if (solved.isEmpty) return _Empty(caption: caption);
 
-    final groups = <(String, List<PuzzleRecord>)>[];
-    switch (_view) {
-      case _View.collection:
-        for (var i = 0; i < set.collections.length; i++) {
-          final c = set.collections[i];
-          final list = solved.where((x) => x.collectionId == c.id).toList();
-          if (list.isNotEmpty) groups.add(('${roman(i + 1)}. ${c.name.toUpperCase()}', list));
-        }
-      case _View.size:
-        for (final s in [5, 10, 15, 20]) {
-          final list = solved.where((x) => _sizeClass(x) == s).toList();
-          if (list.isNotEmpty) groups.add(('$s × $s', list));
-        }
-      case _View.latest:
-        final list = [
-          ...solved,
-        ]..sort((a, b) => (progress[b.id]?.solvedAt ?? DateTime(0)).compareTo(progress[a.id]?.solvedAt ?? DateTime(0)));
-        groups.add(('MOST RECENT FIRST', list));
-    }
-
-    Widget tab(_View v, String label) => GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () => setState(() => _view = v),
-      child: Padding(
-        padding: const EdgeInsets.only(right: 28),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              maxLines: 1,
-              style: _view == v
-                  ? FolioType.style(size: 19, color: p.textPrimary, weight: 500)
-                  : FolioType.style(size: 19, color: p.textMuted, italic: true),
-            ),
-            const SizedBox(height: 4),
-            Container(height: 2, width: 36, color: _view == v ? p.accent : Colors.transparent),
-          ],
-        ),
-      ),
-    );
+    final collections = set.collections.where((c) => solved.any((x) => x.collectionId == c.id)).toList();
+    if (_filter != null && !collections.any((c) => c.id == _filter)) _filter = null;
+    final shown = _filter == null ? solved : solved.where((x) => x.collectionId == _filter).toList();
 
     return ListView(
       padding: EdgeInsets.zero,
       children: [
-        WordmarkHeader(trailing: solved.length == 1 ? '1 picture' : '${solved.length} pictures'),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(folioMargin, 28, folioMargin, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        TallyPageTitle('Gallery', caption: caption),
+        const SizedBox(height: 20),
+        SizedBox(
+          height: MediaQuery.textScalerOf(context).scale(31).clamp(31, 48).toDouble(),
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: tallyMargin),
             children: [
-              Text('Gallery', style: FolioType.display(p)),
-              const SizedBox(height: 6),
-              Text("Every picture you've solved, pressed in order.", style: FolioType.bodyMuted(p, size: 18)),
-              const SizedBox(height: 18),
-              const Hairline(),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                // Scrolls sideways on the narrowest phones rather than overflowing.
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      tab(_View.collection, 'By collection'),
-                      tab(_View.size, 'By size'),
-                      tab(_View.latest, 'Latest'),
-                    ],
-                  ),
-                ),
-              ),
-              const Hairline(),
-              for (final (title, list) in groups) ...[
-                const SizedBox(height: 22),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Expanded(
-                      child: Text(title, style: FolioType.kicker(p, color: p.textPrimary)),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(list.length == 1 ? '1 plate' : '${list.length} plates', style: FolioType.header(p)),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                LayoutBuilder(
-                  builder: (context, c) {
-                    final columns = c.maxWidth > 500 ? 6 : 5;
-                    return GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: columns,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      children: [
-                        for (final x in list)
-                          Semantics(
-                            button: true,
-                            label: x.name,
-                            child: GestureDetector(
-                              onTap: () => context.push('/plate/${x.id}'),
-                              child: PlateThumb(puzzle: x, state: PlateState.solved),
-                            ),
-                          ),
-                      ],
-                    );
-                  },
-                ),
+              _Chip(label: 'All ${solved.length}', selected: _filter == null, onTap: () => setState(() => _filter = null)),
+              for (final c in collections) ...[
+                const SizedBox(width: 4),
+                _Chip(label: c.name, selected: _filter == c.id, onTap: () => setState(() => _filter = c.id)),
               ],
             ],
           ),
         ),
+        const SizedBox(height: 18),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: tallyMargin),
+          child: LayoutBuilder(builder: (context, c) {
+            final columns = c.maxWidth > 520 ? 5 : 3;
+            final tile = (c.maxWidth - _gap * (columns - 1)) / columns;
+            final rows = (shown.length / columns).ceil();
+            return Column(children: [
+              for (var r = 0; r < rows; r++) ...[
+                if (r > 0) const SizedBox(height: 14),
+                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  for (var i = 0; i < columns; i++) ...[
+                    if (i > 0) const SizedBox(width: _gap),
+                    SizedBox(
+                      width: tile,
+                      child: r * columns + i < shown.length
+                          ? _Picture(puzzle: shown[r * columns + i], timeMs: progress[shown[r * columns + i].id]?.bestTimeMs)
+                          : null,
+                    ),
+                  ],
+                ]),
+              ],
+            ]);
+          }),
+        ),
+        const SizedBox(height: 28),
       ],
     );
   }
-
-  static int _sizeClass(PuzzleRecord x) {
-    final longest = x.width > x.height ? x.width : x.height;
-    return longest <= 5 ? 5 : (longest <= 10 ? 10 : (longest <= 15 ? 15 : 20));
-  }
 }
 
-class _Empty extends StatelessWidget {
-  const _Empty({required this.firstPlateId});
+class _Chip extends StatelessWidget {
+  const _Chip({required this.label, required this.selected, required this.onTap});
 
-  final String firstPlateId;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const WordmarkHeader(trailing: '0 pictures'),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(folioMargin, 28, folioMargin, 0),
-          child: Text('Gallery', style: FolioType.display(p)),
+    return Pressable(
+      color: selected ? p.lime : p.surface,
+      onTap: onTap,
+      selected: selected,
+      semanticLabel: label,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Center(
+          widthFactor: 1,
+          child: Text(label, maxLines: 1, style: TallyType.body(selected ? p.onLime : p.ink2).copyWith(fontSize: 15, fontWeight: FontWeight.w800)),
         ),
-        Expanded(
-          child: LayoutBuilder(
-            // Centered when there is room, scrollable when the screen is short
-            // (landscape tablets, large text).
-            builder: (context, c) => SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: c.maxHeight),
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: folioMargin, vertical: 24),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 180,
-                          height: 180,
-                          decoration: BoxDecoration(border: Border.all(color: p.ruleStrong)),
-                          padding: const EdgeInsets.all(8),
-                          child: CustomPaint(
-                            painter: _DashedRect(p.ruleStrong),
-                            child: Center(
-                              child: Text('PLATE I', style: FolioType.kicker(p, color: p.textMuted)),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                        Text(
-                          'Nothing pressed yet',
-                          textAlign: TextAlign.center,
-                          style: FolioType.plateTitle(p, size: 34),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Every picture you solve is kept here, like a plate in a book.',
-                          textAlign: TextAlign.center,
-                          style: FolioType.bodyMuted(p, size: 18),
-                        ),
-                        const SizedBox(height: 28),
-                        ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 280),
-                          child: InkButton(
-                            label: 'Solve your first puzzle',
-                            height: 54,
-                            onPressed: () => context.push('/play/$firstPlateId'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
 
-class _DashedRect extends CustomPainter {
-  _DashedRect(this.color);
+class _Picture extends StatelessWidget {
+  const _Picture({required this.puzzle, required this.timeMs});
 
-  final Color color;
+  final PuzzleRecord puzzle;
+  final int? timeMs;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1;
-    const dash = 5.0, gap = 4.0;
-    void line(Offset a, Offset b) {
-      final total = (b - a).distance;
-      final dir = (b - a) / total;
-      for (var d = 0.0; d < total; d += dash + gap) {
-        canvas.drawLine(a + dir * d, a + dir * (d + dash).clamp(0, total), paint);
-      }
-    }
-
-    line(Offset.zero, Offset(size.width, 0));
-    line(Offset(size.width, 0), Offset(size.width, size.height));
-    line(Offset(size.width, size.height), Offset(0, size.height));
-    line(Offset(0, size.height), Offset.zero);
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final n = puzzle.width > puzzle.height ? puzzle.width : puzzle.height;
+    final style = TallyType.body(p.ink).copyWith(fontSize: 14, fontWeight: FontWeight.w800);
+    return Semantics(
+      button: true,
+      label: timeMs == null ? puzzle.name : '${puzzle.name}, ${formatClock(timeMs!)}',
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: () => context.push('/plate/${puzzle.id}'),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          // Big pictures fill the tile; small ones keep a margin of tile.
+          PlateThumb(puzzle: puzzle, state: PlateState.solved, background: p.tile, inset: n >= 15 ? 0 : 0.125),
+          const SizedBox(height: 8),
+          Row(children: [
+            Expanded(child: Text(puzzle.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: style)),
+            if (timeMs != null) ...[
+              const SizedBox(width: 6),
+              Text(formatClock(timeMs!), style: TallyType.tabular(style.copyWith(color: p.ink2))),
+            ],
+          ]),
+        ]),
+      ),
+    );
   }
+}
+
+class _Empty extends ConsumerWidget {
+  const _Empty({required this.caption});
+
+  final String caption;
 
   @override
-  bool shouldRepaint(_DashedRect old) => old.color != color;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final p = context.palette;
+    final set = ref.watch(puzzleSetProvider);
+    final today = ref.watch(todayDailyProvider);
+    final todaySolved = (ref.watch(dailyResultsProvider).value ?? const {})[localDateString(DateTime.now())]?.solved ?? false;
+    final daily = today != null && !todaySolved ? today : null;
+    final first = set.puzzles.first;
+    return LayoutBuilder(builder: (context, box) {
+      const gap = 10.0;
+      final columns = box.maxWidth > 520 ? 5 : 3;
+      final tile = (box.maxWidth - 2 * tallyMargin - gap * (columns - 1)) / columns;
+      return TallyFillPage(
+        minHeight: 3 * tile + 2 * gap + 420,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          TallyPageTitle('Gallery', caption: caption),
+          const SizedBox(height: 28),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: tallyMargin),
+            child: Column(children: [
+              for (var r = 0; r < 3; r++) ...[
+                if (r > 0) const SizedBox(height: gap),
+                Row(children: [
+                  for (var i = 0; i < columns; i++) ...[
+                    if (i > 0) const SizedBox(width: gap),
+                    Container(
+                      width: tile,
+                      height: tile,
+                      decoration: BoxDecoration(border: Border.all(color: p.outline)),
+                    ),
+                  ],
+                ]),
+              ],
+            ]),
+          ),
+          const Spacer(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(tallyMargin, 28, tallyMargin, 0),
+            child: Text('Your pictures\nland here.', style: TallyType.titleL(p.ink).copyWith(fontSize: 36)),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(tallyMargin, 14, tallyMargin, 28),
+            child: Text(
+              'Solve a puzzle and its picture is saved here in full color.',
+              style: TallyType.prose(p.ink2, size: 16),
+            ),
+          ),
+          if (daily != null)
+            PrimarySlab(
+              label: 'Play the daily',
+              sublabel: '${daily.name} · ${daily.width}×${daily.height}',
+              height: 92,
+              bottomInset: false,
+              onPressed: () => context.push('/play/${daily.id}'),
+            )
+          else
+            PrimarySlab(
+              label: 'Start No. 01',
+              sublabel: '${first.width}×${first.height} · about a minute',
+              height: 92,
+              bottomInset: false,
+              onPressed: () => context.push('/play/${first.id}'),
+            ),
+        ]),
+      );
+    });
+  }
 }

@@ -65,14 +65,20 @@ violation fixtures in `test/layering/fixtures/` prove that the check catches eac
 - **Layout**: phones portrait-only; tablets adaptive, both orientations; iPad first-class. 20x20 on narrow
   phones uses pinch-zoom with pinned clues.
 
-## Design: Folio
+## Design: Tally
 
-Puzzle-book look: cream paper, ink, hairline rules, numbered plates, a "Contents" home.
-Source mocks: `C:\Users\pranta\Downloads\Gridwell design directions exploration\export\gridwell-folio-screens`.
-Typeface: **Literata only** (bundled variable font), tabular lining figures for every number.
-Palette is semantic tokens with light, dark, and high-contrast variants. The three cell states differ
-by shape (solid fill / × mark / empty), never by color alone. The CVD + legibility harness in
+Bold, numeric, edge to edge (kit v2.0, replaces Folio). Square corners everywhere, huge tabular numbers,
+full-width slabs separated by 1 pt `--sunk` gaps, and **one** accent: lime, which always means "press
+this" or "you are here". No gradients, glows or shadows.
+Source kit: `C:\Users\pranta\Downloads\gridwell-tally-kit` (start with `04-design-system/DESIGN-SPEC.md`;
+screens in `01-app-screens/`). The logo kit and store icons are copied into `brand/`.
+Typeface: **Schibsted Grotesk only** (bundled static weights 500/700/800/900 in `assets/fonts/`), tabular
+figures for every number. Tokens: `lib/ui/theme/palette.dart` (dark, light, high contrast); type:
+`lib/ui/theme/typography.dart`; shared components: `lib/ui/widgets/tally.dart`.
+The theme follows the system by default (System / Light / Dark in Settings). The three cell states differ
+by shape (solid square / short dash / empty), never by color alone. The CVD + legibility harness in
 `test/legibility/` must pass before palette changes are committed.
+The kit's copy is British in places ("colour"); the app is always US English.
 
 ## Content pipeline (`tool/`)
 

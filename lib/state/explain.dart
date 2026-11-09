@@ -5,7 +5,7 @@ import '../engine/model/clues.dart';
 import '../engine/solver/line_solver.dart';
 
 /// Plain-English reasoning for hints and proven mistakes, in the voice of the
-/// Folio footnotes ("Row 5 needs one run of 3...").
+/// Hint and mistake explanations ("Row 5 needs one run of 3...").
 abstract final class Explain {
   static const _numbers = [
     'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',

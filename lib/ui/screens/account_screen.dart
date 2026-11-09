@@ -6,7 +6,8 @@ import '../../state/account.dart';
 import '../theme/gridwell_theme.dart';
 import '../theme/palette.dart';
 import '../theme/typography.dart';
-import '../widgets/folio.dart';
+import '../widgets/tally.dart';
+import 'settings_screen.dart' show TallyDialogText, showTallyDialog;
 
 /// Settings > Account, and where the "keep your progress" offer leads.
 /// Guests choose Google or email; signed-in players see who they are and can
@@ -28,24 +29,44 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
     final account = ref.watch(accountProvider).value ?? Account.guest;
 
     return Scaffold(
-      body: FolioBody(
+      body: TallyBody(
+        bottom: false,
         child: Stack(children: [
-          Column(children: [
-            const FolioHeader(leading: 'Back', center: 'Account'),
+          Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            const TallyTopBar(title: 'Account'),
             Expanded(
-              child: FolioCenteredPage(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: account.isGuest ? _guest(context, p) : _signedIn(context, p, account),
-                ),
+              child: ListView(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                children: [
+                  for (final w in account.isGuest ? _guest(context, p) : _signedIn(context, p, account))
+                    w is _EdgeToEdge ? w.child : Padding(padding: const EdgeInsets.symmetric(horizontal: tallyMargin), child: w),
+                ],
               ),
             ),
+            if (account.isGuest)
+              PrimarySlab(
+                label: 'Continue with Google',
+                sublabel: 'One tap, nothing to remember',
+                onPressed: _busy ? null : _google,
+                height: 78,
+              )
+            else
+              ColoredBox(
+                color: p.sunk,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: tallyDivider),
+                  child: SizedBox(
+                    height: 64 + MediaQuery.paddingOf(context).bottom,
+                    child: SlabButton(label: 'Sign out', onPressed: _busy ? null : _signOut, textColor: p.error),
+                  ),
+                ),
+              ),
           ]),
           if (_busy)
             Positioned.fill(
               child: ColoredBox(
-                color: p.surface.withValues(alpha: 0.6),
-                child: Center(child: CircularProgressIndicator(color: p.textPrimary, strokeWidth: 2)),
+                color: p.bg.withValues(alpha: 0.6),
+                child: Center(child: CircularProgressIndicator(color: p.accent, strokeWidth: 2.5)),
               ),
             ),
         ]),
@@ -54,35 +75,36 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
   }
 
   List<Widget> _guest(BuildContext context, GridwellPalette p) => [
-        Text('YOUR PROGRESS', style: FolioType.kicker(p)),
-        const SizedBox(height: 8),
-        Text('Keep your book safe', style: FolioType.display(p)),
-        const SizedBox(height: 14),
+        Overline('Your progress', color: p.accent),
+        const SizedBox(height: 12),
+        Text('Keep your puzzles safe.', style: TallyType.titleL(p.ink)),
+        const SizedBox(height: 16),
         Text(
-          'Sign in to keep your solved plates and best times if you change or lose your phone, '
+          'Sign in to keep your solved puzzles and best times if you change or lose your phone, '
           'and to pick up where you left off on another device.',
-          style: FolioType.body(p, size: 18),
+          style: TallyType.prose(p.ink2, size: 16).copyWith(height: 1.5),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         Text(
           'You can keep playing without an account. Nothing changes, and you can sign in later in Settings.',
-          style: FolioType.bodyMuted(p, size: 16),
+          style: TallyType.prose(p.ink3, size: 14),
         ),
         const SizedBox(height: 28),
-        InkButton(label: 'Continue with Google', onPressed: _busy ? null : _google, height: 60),
-        const SizedBox(height: 12),
-        OutlineButtonFolio(label: 'Continue with email', onPressed: _busy ? null : _email),
-        const SizedBox(height: 8),
-        Center(child: TextAction(label: 'Not now', onPressed: _notNow)),
-        const SizedBox(height: 16),
-        const Hairline(),
-        const SizedBox(height: 14),
+        _EdgeToEdge(ColoredBox(
+          color: p.sunk,
+          child: Column(children: [
+            SettingsRow.link(label: 'Continue with email', onTap: _busy ? () {} : _email),
+            const SizedBox(height: tallyDivider),
+            SettingsRow.link(label: 'Not now', onTap: _notNow),
+          ]),
+        )),
+        const SizedBox(height: 22),
         Wrap(children: [
-          Text('By signing in you agree to the ', style: FolioType.bodyMuted(p, size: 14)),
+          Text('By signing in you agree to the ', style: TallyType.label(p.ink2)),
           _link(p, 'Terms of Use', '/legal/terms'),
-          Text(' and the ', style: FolioType.bodyMuted(p, size: 14)),
+          Text(' and the ', style: TallyType.label(p.ink2)),
           _link(p, 'Privacy Policy', '/legal/privacy'),
-          Text('.', style: FolioType.bodyMuted(p, size: 14)),
+          Text('.', style: TallyType.label(p.ink2)),
         ]),
       ];
 
@@ -93,40 +115,31 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
       _ => 'email',
     };
     return [
-      Text('SIGNED IN WITH ${via.toUpperCase()}', style: FolioType.kicker(p)),
-      const SizedBox(height: 8),
+      Overline('Signed in with $via', color: p.accent),
+      const SizedBox(height: 12),
       FittedBox(
         fit: BoxFit.scaleDown,
         alignment: Alignment.centerLeft,
-        child: Text(account.email ?? 'Your account', maxLines: 1, style: FolioType.plateTitle(p, size: 30)),
+        child: Text(account.email ?? 'Your account', maxLines: 1, style: TallyType.titleM(p.ink)),
       ),
-      const SizedBox(height: 14),
+      const SizedBox(height: 16),
       Text(
-        'Your solved plates and best times are saved to your account. '
+        'Your solved puzzles and best times are saved to your account. '
         'Sign in on another device to carry on there.',
-        style: FolioType.body(p, size: 18),
+        style: TallyType.prose(p.ink2, size: 16).copyWith(height: 1.5),
       ),
       if (account.kind == AccountKind.email && !account.emailVerified) ...[
         const SizedBox(height: 10),
-        Text('We sent you an email to confirm your address.', style: FolioType.bodyMuted(p, size: 15)),
+        Text('We sent you an email to confirm your address.', style: TallyType.prose(p.ink3, size: 14)),
       ],
-      const SizedBox(height: 28),
-      OutlineButtonFolio(label: 'Sign out', onPressed: _busy ? null : _signOut),
-      const SizedBox(height: 10),
-      Text(
-        'Your progress stays on this device after you sign out.',
-        style: FolioType.bodyMuted(p, size: 15),
-      ),
+      const SizedBox(height: 14),
+      Text('Your progress stays on this device after you sign out.', style: TallyType.prose(p.ink3, size: 14)),
     ];
   }
 
   Widget _link(GridwellPalette p, String label, String route) => GestureDetector(
         onTap: () => context.push(route),
-        child: Text(label,
-            style: FolioType.bodyMuted(p, size: 14).copyWith(
-              color: p.textPrimary,
-              decoration: TextDecoration.underline,
-            )),
+        child: Text(label, style: TallyType.label(p.ink).copyWith(decoration: TextDecoration.underline)),
       );
 
   void _notNow() {
@@ -161,25 +174,14 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
   }
 
   Future<void> _signOut() async {
-    final p = context.palette;
-    final ok = await showDialog<bool>(
+    final ok = await showTallyDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: p.surfaceRaised,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-        title: Text('Sign out?', style: FolioType.plateTitle(p, size: 26)),
-        content: Text(
-          'Your progress stays on this device and in your account. Sign in again any time.',
-          style: FolioType.body(p),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Cancel', style: FolioType.body(p))),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('Sign out', style: FolioType.body(p).copyWith(color: p.accent)),
-          ),
-        ],
-      ),
+      title: 'Sign out?',
+      body: const TallyDialogText('Your progress stays on this device and in your account. Sign in again any time.'),
+      cancel: 'Cancel',
+      confirm: 'Sign out',
+      destructive: true,
+      onConfirm: () => true,
     );
     if (ok != true || !mounted) return;
     setState(() => _busy = true);
@@ -195,4 +197,14 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
+}
+
+/// Marks a child of the account page that runs edge to edge, unpadded.
+class _EdgeToEdge extends StatelessWidget {
+  const _EdgeToEdge(this.child);
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => child;
 }

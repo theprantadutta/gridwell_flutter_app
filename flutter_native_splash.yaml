@@ -1,24 +1,22 @@
 # dart run flutter_native_splash:create
 #
-# One ink ground in both themes with a transparent cream mark. The mark sits at
-# 128 dp in the center, exactly where the Flutter splash
-# (lib/ui/screens/splash_screen.dart) draws it, so the hand-off is seamless.
+# Tally: the page color of each theme (--bg) with the 2 x 2 mark centered at
+# 104 dp, exactly where the Flutter splash (lib/ui/screens/splash_screen.dart)
+# paints it, so the hand-off is seamless.
 #
-# Images are 4x: 512 px renders at 128 dp. Regenerate them with
+# Images are 4x: 416 px renders at 104 dp. Regenerate them with
 # brand/make_splash.py (see brand/README-splash.md) if the mark ever changes.
 flutter_native_splash:
-  color: "#201914"
-  color_dark: "#201914"
-  image: brand/splash/splash.png
-  image_dark: brand/splash/splash.png
+  color: "#F6F8F0"
+  color_dark: "#071A13"
+  image: brand/splash/splash-light.png
+  image_dark: brand/splash/splash-dark.png
 
-  # Android 12+ crops the splash icon to a circle 2/3 of a 1152 px canvas; the
-  # 512 px mark (half-diagonal 362 px) sits inside the 384 px radius.
   android_12:
-    color: "#201914"
-    color_dark: "#201914"
-    image: brand/splash/android12.png
-    image_dark: brand/splash/android12.png
+    color: "#F6F8F0"
+    color_dark: "#071A13"
+    image: brand/splash/android12-light.png
+    image_dark: brand/splash/android12-dark.png
 
   android: true
   ios: true

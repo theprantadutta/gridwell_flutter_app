@@ -44,7 +44,7 @@ source: original
 - Header lines are `key: value` up to `---`. `name` is required. `source` is required:
   `original` for in-house art, otherwise a CC0 reference recorded in PROVENANCE.md.
 - Grid characters: `.` background (empty in the solution), `k` ink, `r` red, `o` ochre,
-  `s` stone, `i` indigo. These are the Folio picture palette (art-b, art-a, art-c, art-d, art-e).
+  `s` stone, `i` indigo. Tally draws them as ink (page ink), coral, lime, moss and sea.
 - The solution is every non-background cell. Color is shown only in the revealed picture,
   since the puzzle itself is monochrome.
 - The id is `<collection>-<slug>` (campaign) or `daily-<slug>`.

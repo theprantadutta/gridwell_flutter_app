@@ -7,6 +7,7 @@
 import 'dart:io';
 import 'dart:ui' as ui;
 
+import '../support/fonts.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gridwell_flutter_app/content/puzzle_set.dart';
@@ -24,11 +25,7 @@ const _dpr = 3.0;
 /// The narrowest common phone: 360 dp wide, 8 dp margins (the 20x20 layout).
 const _available = Size(344, 520);
 
-Future<void> _loadFonts() async {
-  final loader = FontLoader('Literata')
-    ..addFont(Future.value(ByteData.sublistView(File('assets/fonts/Literata.ttf').readAsBytesSync())));
-  await loader.load();
-}
+Future<void> _loadFonts() => loadTallyFonts();
 
 class _Rendered {
   _Rendered(this.width, this.height, this.rgba);
@@ -101,7 +98,7 @@ void main() {
 
       final recorder = ui.PictureRecorder();
       final canvas = ui.Canvas(recorder)..scale(_dpr);
-      canvas.drawRect(ui.Offset.zero & g.totalSize, ui.Paint()..color = palette.surface);
+      canvas.drawRect(ui.Offset.zero & g.totalSize, ui.Paint()..color = palette.bg);
       GridPainter(geometry: g, board: board, palette: palette, mistakes: const {}).paint(canvas, g.totalSize);
       CluePainter(
         geometry: g,
@@ -127,7 +124,7 @@ void main() {
         if (cells[i] == CellState.crossed) crossedI ??= i;
         if (cells[i] == CellState.empty) emptyI ??= i;
       }
-      ui.Rect rect(int i) => g.cellRect(i ~/ 20, i % 20);
+      ui.Rect rect(int i) => g.cellSquare(i ~/ 20, i % 20);
       final emptyColor = px.at(rect(emptyI!).center.dx, rect(emptyI).center.dy);
       final filledColor = px.at(rect(filledI!).center.dx, rect(filledI).center.dy);
 
@@ -135,7 +132,7 @@ void main() {
       final liveRow = 19, retiredRow = rowRetired.indexWhere((s) => s.isNotEmpty);
       expect(retiredRow, greaterThanOrEqualTo(0));
       ui.Rect clueRect(int r) => ui.Rect.fromLTWH(0, g.colClueHeight + r * g.cell, g.rowClueWidth - g.clueGap * 0.3, g.cell);
-      final stripBg = palette.surface;
+      final stripBg = palette.bg;
 
       for (final v in Vision.values) {
         final filledVsEmpty = contrast(simulate(filledColor, v), simulate(emptyColor, v));

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/gridwell_theme.dart';
 import '../theme/typography.dart';
-import '../widgets/folio.dart';
+import '../widgets/tally.dart';
 
 /// One stop on the first-game walkthrough.
 class TourStep {
@@ -117,7 +117,7 @@ class _BoardTourState extends State<BoardTour>
                   builder: (context, _) => CustomPaint(
                     painter: _Spotlight(
                       holes: _holes(_move.value),
-                      ring: p.accent,
+                      ring: p.lime,
                     ),
                   ),
                 ),
@@ -135,55 +135,63 @@ class _BoardTourState extends State<BoardTour>
                     duration: const Duration(milliseconds: 180),
                     child: Container(
                       key: ValueKey(_step),
-                      decoration: BoxDecoration(
-                        color: p.surfaceRaised,
-                        border: Border.all(color: p.textPrimary, width: 1.2),
-                      ),
-                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
+                      color: p.surface,
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          Container(height: 4, color: p.lime),
                           Flexible(
                             child: SingleChildScrollView(
+                              padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    '${_step + 1} OF ${widget.steps.length}',
-                                    style: FolioType.kicker(p),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    step.title,
-                                    style: FolioType.plateTitle(p, size: 26),
-                                  ),
+                                  Overline('${_step + 1} of ${widget.steps.length}', color: p.accent),
+                                  const SizedBox(height: 10),
+                                  Text(step.title, style: TallyType.titleS(p.ink).copyWith(fontSize: 26, fontWeight: FontWeight.w900)),
                                   const SizedBox(height: 8),
-                                  Text(
-                                    step.body,
-                                    style: FolioType.body(p, size: 17),
-                                  ),
+                                  Text(step.body, style: TallyType.prose(p.ink2, size: 15)),
                                 ],
                               ),
                             ),
                           ),
-                          const SizedBox(height: 14),
-                          Row(
-                            children: [
-                              if (!last)
-                                TextAction(
-                                  label: 'Skip',
-                                  onPressed: widget.onDone,
+                          SizedBox(
+                            height: 58,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                if (!last) ...[
+                                  Expanded(
+                                    child: SlabButton(label: 'Skip', onPressed: widget.onDone, color: p.track),
+                                  ),
+                                ],
+                                Expanded(
+                                  child: Pressable(
+                                    color: p.lime,
+                                    onTap: _next,
+                                    semanticLabel: last ? 'Start solving' : 'Next',
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 18),
+                                      child: Row(children: [
+                                        Expanded(
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              last ? 'START SOLVING' : 'NEXT',
+                                              maxLines: 1,
+                                              style: TallyType.slab(p.onLime).copyWith(fontSize: 18),
+                                            ),
+                                          ),
+                                        ),
+                                        TallyArrow(color: p.onLime, size: 20),
+                                      ]),
+                                    ),
+                                  ),
                                 ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: InkButton(
-                                  label: last ? 'Start solving' : 'Next',
-                                  height: 50,
-                                  onPressed: _next,
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
