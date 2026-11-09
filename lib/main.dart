@@ -38,6 +38,8 @@ Future<void> main() async {
     await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   }
 
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
   await AppEnv.load();
 
   LicenseRegistry.addLicense(() async* {

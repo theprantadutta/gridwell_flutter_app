@@ -64,7 +64,15 @@ class _GridwellAppState extends ConsumerState<GridwellApp> {
       // Status and navigation bar icons follow the theme (light icons on the
       // dark Tally green, dark icons on paper). Screens may override.
       builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
-        value: Theme.of(context).brightness == Brightness.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+        // Edge to edge (main.dart): transparent bars, so the tab bar and
+        // bottom slabs run under the navigation bar as in the kit.
+        value: (Theme.of(context).brightness == Brightness.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark)
+            .copyWith(
+          statusBarColor: Colors.transparent,
+          systemNavigationBarColor: Colors.transparent,
+          systemNavigationBarDividerColor: Colors.transparent,
+          systemNavigationBarContrastEnforced: false,
+        ),
         child: child ?? const SizedBox(),
       ),
       themeMode: settings.themeMode,
