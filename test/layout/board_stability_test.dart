@@ -21,6 +21,7 @@ import 'package:gridwell_flutter_app/data/remote/api_client.dart';
 import 'package:gridwell_flutter_app/state/online.dart';
 import 'package:gridwell_flutter_app/state/providers.dart';
 import 'package:gridwell_flutter_app/state/settings.dart';
+import 'package:gridwell_flutter_app/ui/board/board_geometry.dart';
 import 'package:gridwell_flutter_app/ui/board/board_tour.dart';
 import 'package:gridwell_flutter_app/ui/board/board_view.dart';
 import 'package:gridwell_flutter_app/ui/router.dart';
@@ -43,7 +44,9 @@ final _shotKey = GlobalKey();
 Future<void> shot(WidgetTester tester, String name) async {
   final dir = Platform.environment['SHOTS'];
   if (dir == null) return;
-  final boundary = tester.renderObject<RenderRepaintBoundary>(find.byKey(_shotKey));
+  final boundary = tester.renderObject<RenderRepaintBoundary>(
+    find.byKey(_shotKey),
+  );
   await tester.runAsync(() async {
     final image = await boundary.toImage(pixelRatio: 1.5);
     final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
@@ -71,6 +74,8 @@ void main() {
     WidgetTester tester,
     Size size, {
     required bool tourDone,
+    int width = 5,
+    bool mistakes = true,
   }) async {
     tester.view.physicalSize = size * 3;
     tester.view.devicePixelRatio = 3;
@@ -84,6 +89,7 @@ void main() {
           Settings(
             onboardingDone: true,
             boardTourDone: tourDone,
+            showProvenMistakes: mistakes,
             themeMode: ThemeMode.light,
           ),
         ),
@@ -97,14 +103,15 @@ void main() {
         ),
       ],
     );
-    final puzzle = set.puzzles.firstWhere((p) => p.width == 5);
+    final puzzle = set.puzzles.firstWhere((p) => p.width == width);
     final router = buildRouter(onboardingDone: true)..go('/play/${puzzle.id}');
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
         child: MaterialApp.router(
-          builder: (context, child) => RepaintBoundary(key: _shotKey, child: child),
-        routerConfig: router,
+          builder: (context, child) =>
+              RepaintBoundary(key: _shotKey, child: child),
+          routerConfig: router,
           theme: GridwellTheme.themeData(
             GridwellPalette.of(Brightness.light, highContrast: false),
           ),
@@ -133,6 +140,7 @@ void main() {
       await pumpBoard(tester, size, tourDone: true);
       final view = find.byType(BoardView);
       final before = tester.getRect(view);
+      final controls = tester.getRect(find.text('Undo'));
       await shot(tester, 'dock-$name-0');
 
       await tester.tap(find.text('Hint'));
@@ -140,6 +148,11 @@ void main() {
       expect(find.text('Got it'), findsOneWidget);
       await shot(tester, 'dock-$name-1-note');
       expect(tester.getRect(view), before, reason: 'hint note moved the board');
+      expect(
+        tester.getRect(find.text('Undo')),
+        controls,
+        reason: 'the hint note moved the controls',
+      );
 
       await tester.tap(find.text('Got it'));
       await settle(tester);
@@ -157,6 +170,48 @@ void main() {
         before,
         reason: 'the clue readout moved the board',
       );
+
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump(const Duration(seconds: 1));
+    });
+
+    testWidgets('clue readout holds still across rows @ $name', (tester) async {
+      // Random taps would raise mistake notes; this test is about the readout.
+      await pumpBoard(tester, size, tourDone: true, width: 20, mistakes: false);
+      final view = tester.getRect(find.byType(BoardView));
+      final controls = tester.getRect(find.text('Undo'));
+      Rect? label;
+      // Down the left edge of the grid, then across the bottom: every row and
+      // column has a different clue length.
+      // Where the grid sits, worked out the way BoardView lays it out.
+      final puzzle = set.puzzles.firstWhere((p) => p.width == 20);
+      final g = BoardGeometry.fit(puzzle.clues, view.size);
+      final origin =
+          view.topLeft +
+          Offset(
+            (view.width - g.totalSize.width) / 2,
+            (view.height - g.totalSize.height) / 2,
+          );
+      for (final i in [2, 6, 9, 13, 17]) {
+        await tester.tapAt(origin + g.cellRect(i, 19).center);
+        await settle(tester);
+        await tester.tapAt(origin + g.cellRect(19, i).center);
+        await settle(tester);
+        final l = tester.getRect(find.textContaining('ROW ').first);
+        label ??= l;
+        expect(l.top, label.top, reason: 'the ROW label moved');
+        expect(
+          tester.getRect(find.text('Undo')),
+          controls,
+          reason: 'the controls moved',
+        );
+        expect(
+          tester.getRect(find.byType(BoardView)),
+          view,
+          reason: 'the board moved',
+        );
+      }
+      await shot(tester, 'readout-$name-20');
 
       await tester.pumpWidget(const SizedBox());
       await tester.pump(const Duration(seconds: 1));
