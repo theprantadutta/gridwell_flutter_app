@@ -20,6 +20,9 @@ import 'providers.dart';
 ///  * It waits for a signed-in, non-guest account and seeds nothing without one.
 ///  * It runs once per install. `GW_SEED_FORCE=true` runs it again.
 ///  * `GW_SEED_PLATES` changes how many plates each collection gets (default 8).
+///  * `GW_SEED_DAILIES=true` also marks every past daily since the shared start
+///    date as solved on its day, so the streak and calendar look used. These
+///    stay on the device: they are never queued for the leaderboard.
 ///
 /// For screenshots without ads, also give the account premium:
 /// `dotnet run grant-premium-to-user.cs -- grant <email>` in the API repo.
@@ -31,12 +34,18 @@ class DevDataSeeder {
   static const _requested = bool.fromEnvironment('GW_SEED');
   static const _force = bool.fromEnvironment('GW_SEED_FORCE');
   static const _plates = int.fromEnvironment('GW_SEED_PLATES', defaultValue: 8);
+  static const _dailies = bool.fromEnvironment('GW_SEED_DAILIES');
   static const _doneKey = 'debug_dev_data_seeded_v1';
+  static const _dailiesDoneKey = 'debug_dev_dailies_seeded_v1';
 
   Future<void> runIfRequested() async {
     if (!kDebugMode || !_requested) return;
     final settings = _ref.read(settingsRepositoryProvider);
-    if (!_force && (await settings.all())[_doneKey] == 'true') return;
+    final done = await settings.all();
+    if (_dailies && (_force || done[_dailiesDoneKey] != 'true')) {
+      await _seedDailies();
+    }
+    if (!_force && done[_doneKey] == 'true') return;
 
     // The cached sign-in can resolve after the first frame: wait for it.
     final auth = _ref.read(authServiceProvider);
@@ -72,6 +81,44 @@ class DevDataSeeder {
     }
     await _ref.read(onlineSessionProvider).uploadAllProgress();
     debugPrint('DevDataSeeder: seeded $solved plates');
+  }
+}
+
+extension on DevDataSeeder {
+  /// Every past daily, solved on its own day with a believable time. Local
+  /// only: the daily repository is the device's own record, and nothing here
+  /// touches the outbox, so no late time reaches a leaderboard.
+  Future<void> _seedDailies() async {
+    final auth = _ref.read(authServiceProvider);
+    for (var i = 0; auth.current.isGuest; i++) {
+      if (i == 30) {
+        debugPrint('DevDataSeeder: no signed-in account, skipping dailies');
+        return;
+      }
+      await Future<void>.delayed(const Duration(seconds: 1));
+    }
+    final now = DateTime.now();
+    await _ref.read(settingsRepositoryProvider).put(DevDataSeeder._dailiesDoneKey, 'true', now);
+    final start = DateTime.tryParse(_ref.read(puzzleSetProvider).dailyStartDate);
+    if (start == null) return;
+    final random = Random(20261109);
+    final repo = _ref.read(dailyRepositoryProvider);
+    var count = 0;
+    for (var d = DateTime(start.year, start.month, start.day);
+        d.isBefore(DateTime(now.year, now.month, now.day));
+        d = DateTime(d.year, d.month, d.day + 1)) {
+      final date = localDateString(d);
+      final puzzle = dailyFor(_ref, date);
+      if (puzzle == null) continue;
+      await repo.recordSolve(
+        date: date,
+        puzzleId: puzzle.id,
+        timeMs: (puzzle.width * puzzle.height * (900 + random.nextInt(900))).clamp(20000, 3600000),
+        onDay: true,
+      );
+      count++;
+    }
+    debugPrint('DevDataSeeder: seeded $count dailies');
   }
 }
 

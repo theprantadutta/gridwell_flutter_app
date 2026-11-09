@@ -278,7 +278,7 @@ class BigStat extends StatelessWidget {
           SizedBox(width: gap),
           Padding(
             padding: EdgeInsets.only(bottom: (style.fontSize ?? 60) * 0.06),
-            child: trailing ?? Text(label!, maxLines: 3, style: TallyType.tabular(TallyType.label(labelColor ?? p.ink2)).copyWith(height: 1.3)),
+            child: trailing ?? Text(label!, maxLines: 3, style: TallyType.label(labelColor ?? p.ink2).copyWith(height: 1.3)),
           ),
         ],
       ],

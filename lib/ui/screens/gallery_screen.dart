@@ -135,11 +135,34 @@ class _Picture extends StatelessWidget {
           // Big pictures fill the tile; small ones keep a margin of tile.
           PlateThumb(puzzle: puzzle, state: PlateState.solved, background: p.tile, inset: n >= 15 ? 0 : 0.125),
           const SizedBox(height: 8),
-          Row(children: [
-            Expanded(child: Text(puzzle.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: style)),
+          // Long names wrap to a second line rather than lose their ending.
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Expanded(
+              child: LayoutBuilder(builder: (context, c) {
+                // Shrink (to 75% at most) until the longest word fits, so a
+                // word is never broken across lines; then wrap between words.
+                final scaler = MediaQuery.textScalerOf(context);
+                final widest = puzzle.name
+                    .split(' ')
+                    .map((w) => (TextPainter(
+                          text: TextSpan(text: w, style: style),
+                          textDirection: TextDirection.ltr,
+                          textScaler: scaler,
+                        )..layout())
+                            .width)
+                    .fold<double>(0, (a, b) => a > b ? a : b);
+                final scale = widest <= c.maxWidth ? 1.0 : (c.maxWidth / widest).clamp(0.75, 1.0);
+                return Text(
+                  puzzle.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: style.copyWith(height: 1.15, fontSize: style.fontSize! * scale - (scale < 1 ? 0.3 : 0)),
+                );
+              }),
+            ),
             if (timeMs != null) ...[
               const SizedBox(width: 6),
-              Text(formatClock(timeMs!), style: style.copyWith(color: p.ink2)),
+              Text(formatClock(timeMs!), style: style.copyWith(color: p.ink2, height: 1.15)),
             ],
           ]),
         ]),
