@@ -8,6 +8,15 @@ abstract interface class AnalyticsService {
 
   /// Turns collection on or off (the player's choice in Settings > Privacy).
   Future<void> setEnabled(bool enabled);
+
+  /// A screen came into view (a `screen_view` event).
+  Future<void> screen(String name);
+
+  /// The pseudonymous user id (Firebase uid), or null to clear it.
+  Future<void> setUserId(String? id);
+
+  /// A user property for segmenting reports (account kind, premium).
+  Future<void> setUserProperty(String name, String? value);
 }
 
 /// Records events in memory. Used in tests and before Firebase is ready.
@@ -23,6 +32,17 @@ class MemoryAnalytics implements AnalyticsService {
 
   @override
   Future<void> setEnabled(bool enabled) async {}
+
+  final screens = <String>[];
+
+  @override
+  Future<void> screen(String name) async => screens.add(name);
+
+  @override
+  Future<void> setUserId(String? id) async {}
+
+  @override
+  Future<void> setUserProperty(String name, String? value) async {}
 }
 
 /// Event names in one place so they cannot drift.

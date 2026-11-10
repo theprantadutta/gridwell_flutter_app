@@ -30,4 +30,27 @@ class FirebaseAnalyticsService implements AnalyticsService {
       await _fa.setAnalyticsCollectionEnabled(enabled);
     } catch (_) {}
   }
+
+  @override
+  Future<void> screen(String name) async {
+    try {
+      await _fa.logScreenView(screenName: name, screenClass: name);
+    } catch (e) {
+      debugPrint('analytics screen $name failed: $e');
+    }
+  }
+
+  @override
+  Future<void> setUserId(String? id) async {
+    try {
+      await _fa.setUserId(id: id);
+    } catch (_) {}
+  }
+
+  @override
+  Future<void> setUserProperty(String name, String? value) async {
+    try {
+      await _fa.setUserProperty(name: name, value: value);
+    } catch (_) {}
+  }
 }

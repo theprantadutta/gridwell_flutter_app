@@ -6,6 +6,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'ad_config.dart';
 import 'ad_service.dart';
+import '../crash/crash_reporter.dart';
 
 /// AdMob behind [AdService]: rewarded and interstitial only (no banners).
 ///
@@ -42,7 +43,8 @@ class GoogleAdService implements AdService {
       await c.future.timeout(const Duration(seconds: 6), onTimeout: () {});
       _canRequestAds = await ConsentInformation.instance.canRequestAds();
       if (_canRequestAds) await _startSdk();
-    } catch (e) {
+    } catch (e, st) {
+      CrashReports.instance.recordError(e, st, reason: 'ads init');
       debugPrint('ads init failed: $e');
     }
   }

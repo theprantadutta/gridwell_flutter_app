@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart' show ThemeMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../services/analytics/analytics_service.dart';
 import 'online.dart';
 import 'providers.dart';
+import 'services.dart';
 
 /// Player settings. Stored locally first; synced last-write-wins.
 class Settings {
@@ -123,6 +125,20 @@ class Settings {
 
 /// Settings, loaded at startup (see [initialSettingsProvider]) and written
 /// through to the database on every change.
+/// Settings the player changes in Settings (logged as `settings_changed`).
+/// Internal flags such as `review_asked_ms` or `board_tour_done` are left out.
+const playerSettingKeys = [
+  'theme_mode',
+  'sound',
+  'haptics',
+  'show_proven_mistakes',
+  'auto_cross',
+  'show_timer',
+  'high_contrast',
+  'daily_reminder',
+  'share_analytics',
+];
+
 class SettingsNotifier extends Notifier<Settings> {
   @override
   Settings build() => ref.watch(initialSettingsProvider);
@@ -137,6 +153,12 @@ class SettingsNotifier extends Notifier<Settings> {
     final a = before.toMap(), b = next.toMap();
     for (final key in b.keys) {
       if (a[key] != b[key]) await repo.put(key, b[key]!, now);
+    }
+    // Choices the player makes in Settings, not the app's own bookkeeping.
+    for (final key in playerSettingKeys) {
+      if (a[key] != b[key]) {
+        unawaited(ref.read(analyticsProvider).log(AnalyticsEvents.settingsChanged, {'setting': key, 'value': b[key]!}));
+      }
     }
     if (syncedSettingKeys.any((k) => a[k] != b[k])) {
       unawaited(

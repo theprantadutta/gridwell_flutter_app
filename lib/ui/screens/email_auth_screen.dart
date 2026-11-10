@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../state/account.dart';
+import '../../state/services.dart';
 import '../theme/gridwell_theme.dart';
 import '../theme/palette.dart';
 import '../theme/typography.dart';
@@ -172,7 +173,8 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
       if (mounted) context.pop(outcome);
     } on AuthFailure catch (e) {
       if (mounted) setState(() => _error = e.message);
-    } catch (_) {
+    } catch (e, st) {
+      ref.read(crashReporterProvider).recordError(e, st, reason: 'email sign-in');
       if (mounted) setState(() => _error = 'Something went wrong. Please try again.');
     } finally {
       if (mounted) setState(() => _busy = false);

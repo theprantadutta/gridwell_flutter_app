@@ -2,11 +2,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/ads/ad_service.dart';
 import '../services/analytics/analytics_service.dart';
+import '../services/crash/crash_reporter.dart';
 import '../services/feedback/feedback_service.dart';
 import 'providers.dart';
 
 /// Swapped for the Firebase implementation in main().
 final analyticsProvider = Provider<AnalyticsService>((ref) => MemoryAnalytics());
+
+/// Swapped for Crashlytics in main() (release builds only).
+final crashReporterProvider = Provider<CrashReporter>((ref) => const NoopCrashReporter());
 
 /// Swapped for the haptics + audio implementation in main().
 final feedbackProvider = Provider<FeedbackService>((ref) => SilentFeedback());

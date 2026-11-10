@@ -11,11 +11,16 @@ import '../config/app_env.dart';
 enum AccountKind { guest, google, email, apple }
 
 class Account {
-  const Account({required this.kind, this.email, this.emailVerified = false});
+  const Account({required this.kind, this.uid, this.email, this.emailVerified = false});
 
   static const guest = Account(kind: AccountKind.guest);
 
   final AccountKind kind;
+
+  /// The Firebase uid, guests included (their anonymous account). Null only
+  /// when Firebase has never been reachable. Pseudonymous: safe for analytics
+  /// and crash reports, unlike [email].
+  final String? uid;
   final String? email;
   final bool emailVerified;
 
@@ -74,7 +79,8 @@ class AuthService {
   }
 
   static Account accountOf(User? user) {
-    if (user == null || user.isAnonymous) return Account.guest;
+    if (user == null) return Account.guest;
+    if (user.isAnonymous) return Account(kind: AccountKind.guest, uid: user.uid);
     final providers = user.providerData.map((p) => p.providerId).toSet();
     final kind = providers.contains('google.com')
         ? AccountKind.google
@@ -85,7 +91,7 @@ class AuthService {
                 : AccountKind.guest;
     final email = user.email ??
         user.providerData.map((p) => p.email).firstWhere((e) => e != null, orElse: () => null);
-    return Account(kind: kind, email: email, emailVerified: user.emailVerified);
+    return Account(kind: kind, uid: user.uid, email: email, emailVerified: user.emailVerified);
   }
 
   Account get current => accountOf(_auth?.currentUser);

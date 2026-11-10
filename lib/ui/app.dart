@@ -11,6 +11,7 @@ import '../state/online.dart';
 import '../state/reminders.dart';
 import '../state/settings.dart';
 import '../state/store_prompts.dart';
+import '../state/telemetry.dart';
 import 'router.dart';
 import 'theme/gridwell_theme.dart';
 import 'theme/palette.dart';
@@ -36,6 +37,15 @@ class _GridwellAppState extends ConsumerState<GridwellApp> {
     ref.read(pushRegistrarProvider).listen();
     ref.read(devDataSeederProvider).runIfRequested(); // debug builds only
     ref.read(purchaseControllerProvider);
+    // Analytics screen views and crash-report context follow navigation.
+    // Listened, not just read: Riverpod pauses providers nobody listens to,
+    // which would stop the account and entitlement updates.
+    final telemetry = ref.listenManual(telemetryProvider, (_, _) {}).read();
+    _router.routerDelegate.addListener(() {
+      final config = _router.routerDelegate.currentConfiguration;
+      if (config.isEmpty) return;
+      telemetry.route(config.fullPath, puzzleId: config.pathParameters['id']);
+    });
     _lifecycle = AppLifecycleListener(onResume: _onForeground);
     // After the splash, so an update offer never lands on top of it.
     Future<void>.delayed(const Duration(seconds: 3), () {

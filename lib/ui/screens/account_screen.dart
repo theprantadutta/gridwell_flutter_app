@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../state/account.dart';
+import '../../state/services.dart';
 import '../theme/gridwell_theme.dart';
 import '../theme/palette.dart';
 import '../theme/typography.dart';
@@ -155,7 +156,9 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
       _signedInMessage(outcome);
     } on AuthFailure catch (e) {
       _show(e.message);
-    } catch (e) {
+    } catch (e, st) {
+      // Not a known auth failure: worth a look.
+      ref.read(crashReporterProvider).recordError(e, st, reason: 'google sign-in');
       _show('Google sign-in did not work. Please try again.');
     } finally {
       if (mounted) setState(() => _busy = false);

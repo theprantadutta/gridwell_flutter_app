@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 
 import 'product_ids.dart';
+import '../crash/crash_reporter.dart';
 
 /// A completed store purchase, ready for server verification.
 class StorePurchase {
@@ -47,7 +48,8 @@ class StoreService {
       });
       _connected = await _iap.initConnection().timeout(const Duration(seconds: 8), onTimeout: () => false);
       if (_connected) await loadProducts();
-    } catch (e) {
+    } catch (e, st) {
+      CrashReports.instance.recordError(e, st, reason: 'store init');
       debugPrint('store unavailable: $e');
     }
   }
@@ -86,7 +88,8 @@ class StoreService {
               google: RequestPurchaseAndroidProps(skus: [productId]),
             )));
       return true;
-    } catch (e) {
+    } catch (e, st) {
+      CrashReports.instance.recordError(e, st, reason: 'purchase start');
       debugPrint('purchase failed to start: $e');
       return false;
     }
@@ -96,7 +99,8 @@ class StoreService {
   Future<void> finish(StorePurchase p) async {
     try {
       await _iap.finishTransaction(purchase: p.raw, isConsumable: false);
-    } catch (e) {
+    } catch (e, st) {
+      CrashReports.instance.recordError(e, st, reason: 'purchase finish');
       debugPrint('finishTransaction failed (retried on next restore): $e');
     }
   }
@@ -112,7 +116,8 @@ class StoreService {
         for (final p in list)
           StorePurchase(productId: p.productId, platform: _platform, token: p.purchaseToken, raw: p),
       ];
-    } catch (e) {
+    } catch (e, st) {
+      CrashReports.instance.recordError(e, st, reason: 'owned purchases');
       debugPrint('owned purchases unavailable: $e');
       return null;
     }

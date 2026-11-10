@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:isolate';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -13,6 +14,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
 import 'services/analytics/analytics_service.dart';
 import 'services/config/app_env.dart';
+import 'services/crash/crash_reporter.dart';
+import 'services/crash/firebase_crash_reporter.dart';
 import 'services/analytics/firebase_analytics_service.dart';
 import 'services/ads/google_ad_service.dart';
 import 'services/feedback/sound_haptic_feedback.dart';
@@ -49,16 +52,17 @@ Future<void> main() async {
   });
 
   // Firebase is enrichment only: the game must start without it. Analytics
-  // and crash reporting run in profile and release builds, never in debug.
+  // and crash reporting run in release builds only, never in debug or profile.
   AnalyticsService analytics = MemoryAnalytics();
+  CrashReporter crash = const NoopCrashReporter();
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
-      !kDebugMode,
+      kReleaseMode,
     );
-    if (kDebugMode) {
+    if (!kReleaseMode) {
       await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(false);
     } else {
       analytics = FirebaseAnalyticsService(FirebaseAnalytics.instance);
@@ -69,6 +73,17 @@ Future<void> main() async {
         FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
         return true;
       };
+      // Errors thrown in background isolates (decoding, the solver).
+      Isolate.current.addErrorListener(RawReceivePort((List<dynamic> pair) {
+        FirebaseCrashlytics.instance.recordError(
+          pair.first,
+          pair.last == null ? null : StackTrace.fromString(pair.last.toString()),
+          fatal: true,
+        );
+      }).sendPort);
+      // Caught errors and report context (user, screen, puzzle).
+      crash = FirebaseCrashReporter(FirebaseCrashlytics.instance);
+      CrashReports.instance = crash;
     }
   } catch (e) {
     debugPrint('Firebase unavailable: $e');
@@ -92,6 +107,7 @@ Future<void> main() async {
         ...overrides,
         feedbackProvider.overrideWithValue(feedback),
         analyticsProvider.overrideWithValue(analytics),
+        crashReporterProvider.overrideWithValue(crash),
         adServiceProvider.overrideWithValue(ads),
         storeServiceProvider.overrideWithValue(store),
         notificationServiceProvider.overrideWithValue(notifications),

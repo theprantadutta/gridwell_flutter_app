@@ -117,6 +117,11 @@ picture (text art in `content/plates/`) → clue derivation → line-solvability
 
 ## Firebase and platform notes
 
+- **Analytics and Crashlytics run in release builds only** (`kReleaseMode` in `main.dart`); debug and profile
+  collect nothing. Fatal errors: `FlutterError.onError`, `PlatformDispatcher.onError` and isolate errors.
+  Caught errors go through `CrashReports.instance` (services) or `crashReporterProvider` (state/UI).
+  `lib/state/telemetry.dart` sets the pseudonymous uid, `account_kind` and `plan` on both and logs a
+  `screen_view` per route (also the `screen` and `puzzle_id` crash keys). Never send the email.
 - Firebase client config (`google-services.json`, `GoogleService-Info.plist`, `firebase_options.dart`,
   `firebase.json`) is gitignored. Regenerate with `flutterfire configure`.
 - iOS builds and `GoogleService-Info.plist` live on the Mac. Mac-side checklist: `docs/MAC_CHECKLIST.md`.

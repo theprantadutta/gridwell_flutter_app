@@ -5,6 +5,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
+import '../crash/crash_reporter.dart';
 
 /// Local notifications: the 7pm daily reminder. Scheduled on the device in
 /// the player's own timezone, so it works with no connection at all.
@@ -39,7 +40,8 @@ class NotificationService {
         ),
       );
       _ready = true;
-    } catch (e) {
+    } catch (e, st) {
+      CrashReports.instance.recordError(e, st, reason: 'notifications init');
       debugPrint('notifications unavailable: $e');
     }
   }
@@ -52,7 +54,8 @@ class NotificationService {
       if (android != null) return await android.requestNotificationsPermission() ?? false;
       final ios = _plugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
       if (ios != null) return await ios.requestPermissions(alert: true, sound: true) ?? false;
-    } catch (e) {
+    } catch (e, st) {
+      CrashReports.instance.recordError(e, st, reason: 'notification permission');
       debugPrint('notification permission failed: $e');
     }
     return false;
