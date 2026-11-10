@@ -130,6 +130,11 @@ class SettingsScreen extends ConsumerWidget {
         SettingsRow.link(label: 'Restore purchase', onTap: () => context.push('/store?restore=1')),
       ]),
       SettingsGroup(title: 'About', children: [
+        SettingsRow.link(
+          label: 'About Gridwell',
+          detail: 'The game, this version, and who made it',
+          onTap: () => context.push('/about'),
+        ),
         if (defaultTargetPlatform == TargetPlatform.android)
           SettingsRow.link(label: 'Check for updates', onTap: () => _checkForUpdates(context, ref)),
         SettingsRow.link(label: 'Privacy', onTap: () => context.push('/privacy')),
@@ -138,7 +143,7 @@ class SettingsScreen extends ConsumerWidget {
       Padding(
         padding: const EdgeInsets.fromLTRB(tallyMargin, 16, tallyMargin, 24),
         child: Text(
-          version == null ? 'Gridwell · pranta.dev' : 'Gridwell $version · pranta.dev',
+          version == null ? 'Gridwell' : 'Gridwell $version',
           style: TallyType.label(p.ink3),
         ),
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'screens/about_screen.dart';
 import 'screens/account_screen.dart';
 import 'screens/board_screen.dart';
 import 'screens/collection_screen.dart';
@@ -48,6 +49,7 @@ GoRouter buildRouter({required bool onboardingDone}) => GoRouter(
           builder: (_, state) => StoreScreen(restoreOnOpen: state.uri.queryParameters['restore'] == '1'),
         ),
         GoRoute(path: '/privacy', builder: (_, _) => const PrivacyScreen()),
+        GoRoute(path: '/about', builder: (_, _) => const AboutScreen()),
         GoRoute(path: '/account', builder: (_, _) => const AccountScreen()),
         GoRoute(path: '/account/email', builder: (_, _) => const EmailAuthScreen()),
         GoRoute(

@@ -80,6 +80,7 @@ void main() {
     'plate': () => '/plate/${set.puzzles.first.id}',
     'store': () => '/store',
     'privacy': () => '/privacy',
+    'about': () => '/about',
     'legal': () => '/legal/terms',
     'account': () => '/account',
     'account-email': () => '/account/email',
