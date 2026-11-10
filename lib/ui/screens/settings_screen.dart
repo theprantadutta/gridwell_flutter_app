@@ -144,6 +144,7 @@ class SettingsScreen extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(tallyMargin, 16, tallyMargin, 24),
         child: Text(
           version == null ? 'Gridwell' : 'Gridwell $version',
+          textAlign: TextAlign.center,
           style: TallyType.label(p.ink3),
         ),
       ),
