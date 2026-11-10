@@ -59,7 +59,11 @@ class ContentsScreen extends ConsumerWidget {
       final tile = PlateGrid.tileFor(box.maxWidth, columns);
       final scaler = MediaQuery.textScalerOf(context);
       return TallyFillPage(
-        minHeight: 470 + set.collections.length * 48 + tile,
+        // Measured: the fixed part (header, big stat, daily slab, collection
+        // rows, section header) is about 340 + 46 per collection. Below that,
+        // one row of plates and the foot gap. Any more and the page scrolls
+        // when everything already fits.
+        minHeight: 340 + set.collections.length * 46 + tile + 12,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -117,30 +121,40 @@ class ContentsScreen extends ConsumerWidget {
                 current: c.id == featured,
                 onTap: () => context.push('/collection/${c.id}'),
               ),
-            SectionHeader(
-              featuredInfo.name,
-              action: 'All ${featuredPlates.length}',
-              onAction: () => context.push('/collection/$featured'),
-            ),
-            // As many rows of plates as the page has room for. The plate
+            // As many rows of plates as the page has room for, under their
+            // section header. Spare height goes above the header, between the
+            // sections, never as a dead band over the tab bar. The plate
             // you're on (and the one after it) always shows.
             Expanded(
               child: LayoutBuilder(builder: (context, c) {
-                final rows = math.max(1, ((c.maxHeight + PlateGrid.gap) / (tile + PlateGrid.gap)).floor());
+                final header = scaler.scale(61); // SectionHeader: 22 + 28 + 10, plus 1
+                final rows = math.max(1, ((c.maxHeight - header + PlateGrid.gap) / (tile + PlateGrid.gap)).floor());
+                final gridHeight = rows * tile + (rows - 1) * PlateGrid.gap;
                 final shown = _window(featuredPlates, rows * columns, current);
-                return ClipRect(
-                  child: OverflowBox(
-                    alignment: Alignment.topCenter,
-                    maxHeight: double.infinity,
-                    child: PlateGrid(
-                      plates: shown,
-                      columns: columns,
-                      progress: progress,
-                      inProgress: inProgress,
-                      current: current?.id,
+                return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  const Spacer(),
+                  SectionHeader(
+                    featuredInfo.name,
+                    action: 'All ${featuredPlates.length}',
+                    onAction: () => context.push('/collection/$featured'),
+                  ),
+                  SizedBox(
+                    height: math.min(gridHeight, math.max(0.0, c.maxHeight - header)),
+                    child: ClipRect(
+                      child: OverflowBox(
+                        alignment: Alignment.topCenter,
+                        maxHeight: double.infinity,
+                        child: PlateGrid(
+                          plates: shown,
+                          columns: columns,
+                          progress: progress,
+                          inProgress: inProgress,
+                          current: current?.id,
+                        ),
+                      ),
                     ),
                   ),
-                );
+                ]);
               }),
             ),
             SizedBox(height: scaler.scale(12)),

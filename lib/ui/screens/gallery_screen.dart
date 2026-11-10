@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -188,22 +190,29 @@ class _Empty extends ConsumerWidget {
       const gap = 10.0;
       final columns = box.maxWidth > 520 ? 5 : 3;
       final tile = (box.maxWidth - 2 * tallyMargin - gap * (columns - 1)) / columns;
+      // Measured: title, words and slab need about 372. The empty frames take
+      // what is left, up to three rows, so the page never scrolls just to
+      // show placeholders (tablet landscape fits one row).
+      final scaled = MediaQuery.textScalerOf(context).scale(372);
+      final rows = ((box.maxHeight - scaled + gap) / (tile + gap)).floor().clamp(1, 3);
+      // A single row that still does not fit shrinks its frames instead.
+      final frame = rows == 1 ? math.min(tile, math.max(60.0, box.maxHeight - scaled)) : tile;
       return TallyFillPage(
-        minHeight: 3 * tile + 2 * gap + 420,
+        minHeight: rows * frame + (rows - 1) * gap + 372,
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           TallyPageTitle('Gallery', caption: caption),
           const SizedBox(height: 28),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: tallyMargin),
             child: Column(children: [
-              for (var r = 0; r < 3; r++) ...[
+              for (var r = 0; r < rows; r++) ...[
                 if (r > 0) const SizedBox(height: gap),
-                Row(children: [
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   for (var i = 0; i < columns; i++) ...[
                     if (i > 0) const SizedBox(width: gap),
                     Container(
-                      width: tile,
-                      height: tile,
+                      width: frame,
+                      height: frame,
                       decoration: BoxDecoration(border: Border.all(color: p.outline)),
                     ),
                   ],

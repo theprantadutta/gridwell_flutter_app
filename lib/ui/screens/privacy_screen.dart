@@ -29,7 +29,7 @@ class PrivacyScreen extends ConsumerWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           const TallyTopBar(title: 'Privacy'),
           Expanded(
-            child: ListView(padding: const EdgeInsets.only(bottom: 32), children: [
+            child: ListView(padding: const EdgeInsets.only(bottom: 20), children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(tallyMargin, 14, tallyMargin, 0),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

@@ -33,7 +33,9 @@ class PlateScreen extends ConsumerWidget {
           ),
           Expanded(
             child: TallyFillPage(
-              minHeight: 520,
+              // The picture flexes; below it the name, facts and slab need about
+              // 450. More would scroll a page whose content already fits.
+              minHeight: 460,
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                 const SizedBox(height: 8),
                 Expanded(
