@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../state/account.dart';
 import '../../state/app_info.dart';
+import '../../state/display.dart';
 import '../../state/monetization.dart';
 import '../../state/online.dart';
 import '../../state/progress_actions.dart';
@@ -96,6 +97,7 @@ class SettingsScreen extends ConsumerWidget {
           value: s.highContrast,
           onChanged: (v) => set((x) => x.copyWith(highContrast: v)),
         ),
+        _SmoothMotionRow(value: s.highRefreshRate, onChanged: (v) => set((x) => x.copyWith(highRefreshRate: v))),
       ]),
       SettingsGroup(title: 'Account', children: [
         SettingsRow.link(
@@ -276,3 +278,56 @@ Future<T?> showTallyDialog<T>({
         );
       },
     );
+
+/// "Smooth motion": the display's highest refresh rate, with what the screen
+/// can do and is doing right now. Re-reads the display whenever Settings
+/// opens, so the numbers are current.
+class _SmoothMotionRow extends ConsumerStatefulWidget {
+  const _SmoothMotionRow({required this.value, required this.onChanged});
+
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  ConsumerState<_SmoothMotionRow> createState() => _SmoothMotionRowState();
+}
+
+class _SmoothMotionRowState extends ConsumerState<_SmoothMotionRow> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) ref.read(displayRateProvider.notifier).refresh();
+    });
+  }
+
+  static String _hz(double hz) => '${hz.round()} Hz';
+
+  @override
+  Widget build(BuildContext context) {
+    final rates = ref.watch(displayRateProvider);
+    // A screen with a single rate: say so instead of offering a dead switch.
+    if (rates != null && !rates.supportsHighRate) {
+      return SettingsRow(
+        label: 'Smooth motion',
+        detail: rates.maxHz > 0
+            ? 'This screen runs at ${_hz(rates.maxHz)}, so it is already as smooth as it gets.'
+            : 'This screen runs at one refresh rate, so there is nothing to change.',
+      );
+    }
+    final detail = StringBuffer(rates == null
+        ? "Use your screen's highest refresh rate"
+        : "Up to ${_hz(rates.maxHz)} · now ${_hz(rates.currentHz)}");
+    if (rates != null && widget.value && rates.lowPower) {
+      detail.write('. Battery saver keeps it lower for now');
+    } else if (rates != null && widget.value && rates.warm) {
+      detail.write('. Your device is warm, so it may stay lower for a while');
+    }
+    return SettingsRow.toggle(
+      label: 'Smooth motion',
+      detail: detail.toString(),
+      value: widget.value,
+      onChanged: widget.onChanged,
+    );
+  }
+}

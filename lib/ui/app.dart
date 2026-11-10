@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;
 
 import '../state/dev_seeder.dart';
+import '../state/display.dart';
 import '../state/monetization.dart';
 import '../state/online.dart';
 import '../state/reminders.dart';
@@ -47,6 +48,11 @@ class _GridwellAppState extends ConsumerState<GridwellApp> {
       telemetry.route(config.fullPath, puzzleId: config.pathParameters['id']);
     });
     _lifecycle = AppLifecycleListener(onResume: _onForeground);
+    // Smooth motion: after the first frame (the plugin needs the rendering
+    // surface attached), then again on every resume and setting change.
+    // Listened, not just read, so Riverpod keeps it awake.
+    ref.listenManual(displayRateProvider, (_, _) {});
+    WidgetsBinding.instance.addPostFrameCallback((_) => ref.read(displayRateProvider.notifier).apply());
     // After the splash, so an update offer never lands on top of it.
     Future<void>.delayed(const Duration(seconds: 3), () {
       if (mounted) ref.read(updateReadyProvider.notifier).check();
@@ -54,6 +60,8 @@ class _GridwellAppState extends ConsumerState<GridwellApp> {
   }
 
   void _onForeground() {
+    // Android can drop the window's preferred display mode in the background.
+    ref.read(displayRateProvider.notifier).apply();
     ref.read(onlineSessionProvider).onForeground().then((_) => ref.read(pushRegistrarProvider).register());
     ref.read(reminderSchedulerProvider).reschedule();
   }

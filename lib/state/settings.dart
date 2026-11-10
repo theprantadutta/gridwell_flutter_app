@@ -25,6 +25,7 @@ class Settings {
     this.notificationsAsked = false,
     this.dailyReminder = true,
     this.shareAnalytics = true,
+    this.highRefreshRate = true,
   });
 
   final ThemeMode themeMode;
@@ -50,6 +51,12 @@ class Settings {
   /// Anonymous usage statistics (Firebase Analytics). Off stops collection.
   final bool shareAnalytics;
 
+  /// Ask the display for its highest refresh rate ("Smooth motion"). On by
+  /// default: a 120 Hz screen otherwise runs the app at 60 Hz. Kept per
+  /// device, not synced: whether it is worth the battery depends on the
+  /// hardware in hand.
+  final bool highRefreshRate;
+
   Settings copyWith({
     ThemeMode? themeMode,
     bool? sound,
@@ -65,6 +72,7 @@ class Settings {
     bool? notificationsAsked,
     bool? dailyReminder,
     bool? shareAnalytics,
+    bool? highRefreshRate,
   }) => Settings(
     themeMode: themeMode ?? this.themeMode,
     sound: sound ?? this.sound,
@@ -80,6 +88,7 @@ class Settings {
     notificationsAsked: notificationsAsked ?? this.notificationsAsked,
     dailyReminder: dailyReminder ?? this.dailyReminder,
     shareAnalytics: shareAnalytics ?? this.shareAnalytics,
+    highRefreshRate: highRefreshRate ?? this.highRefreshRate,
   );
 
   Map<String, String> toMap() => {
@@ -97,6 +106,7 @@ class Settings {
     'notifications_asked': '$notificationsAsked',
     'daily_reminder': '$dailyReminder',
     'share_analytics': '$shareAnalytics',
+    'high_refresh_rate': '$highRefreshRate',
   };
 
   factory Settings.fromMap(Map<String, String> m) {
@@ -119,6 +129,7 @@ class Settings {
       notificationsAsked: b('notifications_asked', false),
       dailyReminder: b('daily_reminder', true),
       shareAnalytics: b('share_analytics', true),
+      highRefreshRate: b('high_refresh_rate', true),
     );
   }
 }
@@ -137,6 +148,7 @@ const playerSettingKeys = [
   'high_contrast',
   'daily_reminder',
   'share_analytics',
+  'high_refresh_rate',
 ];
 
 class SettingsNotifier extends Notifier<Settings> {

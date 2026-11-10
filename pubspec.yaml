@@ -64,6 +64,7 @@ dependencies:
   google_sign_in: ^7.2.0
   flutter_dotenv: ^6.0.1
   in_app_update: ^5.0.0
+  refresh_rate: ^2.0.1
 
 dev_dependencies:
   flutter_test:

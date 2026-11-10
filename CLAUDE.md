@@ -125,6 +125,10 @@ picture (text art in `content/plates/`) → clue derivation → line-solvability
 - Firebase client config (`google-services.json`, `GoogleService-Info.plist`, `firebase_options.dart`,
   `firebase.json`) is gitignored. Regenerate with `flutterfire configure`.
 - iOS builds and `GoogleService-Info.plist` live on the Mac. Mac-side checklist: `docs/MAC_CHECKLIST.md`.
+- Smooth motion (`refresh_rate` 2.x): Settings > Look, on by default, stored per device (`high_refresh_rate`,
+  not synced). `lib/state/display.dart` requests the max rate after the first frame, on every change and on
+  resume (Android can drop it in the background); "off" hands the choice back to the system, never forces
+  60 Hz. Control is Android-only; iOS relies on `CADisableMinimumFrameDurationOnPhone` in Info.plist.
 - Some packages (go_router 18+, etc.) pull in `package:material_ui`. Keep `material_ui` as a direct
   dependency and register `material_ui.GlobalMaterialLocalizations.delegates` next to Flutter's
   delegates on every MaterialApp.

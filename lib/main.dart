@@ -16,11 +16,13 @@ import 'services/analytics/analytics_service.dart';
 import 'services/config/app_env.dart';
 import 'services/crash/crash_reporter.dart';
 import 'services/crash/firebase_crash_reporter.dart';
+import 'services/display/display_rate_service.dart';
 import 'services/analytics/firebase_analytics_service.dart';
 import 'services/ads/google_ad_service.dart';
 import 'services/feedback/sound_haptic_feedback.dart';
 import 'services/notifications/notification_service.dart';
 import 'services/purchases/store_service.dart';
+import 'state/display.dart';
 import 'state/monetization.dart';
 import 'state/reminders.dart';
 import 'state/providers.dart';
@@ -108,6 +110,7 @@ Future<void> main() async {
         feedbackProvider.overrideWithValue(feedback),
         analyticsProvider.overrideWithValue(analytics),
         crashReporterProvider.overrideWithValue(crash),
+        displayRateServiceProvider.overrideWithValue(const RefreshRateDisplayService()),
         adServiceProvider.overrideWithValue(ads),
         storeServiceProvider.overrideWithValue(store),
         notificationServiceProvider.overrideWithValue(notifications),
