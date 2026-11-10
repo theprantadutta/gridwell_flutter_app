@@ -71,7 +71,9 @@ Bold, numeric, edge to edge (kit v2.0, replaces Folio). Square corners everywher
 full-width slabs separated by 1 pt `--sunk` gaps, and **one** accent: lime, which always means "press
 this" or "you are here". No gradients, glows or shadows.
 Source kit: `C:\Users\pranta\Downloads\gridwell-tally-kit` (start with `04-design-system/DESIGN-SPEC.md`;
-screens in `01-app-screens/`). The logo kit and store icons are copied into `brand/`.
+screens in `01-app-screens/`). Logo: the "Clue G" icon kit (`C:\Users\pranta\Downloads\gridwell-icons-clue-g`:
+a solved 5 × 5 nonogram drawing a G, top-right cell lime), copied into `brand/` with the store assets; the
+wordmark keeps its lime-dot ı.
 Typeface: **Schibsted Grotesk only** (bundled static weights 500/700/800/900 in `assets/fonts/`), tabular
 figures for every number. Tokens: `lib/ui/theme/palette.dart` (dark, light, high contrast); type:
 `lib/ui/theme/typography.dart`; shared components: `lib/ui/widgets/tally.dart`.

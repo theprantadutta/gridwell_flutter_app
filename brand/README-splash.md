@@ -1,10 +1,10 @@
 # Splash images
 
-`splash/` holds the native splash images, drawn by `make_splash.py` from the Tally mark's geometry
-(2 × 2 cells, logo kit v2.0):
+`splash/` holds the native splash images, drawn by `make_splash.py` from the Clue G mark's geometry
+(a solved 5 × 5 nonogram that draws a G, icon kit "Clue G"):
 
 - `splash-light.png`, `splash-dark.png`: the transparent mark at 416 px (4x, renders at 104 dp) in
-  each theme's colors (ink and track cells differ; the lime cell is the same)
+  each theme's colors (filled and empty cells differ; the lime cell is the same)
 - `android12-light.png`, `android12-dark.png`: the same mark centered on a 1152 px transparent canvas,
   inside Android 12's 768 px crop circle
 

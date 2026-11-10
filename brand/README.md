@@ -1,50 +1,54 @@
-# Gridwell logo kit · v2.0 (Tally, L6 "Wordmark Cells")
+# Gridwell icons · L1 "Clue G"
 
-The dot of the i in "Gridwell" is a single filled cell in lime. The app icon is that cell in context: a 2 × 2 grid with one square inked and one square solved.
-Open `05-brand-sheet/gridwell-brand-sheet.png` first.
+The icon is a solved 5 × 5 nonogram that draws a G. The top-right cell is lime: the square you just solved.
+This pack replaces every icon from the earlier L6 kit. It has icons only, no screens or design docs.
 
 ```
-01-mark/
-  svg/  gridwell-mark-{dark,light,mono-ink,mono-white}.svg   vector, use these first
-  png/  same four at 256 and 1024 px, transparent
-02-lockups/
-  svg/  gridwell-lockup-{horizontal,stacked}-{dark,light}.svg, gridwell-wordmark-{dark,light}.svg   text converted to outlines
-  png/  the same at 2x, transparent
-03-app-icon-ios/
-  AppIcon.appiconset/   drop-in Xcode asset: default, dark and tinted, 1024 px
-  AppIcon-1024(.svg, -dark.svg)   vector masters
-04-app-icon-android/
-  res/                  drop-in Android resources (adaptive + monochrome + legacy mipmaps)
-  png-layers-432/       adaptive layers as PNG
-  play-store-512.png    Google Play hi-res icon
-05-brand-sheet/
-  gridwell-brand-sheet.png
+01-mark/                 the G mark alone: svg + png (256, 1024), transparent
+  dark        for dark backgrounds (chalk cells, lime cell, faint empty cells)
+  light       for light backgrounds
+  mono-ink / mono-white   one color, empty cells dropped
+02-app-icon-ios/
+  AppIcon.appiconset/    drop into Assets.xcassets: default, dark and tinted (iOS 18), 1024 px
+  AppIcon-1024*.svg      vector masters
+03-app-icon-android/
+  res/                   copy into app/src/main/res/ (adaptive + monochrome + legacy mipmaps, square and round)
+  png-layers-432/        adaptive layers as PNG
+04-store-icons/
+  play-store-512.png     Play Console hi-res icon
+  app-store-1024.png     App Store icon (no alpha)
+05-extras/
+  gridwell-icon-clued-dark / clued-lime   the G with its row and column clues (512, 1024): for marketing, social, press
+  gridwell-icon-lime                      the G on lime (512, 1024)
+flutter_launcher_icons.yaml   optional config if you generate sizes with flutter_launcher_icons
 ```
 
-"dark" variants are for dark backgrounds, "light" variants for light backgrounds. Mono versions: filled cells solid, empty cells outlined, one color.
+The launcher and store icons use the clean G **without** clue numbers on purpose: the clues turn to noise at
+home-screen size (48 dp). The clued version is in 05-extras for places where the icon is shown large.
 
-## Install: iOS (Xcode 15+)
-1. Open `Assets.xcassets`, delete the existing `AppIcon`, drag in `03-app-icon-ios/AppIcon.appiconset`.
-2. It contains the default (opaque, Tally green), dark (transparent background) and tinted (grayscale) appearances.
+## Install: iOS
+In Xcode, open Assets.xcassets, delete AppIcon, and drag in `02-app-icon-ios/AppIcon.appiconset`.
 
 ## Install: Android
-1. Copy `04-app-icon-android/res/` into `app/src/main/res/`, overwriting `ic_launcher*`.
-2. Manifest: `android:icon="@mipmap/ic_launcher"`, `android:roundIcon="@mipmap/ic_launcher_round"`.
-3. Adaptive icon: vector foreground (mark 48 dp in the 108 dp canvas, inside the 66 dp safe zone) on `#071A13`. Android 13+ themed icons use the monochrome layer.
-4. Upload `play-store-512.png` as the Play Console hi-res icon.
+Copy `03-app-icon-android/res/` into `app/src/main/res/`, overwriting the `ic_launcher*` files. The manifest keeps
+`android:icon="@mipmap/ic_launcher"` and `android:roundIcon="@mipmap/ic_launcher_round"`.
+The adaptive icon is a vector foreground (G mark 46 dp in the 108 dp canvas, inside the circular 66 dp safe zone) on #071A13.
+Android 13+ themed icons use the monochrome layer.
+
+## Install: stores
+Play Console → Main store listing → App icon: `04-store-icons/play-store-512.png`.
+App Store Connect takes the icon from the app build (the 1024 in the asset catalog); `app-store-1024.png` is the same image.
 
 ## Colors
-| Name | Hex | Used for |
-|---|---|---|
-| Tally green | #071A13 | App icon background, dark theme page |
-| Chalk | #F0F3E8 | Inked cell and wordmark on dark |
-| Track (dark) | #1C3329 | Empty cells of the mark on dark |
-| Lime | #C1EE66 | The solved cell and the i dot. Always lime |
-| Paper | #F6F8F0 | Light theme page |
-| Ink | #0D1F16 | Inked cell and wordmark on light |
-| Track (light) | #D2DBCE | Empty cells of the mark on light |
+| Name | Hex |
+|---|---|
+| Background (Tally green) | #071A13 |
+| Filled cells (chalk) | #F0F3E8 |
+| Solved cell (lime) | #C1EE66 |
+| Empty cells on dark | #12271E |
+| Filled cells on light | #0D1F16 |
+| Empty cells on light | #D2DBCE |
 
-## Rules
-- Clear space: one cell on every side (10/21.5 of the mark's width). Minimum: mark 16 px, wordmark 18 px cap height.
-- Lime cell always bottom-right and always lime. Never rotate, recolor, outline the color mark, or add gradients, glows or shadows.
-- On photos or busy backgrounds use the mono mark.
+## Geometry
+5 × 5 grid of 10-unit cells with 1.5-unit gaps (56 units across). Filled rows: `####L`, `#....`, `#.###`, `#...#`, `#####`
+(L = the lime cell). App icons: the mark is 60% of the canvas, centered.

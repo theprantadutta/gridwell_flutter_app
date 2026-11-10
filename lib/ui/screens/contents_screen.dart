@@ -66,7 +66,8 @@ class ContentsScreen extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(tallyMargin, 12, tallyMargin, 0),
               child: Row(children: [
-                const GridwellMark(size: 20),
+                // The 5 × 5 G needs about 26 pt for its cells to read as a grid.
+                const GridwellMark(size: 26),
                 const SizedBox(width: 10),
                 const GridwellWordmark(size: 21),
                 const Spacer(),

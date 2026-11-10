@@ -4,18 +4,18 @@ import '../theme/gridwell_theme.dart';
 import '../theme/palette.dart';
 import '../theme/typography.dart';
 
-/// The Gridwell mark (logo kit v2.0, L6 "Wordmark Cells"): a 2 × 2 grid with
-/// one square inked and one solved. Top-left `--ink`, top-right and
-/// bottom-left `--track`, bottom-right lime, always.
+/// The Gridwell mark ("Clue G"): a solved 5 × 5 nonogram that draws a G.
+/// The top-right cell is lime, the square you just solved; the empty cells
+/// are faint so the grid still reads.
 ///
-/// Geometry, in kit units (21.5 square): 10-unit cells, 1.5-unit gap.
+/// Geometry, in kit units (56 square): 10-unit cells, 1.5-unit gaps. Filled
+/// rows `####L`, `#....`, `#.###`, `#...#`, `#####` (L = the lime cell).
 class GridwellMark extends StatelessWidget {
   const GridwellMark({super.key, required this.size, this.mono = false});
 
   final double size;
 
-  /// One color: filled cells solid, empty cells outlined. For photos and busy
-  /// backgrounds.
+  /// One color, empty cells dropped. For photos and busy backgrounds.
   final bool mono;
 
   @override
@@ -35,28 +35,26 @@ class GridwellMarkPainter extends CustomPainter {
   final GridwellPalette palette;
   final bool mono;
 
-  static const units = 21.5, cell = 10.0, gap = 1.5;
+  static const rows = ['####L', '#....', '#.###', '#...#', '#####'];
+  static const units = 56.0, cell = 10.0, gap = 1.5;
+
+  /// Empty cells: `--surface` on dark (#12271E), `--track` on light (#D2DBCE).
+  Color get _empty => palette.isDark ? palette.surface : palette.track;
 
   @override
   void paint(Canvas canvas, Size size) {
     final u = size.shortestSide / units;
-    Rect at(int r, int c) => Rect.fromLTWH(c * (cell + gap) * u, r * (cell + gap) * u, cell * u, cell * u);
-    if (mono) {
-      final solid = Paint()..color = palette.ink;
-      final line = Paint()
-        ..color = palette.ink
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = u;
-      canvas.drawRect(at(0, 0), solid);
-      canvas.drawRect(at(1, 1), solid);
-      canvas.drawRect(at(0, 1).deflate(u / 2), line);
-      canvas.drawRect(at(1, 0).deflate(u / 2), line);
-      return;
+    final ink = Paint()..color = palette.ink;
+    final lime = Paint()..color = mono ? palette.ink : palette.lime;
+    final empty = Paint()..color = _empty;
+    for (var r = 0; r < 5; r++) {
+      for (var c = 0; c < 5; c++) {
+        final ch = rows[r][c];
+        if (ch == '.' && mono) continue;
+        final rect = Rect.fromLTWH(c * (cell + gap) * u, r * (cell + gap) * u, cell * u, cell * u);
+        canvas.drawRect(rect, ch == 'L' ? lime : (ch == '#' ? ink : empty));
+      }
     }
-    canvas.drawRect(at(0, 0), Paint()..color = palette.ink);
-    canvas.drawRect(at(0, 1), Paint()..color = palette.track);
-    canvas.drawRect(at(1, 0), Paint()..color = palette.track);
-    canvas.drawRect(at(1, 1), Paint()..color = palette.lime);
   }
 
   @override
