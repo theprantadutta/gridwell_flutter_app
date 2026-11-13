@@ -43,13 +43,18 @@ underscores and dots (for example `com.pranta.gridwell.remove_ads`).
 
 | Product | Type | Price | Play product id | App Store product id |
 |---|---|---|---|---|
-| Remove Ads | One-time (non-consumable) | $1.99 | `______________` | `______________` |
-| Premium monthly | Auto-renewing subscription | $2.99 / month, trial: ___ days | `______________` | `______________` |
-| Premium yearly | Auto-renewing subscription | $14.99 / year, trial: ___ days | `______________` | `______________` |
+| Remove Ads | One-time (non-consumable) | $1.99 | `remove_ads` | `com.pranta.gridwell.remove_ads` |
+| Premium monthly | Auto-renewing subscription | $2.99 / month, trial: 7 days on iOS | `premium_monthly` | `com.pranta.gridwell.premium_monthly` |
+| Premium yearly | Auto-renewing subscription | $14.99 / year, trial: 7 days on iOS | `premium_yearly` | `com.pranta.gridwell.premium_yearly` |
+
+App Store product ids must be unique across the whole developer account (`remove_ads` was already taken
+by another app), so iOS uses the bundle-prefixed ids; `ProductIds` picks per platform. The iOS products
+live in App Store Connect under the subscription group "Gridwell Premium" (created 2026-11-13).
 
 These go in two places:
 - The app: `lib/services/purchases/product_ids.dart`
-- The API's `.env`: `PRODUCT_REMOVE_ADS`, `PRODUCT_PREMIUM_MONTHLY`, `PRODUCT_PREMIUM_YEARLY`
+- The API's `.env`: `PRODUCT_REMOVE_ADS`, `PRODUCT_PREMIUM_MONTHLY`, `PRODUCT_PREMIUM_YEARLY`, and
+  `PRODUCT_IOS_REMOVE_ADS`, `PRODUCT_IOS_PREMIUM_MONTHLY`, `PRODUCT_IOS_PREMIUM_YEARLY` (defaults match)
 
 For subscriptions on Google Play, also note the **base plan id** for each plan (for example
 `monthly`, `yearly`): `______________` / `______________`

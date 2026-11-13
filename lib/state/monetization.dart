@@ -50,6 +50,11 @@ class PurchaseController extends Notifier<StoreState> {
     _sub = store.purchases.listen(_onPurchase);
     ref.onDispose(() => _sub?.cancel());
     unawaited(_reconcileOwned());
+    // The store connects in the background after launch: pick up prices that
+    // arrive after this notifier was first built.
+    unawaited(store.ready.then((_) {
+      if (ref.mounted) state = state.copyWith(prices: Map.of(store.products));
+    }));
     return StoreState(prices: Map.of(store.products));
   }
 

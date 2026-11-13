@@ -34,6 +34,12 @@ class StoreService {
   /// Product id -> localized price ("$1.99").
   final products = <String, String>{};
 
+  final _ready = Completer<void>();
+
+  /// Completes once [initialize] has finished, whether or not the store
+  /// connected, so listeners can pick up [products] that arrived late.
+  Future<void> get ready => _ready.future;
+
   Stream<StorePurchase> get purchases => _purchases.stream;
 
   bool get available => _connected && products.isNotEmpty;
@@ -51,13 +57,15 @@ class StoreService {
     } catch (e, st) {
       CrashReports.instance.recordError(e, st, reason: 'store init');
       debugPrint('store unavailable: $e');
+    } finally {
+      if (!_ready.isCompleted) _ready.complete();
     }
   }
 
   Future<void> loadProducts() async {
     try {
       final oneTime = await _iap.fetchProducts<Product>(
-        skus: const [ProductIds.removeAds],
+        skus: [ProductIds.removeAds],
         type: ProductQueryType.InApp,
       );
       final subs = await _iap.fetchProducts<ProductSubscription>(
