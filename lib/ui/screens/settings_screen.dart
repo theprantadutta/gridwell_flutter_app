@@ -75,12 +75,14 @@ class SettingsScreen extends ConsumerWidget {
             );
           },
         ),
-        SettingsRow.toggle(
-          label: 'Confirm before exiting',
-          detail: 'Ask before the Back button closes Gridwell',
-          value: s.confirmExit,
-          onChanged: (v) => set((x) => x.copyWith(confirmExit: v)),
-        ),
+        // iOS has no Back button that can close the app.
+        if (defaultTargetPlatform == TargetPlatform.android)
+          SettingsRow.toggle(
+            label: 'Confirm before exiting',
+            detail: 'Ask before the Back button closes Gridwell',
+            value: s.confirmExit,
+            onChanged: (v) => set((x) => x.copyWith(confirmExit: v)),
+          ),
         SettingsRow.link(
           label: 'How to play',
           detail: 'The three steps, again',
