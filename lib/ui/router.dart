@@ -24,7 +24,10 @@ GoRouter buildRouter({required bool onboardingDone}) => GoRouter(
       initialLocation: '/splash',
       routes: [
         GoRoute(path: '/splash', pageBuilder: (_, _) => const NoTransitionPage(child: SplashScreen())),
-        GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingScreen()),
+        GoRoute(
+          path: '/onboarding',
+          builder: (_, state) => OnboardingScreen(replay: state.uri.queryParameters['replay'] == '1'),
+        ),
         ShellRoute(
           builder: (context, state, child) => HomeShell(location: state.uri.path, child: child),
           routes: [

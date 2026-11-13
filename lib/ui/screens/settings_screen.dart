@@ -75,6 +75,17 @@ class SettingsScreen extends ConsumerWidget {
             );
           },
         ),
+        SettingsRow.toggle(
+          label: 'Confirm before exiting',
+          detail: 'Ask before the Back button closes Gridwell',
+          value: s.confirmExit,
+          onChanged: (v) => set((x) => x.copyWith(confirmExit: v)),
+        ),
+        SettingsRow.link(
+          label: 'How to play',
+          detail: 'The three steps, again',
+          onTap: () => context.push('/onboarding?replay=1'),
+        ),
         SettingsRow.link(
           label: 'Show walkthrough again',
           onTap: () {
@@ -135,6 +146,22 @@ class SettingsScreen extends ConsumerWidget {
           detail: 'The game, this version, and who made it',
           onTap: () => context.push('/about'),
         ),
+        SettingsRow.link(
+          label: 'Rate Gridwell',
+          detail: 'A rating helps other puzzlers find it',
+          onTap: () async {
+            final opened = await ref.read(appReviewServiceProvider).openStoreListing();
+            if (!opened && context.mounted) tallyToast(context, 'Could not open the store. Please try again.');
+          },
+        ),
+        Builder(
+          // Its own context, so the share sheet can anchor to this row on iPad.
+          builder: (rowContext) => SettingsRow.link(
+            label: 'Share Gridwell',
+            detail: 'Send it to a friend who likes puzzles',
+            onTap: () => _shareApp(rowContext, ref),
+          ),
+        ),
         if (defaultTargetPlatform == TargetPlatform.android)
           SettingsRow.link(label: 'Check for updates', onTap: () => _checkForUpdates(context, ref)),
         SettingsRow.link(label: 'Privacy', onTap: () => context.push('/privacy')),
@@ -190,6 +217,18 @@ class SettingsScreen extends ConsumerWidget {
       if (context.mounted) tallyToast(context, 'Progress reset. Every puzzle is fresh again.');
     }
   }
+}
+
+Future<void> _shareApp(BuildContext context, WidgetRef ref) async {
+  final box = context.findRenderObject() as RenderBox?;
+  final origin = box == null ? null : box.localToGlobal(Offset.zero) & box.size;
+  final ok = await ref.read(shareServiceProvider).shareText(
+        'I have been solving picture puzzles in Gridwell, a nonogram game where every puzzle is pure '
+        'logic, no guessing. 150 puzzles and a new daily one. Give it a try: $playStoreUrl',
+        subject: 'Try Gridwell, a nonogram puzzle game',
+        origin: origin,
+      );
+  if (!ok && context.mounted) tallyToast(context, 'Could not open sharing. Please try again.');
 }
 
 Future<void> _checkForUpdates(BuildContext context, WidgetRef ref) async {

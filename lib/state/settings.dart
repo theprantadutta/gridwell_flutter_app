@@ -26,6 +26,7 @@ class Settings {
     this.dailyReminder = true,
     this.shareAnalytics = true,
     this.highRefreshRate = true,
+    this.confirmExit = true,
   });
 
   final ThemeMode themeMode;
@@ -57,6 +58,9 @@ class Settings {
   /// hardware in hand.
   final bool highRefreshRate;
 
+  /// Ask before the Back button closes the app from the Play tab.
+  final bool confirmExit;
+
   Settings copyWith({
     ThemeMode? themeMode,
     bool? sound,
@@ -73,6 +77,7 @@ class Settings {
     bool? dailyReminder,
     bool? shareAnalytics,
     bool? highRefreshRate,
+    bool? confirmExit,
   }) => Settings(
     themeMode: themeMode ?? this.themeMode,
     sound: sound ?? this.sound,
@@ -89,6 +94,7 @@ class Settings {
     dailyReminder: dailyReminder ?? this.dailyReminder,
     shareAnalytics: shareAnalytics ?? this.shareAnalytics,
     highRefreshRate: highRefreshRate ?? this.highRefreshRate,
+    confirmExit: confirmExit ?? this.confirmExit,
   );
 
   Map<String, String> toMap() => {
@@ -107,6 +113,7 @@ class Settings {
     'daily_reminder': '$dailyReminder',
     'share_analytics': '$shareAnalytics',
     'high_refresh_rate': '$highRefreshRate',
+    'confirm_exit': '$confirmExit',
   };
 
   factory Settings.fromMap(Map<String, String> m) {
@@ -130,6 +137,7 @@ class Settings {
       dailyReminder: b('daily_reminder', true),
       shareAnalytics: b('share_analytics', true),
       highRefreshRate: b('high_refresh_rate', true),
+      confirmExit: b('confirm_exit', true),
     );
   }
 }
@@ -149,6 +157,7 @@ const playerSettingKeys = [
   'daily_reminder',
   'share_analytics',
   'high_refresh_rate',
+  'confirm_exit',
 ];
 
 class SettingsNotifier extends Notifier<Settings> {

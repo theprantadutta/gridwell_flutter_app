@@ -36,4 +36,16 @@ class AppReviewService {
       debugPrint('review request failed: $e');
     }
   }
+
+  /// Opens Gridwell's store page (Settings > Rate Gridwell). Unlike [request],
+  /// this always shows something, so it suits a button the player pressed.
+  Future<bool> openStoreListing() async {
+    try {
+      await InAppReview.instance.openStoreListing();
+      return true;
+    } catch (e) {
+      debugPrint('store listing failed: $e');
+      return false;
+    }
+  }
 }

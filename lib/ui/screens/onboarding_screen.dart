@@ -16,7 +16,11 @@ import '../widgets/tally.dart';
 /// How to play, in three steps: read a clue, find the overlap, cross out and
 /// reveal. Each step has a demo line of real cells.
 class OnboardingScreen extends ConsumerStatefulWidget {
-  const OnboardingScreen({super.key});
+  const OnboardingScreen({super.key, this.replay = false});
+
+  /// Opened again from Settings > How to play: finishing returns there
+  /// instead of starting the first puzzle.
+  final bool replay;
 
   @override
   ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -27,6 +31,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   var _page = 0;
 
   Future<void> _finish({required bool play}) async {
+    if (widget.replay) {
+      context.pop();
+      return;
+    }
     await ref
         .read(settingsProvider.notifier)
         .update((s) => s.copyWith(onboardingDone: true));
@@ -170,7 +178,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 ),
               ),
               PrimarySlab(
-                label: _page < 2 ? 'Next' : 'Start playing',
+                label: _page < 2 ? 'Next' : (widget.replay ? 'Got it' : 'Start playing'),
                 onPressed: _next,
                 height: 78,
               ),

@@ -34,52 +34,54 @@ Gridwell: Nonogram Puzzles
 150 hand-drawn nonogram puzzles. Pure logic, no guessing. Plays fully offline.
 ```
 
-### Full description (4000 max): 3,045
+### Full description (4000 max): 3,357
 
 ```text
-Gridwell is a book of picture logic puzzles you can take anywhere. Each puzzle is a nonogram: the numbers beside every row and column tell you how many cells to fill, and in what runs. Fill the right ones and a small hand-drawn picture appears: a lighthouse, a fern, a snail, a teacup by lamplight.
+Gridwell is a nonogram puzzle game: picture logic puzzles you solve with pure reasoning. The numbers beside each row and above each column tell you how many squares to fill, and in what runs. Fill the right squares and a pixel art picture appears: a lighthouse, a puffin, a fern, a teacup by lamplight.
 
-If you know these puzzles as picross, griddlers, hanjie, paint by numbers or Japanese crosswords, you will feel at home. If they are new to you, the first plates teach the idea in a minute.
+Know these puzzles as picross, griddlers, hanjie, paint by numbers, pic-a-pix or Japanese crosswords? You will feel right at home. New to them? A three-step guide and a short walkthrough on your first board teach the idea in a minute.
 
 NO GUESSING, EVER
-Every puzzle in Gridwell is checked before it ships. Each one has exactly one solution, and every cell can be worked out by pure logic from the clues. You never have to guess and hope. When you are stuck, there is always a next step to find.
+Every puzzle is checked before it ships. Each one has exactly one solution, and every square can be worked out by logic from the clues. You never have to guess and hope. When you are stuck, there is always a next step to find.
+
+HINTS THAT SHOW THEIR WORKING
+A hint does not just fill a square. It shows you which square, what it is, and why, with the row drawn out, so you learn the technique and solve the next one yourself. Apply it, or close it and try on your own.
 
 PLAYS FULLY OFFLINE
-No wifi? No problem. All 150 puzzles and the daily puzzle are inside the app, so Gridwell plays on a plane, on the subway, or anywhere without a signal. When you are online, your progress is backed up and the daily leaderboard updates.
+No wifi? No problem. All 150 puzzles and the daily puzzle are inside the app, so this offline puzzle game plays on a plane, on the subway, or anywhere without a signal. When you are online, your progress is backed up and the daily leaderboard updates.
 
-150 HAND-DRAWN PUZZLES
-Four collections, all open from the start:
+150 PUZZLES IN FOUR COLLECTIONS
+All open from the start:
 • Coastline: harbor and shore
 • Botanica: leaves, flowers and fruit
 • Bestiary: creatures, from a snail to an elephant
 • Small Hours: lamps, teacups and the moon
 
-Puzzles range from quick 5x5 warmups to 20x20 plates you can settle into, and each collection climbs gently from easy to hard. Every picture you solve is kept in your Gallery, in color.
+Grids range from quick 5x5 warmups to 20x20 boards you can settle into, and each collection climbs gently from easy to hard. Every picture you solve is kept in your Gallery, in full color.
 
-A DAILY PUZZLE
-A new pixel art puzzle every day, the same one for everyone, with a daily leaderboard. You appear under a pen name we make up for you, and you can change it whenever you like. Missed a day? Catch up by watching a short video.
+A NEW DAILY PUZZLE
+A fresh puzzle every day, the same one for everyone, with a daily leaderboard, a streak to keep and a month calendar of the days you solved. You appear under a pen name, never your real name. Missed a day? Open it with a short video. Turn on a gentle evening reminder if you like one.
 
-MADE TO BE CALM
-• A puzzle-book look: cream paper and ink, with dark and high-contrast themes
-• Filled, crossed and empty cells differ by shape, not by color alone
-• Calm, musical sound that plays alongside your own music, plus gentle haptics
+BUILT FOR FOCUS
+• A bold, clean design in light and dark, with a high-contrast option
+• Filled, crossed and empty squares differ by shape, not by color alone
+• Smooth motion on high refresh rate screens (90 Hz and 120 Hz)
 • Drag to fill or cross a whole run in one stroke
 • Unlimited undo, always free
-• Optional mistake flagging that marks a cell only when its row or column proves it wrong
-• Three free hints per puzzle, each showing the next logical step and explaining why
-• A timer you can hide, with your best times kept
+• Optional mistake flagging that marks a square only when its row or column proves it wrong
+• A timer you can hide, with your best times kept for every size
+• Calm sound that plays alongside your own music, plus gentle haptics
+• Tablet layouts in portrait and landscape
 
 NO SIGN-UP NEEDED
-Open the app and start solving. If you want your progress on another device, you can sign in with Google or an email address, but you never have to.
+Open the app and start solving. To keep your progress on another device, sign in with Google or an email address, but you never have to.
 
 FREE TO PLAY
-Gridwell is free to play and supported by ads. There are no banner ads: you may see an ad between puzzles, and you can choose to watch a short video for an extra hint. Optional purchases:
+Gridwell is a free logic puzzle game supported by ads. There are no banner ads: you may see an ad between puzzles, and you can choose to watch a short video for an extra hint. Optional purchases:
 • Remove Ads: a one-time purchase that turns off the ads between puzzles
 • Gridwell Premium, monthly or yearly, each with a free trial: unlimited hints, no ads, missed dailies unlocked for free, and early access to new collections
 
 Subscriptions renew automatically unless canceled at least 24 hours before the end of the current period. Manage or cancel them any time in your Google Play subscriptions.
-
-Questions or ideas? Write to prantadutta1997@gmail.com.
 ```
 
 Play also needs: app category **Puzzle** (Games), contact email `prantadutta1997@gmail.com`, privacy
