@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform;
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,9 +12,9 @@ import '../widgets/tally.dart';
 import 'settings_screen.dart' show TallyDialogText, showTallyDialog;
 
 /// Settings > Account, and where the "keep your progress" offer leads.
-/// Guests choose Google or email; signed-in players see who they are and can
-/// sign out. Playing without an account is always fine.
-// TODO(mac): add "Continue with Apple" on iOS (docs/MAC_CHECKLIST.md).
+/// Guests choose Apple (iOS only, and first there), Google or email;
+/// signed-in players see who they are and can sign out. Playing without an
+/// account is always fine.
 class AccountScreen extends ConsumerStatefulWidget {
   const AccountScreen({super.key});
 
@@ -23,6 +24,9 @@ class AccountScreen extends ConsumerStatefulWidget {
 
 class _AccountScreenState extends ConsumerState<AccountScreen> {
   bool _busy = false;
+
+  /// Sign in with Apple is offered on iOS only (App Store rule 4.8).
+  static bool get _apple => defaultTargetPlatform == TargetPlatform.iOS;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +48,9 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                 ],
               ),
             ),
-            if (account.isGuest)
+            if (account.isGuest && _apple)
+              _AppleSlab(onPressed: _busy ? null : _signInWithApple)
+            else if (account.isGuest)
               PrimarySlab(
                 label: 'Continue with Google',
                 sublabel: 'One tap, nothing to remember',
@@ -94,6 +100,10 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
         _EdgeToEdge(ColoredBox(
           color: p.sunk,
           child: Column(children: [
+            if (_apple) ...[
+              SettingsRow.link(label: 'Continue with Google', onTap: _busy ? () {} : _google),
+              const SizedBox(height: tallyDivider),
+            ],
             SettingsRow.link(label: 'Continue with email', onTap: _busy ? () {} : _email),
             const SizedBox(height: tallyDivider),
             SettingsRow.link(label: 'Not now', onTap: _notNow),
@@ -165,6 +175,22 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
     }
   }
 
+  Future<void> _signInWithApple() async {
+    setState(() => _busy = true);
+    try {
+      final outcome = await ref.read(accountActionsProvider).signInWithApple();
+      if (!mounted || outcome == SignInOutcome.cancelled) return;
+      _signedInMessage(outcome);
+    } on AuthFailure catch (e) {
+      _show(e.message);
+    } catch (e, st) {
+      ref.read(crashReporterProvider).recordError(e, st, reason: 'apple sign-in');
+      _show('Sign in with Apple did not work. Please try again.');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<void> _email() async {
     final outcome = await context.push<SignInOutcome>('/account/email');
     if (outcome != null && mounted) _signedInMessage(outcome);
@@ -199,6 +225,35 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
   void _show(String message) {
     if (!mounted) return;
     tallyToast(context, message);
+  }
+}
+
+/// The Sign in with Apple button: black on light, white on dark, with the
+/// Apple logo, per Apple's button guidelines. Runs to the bottom edge like
+/// the other primary slabs.
+class _AppleSlab extends StatelessWidget {
+  const _AppleSlab({required this.onPressed});
+
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final inset = MediaQuery.paddingOf(context).bottom;
+    return Pressable(
+      color: p.ink,
+      onTap: onPressed,
+      semanticLabel: 'Continue with Apple',
+      child: Container(
+        constraints: BoxConstraints(minHeight: 78 + inset),
+        padding: EdgeInsets.fromLTRB(24, 18, 24, 18 + inset * 0.6),
+        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Icon(Icons.apple, color: p.bg, size: 26),
+          const SizedBox(width: 10),
+          Text('Continue with Apple', maxLines: 1, style: TallyType.slab(p.bg).copyWith(fontSize: 22)),
+        ]),
+      ),
+    );
   }
 }
 

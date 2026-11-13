@@ -29,6 +29,8 @@ class AccountActions {
 
   Future<SignInOutcome> signInWithGoogle() => _run('google', _auth.signInWithGoogle);
 
+  Future<SignInOutcome> signInWithApple() => _run('apple', _auth.signInWithApple);
+
   Future<SignInOutcome> signInWithEmail(String email, String password) =>
       _run('email', () => _auth.signInWithEmail(email, password));
 

@@ -130,6 +130,41 @@ class AuthService {
     return _linkOrSignIn(auth, credential);
   }
 
+  /// Sign in with Apple through Firebase's native provider (iOS only). A
+  /// guest is upgraded in place; an Apple ID that already has an account is
+  /// signed in to instead, like [signInWithGoogle].
+  Future<SignInOutcome> signInWithApple() async {
+    final auth = _requireAuth();
+    // Email only: the app never uses the player's name, so it does not ask.
+    final provider = AppleAuthProvider()..addScope('email');
+    final user = auth.currentUser;
+    try {
+      if (user != null && user.isAnonymous) {
+        try {
+          await user.linkWithProvider(provider);
+          return SignInOutcome.linked;
+        } on FirebaseAuthException catch (e) {
+          if (e.code != 'credential-already-in-use' && e.code != 'email-already-in-use') rethrow;
+          final existing = e.credential;
+          if (existing != null) {
+            await auth.signInWithCredential(existing);
+          } else {
+            await auth.signInWithProvider(provider);
+          }
+          return SignInOutcome.switched;
+        }
+      }
+      await auth.signInWithProvider(provider);
+      return SignInOutcome.switched;
+    } on FirebaseAuthException catch (e) {
+      // The system sheet's Cancel button arrives as an exception.
+      if (e.code == 'canceled' || e.code == 'user-cancelled' || e.code == 'web-context-canceled') {
+        return SignInOutcome.cancelled;
+      }
+      throw _friendly(e);
+    }
+  }
+
   Future<SignInOutcome> signInWithEmail(String email, String password) async {
     final auth = _requireAuth();
     try {
