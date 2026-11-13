@@ -129,9 +129,14 @@ picture (text art in `content/plates/`) → clue derivation → line-solvability
   not synced). `lib/state/display.dart` requests the max rate after the first frame, on every change and on
   resume (Android can drop it in the background); "off" hands the choice back to the system, never forces
   60 Hz. Control is Android-only; iOS relies on `CADisableMinimumFrameDurationOnPhone` in Info.plist.
-- Some packages (go_router 18+, etc.) pull in `package:material_ui`. Keep `material_ui` as a direct
-  dependency and register `material_ui.GlobalMaterialLocalizations.delegates` next to Flutter's
-  delegates on every MaterialApp.
+- Flutter 3.50+: the app is fully migrated to `package:material_ui` (direct dependency; never import
+  `package:flutter/material.dart`). Every MaterialApp, test harnesses included, uses
+  `localizationsDelegates: GlobalMaterialLocalizations.delegates` from material_ui, and the app's
+  `builder` wraps the child in `MaterialUiCompatibilityBridge` for third-party packages still on the old
+  import. Remove the bridge once no dependency needs it.
+- AGP 9 drops dot-file assets from release builds, which removed the bundled `.env` and crashed release
+  at startup. `android/app/build.gradle.kts` sets `androidResources.ignoreAssetsPattern` without the `.*`
+  rule; keep it, and check `assets/flutter_assets/.env` is inside any release APK/AAB.
 
 ## Commands
 

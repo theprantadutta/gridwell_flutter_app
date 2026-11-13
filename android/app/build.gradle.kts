@@ -20,6 +20,12 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
+    // Flutter 3.50 / AGP 9 release builds drop dot-file assets by default
+    // (aapt's ignore list includes ".*"), so the bundled .env vanished from the
+    // APK/AAB and the app failed at startup. AGP's default list minus that rule.
+    androidResources {
+        ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~"
+    }
     namespace = "com.pranta.gridwell"
     // Firebase, ads and androidx lifecycle need API 37 to compile against.
     compileSdk = 37

@@ -7,7 +7,7 @@
 // Reports average / 90th / 99th percentile build and raster times from the
 // engine's FrameTiming data into build/board_perf.json.
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gridwell_flutter_app/state/providers.dart';

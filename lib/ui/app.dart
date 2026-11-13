@@ -1,9 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart' show SystemUiOverlayStyle;
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_ui/material_ui.dart' as material_ui;
 
 import '../state/dev_seeder.dart';
 import '../state/display.dart';
@@ -85,21 +83,19 @@ class _GridwellAppState extends ConsumerState<GridwellApp> {
         // Edge to edge (main.dart): transparent bars, so the tab bar and
         // bottom slabs run under the navigation bar as in the kit.
         value: tallyOverlay(Theme.of(context).brightness == Brightness.dark),
-        child: child ?? const SizedBox(),
+        // Third-party packages still on package:flutter/material.dart get their
+        // legacy localizations and theme from this bridge.
+        // ignore: deprecated_member_use
+        child: MaterialUiCompatibilityBridge(child: child ?? const SizedBox()),
       ),
       themeMode: settings.themeMode,
       theme: GridwellTheme.themeData(
           GridwellPalette.of(Brightness.light, highContrast: settings.highContrast)),
       darkTheme: GridwellTheme.themeData(
           GridwellPalette.of(Brightness.dark, highContrast: settings.highContrast)),
-      // go_router and other migrated packages use package:material_ui, whose
-      // MaterialLocalizations is a different type from Flutter's. Register both.
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        ...material_ui.GlobalMaterialLocalizations.delegates,
-      ],
+      // The app is on package:material_ui; its delegates cover Material and
+      // widgets. Legacy packages are covered by the bridge in [builder].
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
       supportedLocales: const [Locale('en', 'US')],
     );
   }

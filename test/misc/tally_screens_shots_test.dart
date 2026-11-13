@@ -11,9 +11,8 @@ import 'dart:ui' as ui;
 
 import 'package:drift/drift.dart' show driftRuntimeOptions;
 import 'package:drift/native.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -35,7 +34,6 @@ import 'package:gridwell_flutter_app/ui/theme/gridwell_theme.dart';
 import 'package:gridwell_flutter_app/ui/theme/palette.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:material_ui/material_ui.dart' as material_ui;
 
 import '../support/fonts.dart';
 
@@ -110,12 +108,7 @@ Future<void> _shoot(WidgetTester tester, PuzzleSet set, String name, Widget Func
       builder: (context, child) => RepaintBoundary(key: _shotKey, child: child),
       routerConfig: router,
       theme: GridwellTheme.themeData(palette),
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        ...material_ui.GlobalMaterialLocalizations.delegates,
-      ],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
     ),
   ));
 
