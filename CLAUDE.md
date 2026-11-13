@@ -112,6 +112,7 @@ picture (text art in `content/plates/`) → clue derivation → line-solvability
   `test.user@gridwell.app` (free) and `test.user.premium@gridwell.app` (premium).
 - `dotnet run grant-premium-to-user.cs -- grant <email>` in the API repo gives one existing user premium.
   `realjohndoe276@gmail.com` is the premium test account on the A24 and the tablet, used for store shots.
+  `theprantadutta@gmail.com` is the iOS test account for simulator store shots (the owner signs in).
 - `--dart-define=GW_SEED=true` (debug builds only, `lib/state/dev_seeder.dart`) solves plates for a signed-in
   test account so screens look lived in. Only ever seed test accounts.
 
