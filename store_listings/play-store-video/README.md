@@ -4,8 +4,8 @@
 - `youtube-thumbnail-1280x720.png`: the feature graphic resized for YouTube (`tools/thumb.py`).
   The feature graphic itself is not changed.
 
-Upload to YouTube (unlisted or public, ads off), then paste the `watch?v=` URL into
-Play Console > Store listing > Video.
+Live on YouTube: https://www.youtube.com/watch?v=_NDW-EJtoBQ (ads off). This `watch?v=` URL is the
+one in Play Console > Store listing > Video.
 
 ## Music
 
