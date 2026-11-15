@@ -3,7 +3,7 @@
 Everything that blocks the 1.0 launch on Google Play and the App Store, in the order it should start.
 Some items have long lead times (the Play closed test takes at least 14 days), so start those first.
 
-Related docs: `MONETIZATION_IDS.md` (IDs to fill in), `STORE_LISTING.md`, `assets/legal/PRIVACY.md`,
+Related docs: `PLAY_PRODUCTION.md` (every Play step once production access arrives), `MONETIZATION_IDS.md` (IDs to fill in), `STORE_LISTING.md`, `assets/legal/PRIVACY.md`,
 `DATA_SAFETY.md`, `MAC_CHECKLIST.md` (all iOS work), `PERFORMANCE.md`, and the API repo's `CLAUDE.md`.
 
 ---
@@ -96,8 +96,10 @@ Fill in `MONETIZATION_IDS.md`, then put each value where its "Goes in" column sa
   **US state regulations** message. **[CONFIRM]** the US message decision; `assets/legal/PRIVACY.md` 1.9 depends on it.
 - [ ] AdMob > app-ads.txt: publish `app-ads.txt` at the root of the **developer website domain** listed in
   both store listings (**[CONFIRM]** which domain, for example `pranta.dev`), then verify it in AdMob.
-- [ ] Product IDs: after the products exist (section 6), set `lib/services/purchases/product_ids.dart` and the
-  API's `PRODUCT_REMOVE_ADS`, `PRODUCT_PREMIUM_MONTHLY`, `PRODUCT_PREMIUM_YEARLY`. The two must match.
+- [ ] Product IDs: the app and the API already use the ids in `MONETIZATION_IDS.md` (Remove Ads, the two
+  Premium plans and the seven theme products). Only if an id changes in a store, change it in
+  `lib/services/purchases/product_ids.dart` and the API's `PRODUCT_*` values too; theme ids must keep the
+  `theme_<key>` rule.
 
 ## 5. Backend: credentials, production `.env`, deploy
 
@@ -185,15 +187,19 @@ All in the API repo (`gridwell-dotnet-api`). See its `CLAUDE.md` and `.env.examp
 
 ## 6. Store products (after approval)
 
-Per the project rule, products are created only **after** each store approves the app. Until then the
-app uses placeholder IDs (`remove_ads`, `premium_monthly`, `premium_yearly`) and test products.
+Per the project rule, products are created only **after** each store approves the app. The ids are
+fixed already (`MONETIZATION_IDS.md`). Google Play: follow `PLAY_PRODUCTION.md` step by step. App Store:
+`MAC_CHECKLIST.md` steps 8 and 13.
 
-- [ ] Google Play > Monetize > Products:
-  - [ ] **In-app product** (one-time): Remove Ads, **$1.99**.
+- [ ] Google Play > Monetize > Products (details in `PLAY_PRODUCTION.md`):
+  - [ ] **One-time products**: Remove Ads **$1.99**; six themes (`theme_midnight`, `theme_blossom`,
+    `theme_ink`, `theme_sky`, `theme_ember`, `theme_violet`) **$0.99** each; `theme_bundle` **$2.99**.
   - [ ] **Subscription** "Gridwell Premium" with base plans: monthly **$2.99** and yearly **$14.99**, each
     with a **free trial offer** (**[CONFIRM]** trial lengths). Note the base plan IDs in `MONETIZATION_IDS.md`.
 - [ ] App Store Connect:
   - [ ] **Non-consumable** Remove Ads, **$1.99** tier.
+  - [ ] **Non-consumables** for the six themes ($0.99) and All themes ($2.99), ids prefixed with
+    `com.pranta.gridwell.` (`MAC_CHECKLIST.md` step 13).
   - [ ] **Subscription group** "Gridwell Premium": monthly **$2.99**, yearly **$14.99**, each with a
     **free trial introductory offer**. Add the localized display name and description, and the review
     screenshot of the paywall that every IAP needs.

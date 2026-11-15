@@ -61,7 +61,8 @@ violation fixtures in `test/layering/fixtures/` prove that the check catches eac
   frequency-capped, never early, never on restart or resume; **no banners**. $1.99 one-time Remove Ads
   (interstitials only). Paid themes at $0.99 each or $2.99 for the All themes bundle (one-time).
   Premium subscription $2.99/mo and $14.99/yr with trials on both, unlocking everything, every theme included.
-  Store products are created only after store approval; until then use placeholder IDs and test products.
+  Store products are created only after store approval (Play: `docs/PLAY_PRODUCTION.md`; App Store:
+  `docs/MAC_CHECKLIST.md` steps 8 and 13); every product id is fixed in `docs/MONETIZATION_IDS.md`.
 - **Audio**: ambient / mix-with-others on both platforms. Never pauses other audio, honors the iOS silent switch.
 - **Layout**: phones portrait-only; tablets adaptive, both orientations; iPad first-class. 20x20 on narrow
   phones uses pinch-zoom with pinned clues.
