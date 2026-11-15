@@ -81,7 +81,11 @@ class StoreService {
         type: ProductQueryType.Subs,
       );
       for (final p in [...oneTime, ...subs]) {
-        products[p.id] = p.displayPrice;
+        // A product the store lists without a price cannot be bought (a
+        // build not installed from the store, or a product not yet active).
+        // Leaving it out keeps "$1.99"-shaped labels from showing a blank.
+        final price = p.displayPrice.trim();
+        if (price.isNotEmpty) products[p.id] = price;
       }
     } catch (e) {
       debugPrint('products unavailable (expected until store setup): $e');
