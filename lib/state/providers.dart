@@ -60,6 +60,7 @@ Future<List<Override>> bootstrapOverrides() async {
     initialEntitlementsProvider.overrideWithValue(Entitlements(
       removeAds: raw['ent_remove_ads'] == 'true',
       premium: raw['ent_premium'] == 'true',
+      themes: Entitlements.decodeThemes(raw['ent_themes']),
     )),
     puzzleSetProvider.overrideWithValue(set),
   ];

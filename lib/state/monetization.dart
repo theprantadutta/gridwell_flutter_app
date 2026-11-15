@@ -68,9 +68,11 @@ class PurchaseController extends Notifier<StoreState> {
 
   void _grantLocally(String productId) {
     final current = ref.read(entitlementsProvider);
+    final theme = ProductIds.themeKeyOf(productId);
     ref.read(entitlementsProvider.notifier).set(Entitlements(
           removeAds: current.removeAds || productId == ProductIds.removeAds,
           premium: current.premium || ProductIds.subscriptions.contains(productId),
+          themes: theme == null ? current.themes : {...current.themes, theme},
         ));
   }
 
@@ -97,6 +99,8 @@ class PurchaseController extends Notifier<StoreState> {
           removeAds: current.removeAds || ids.contains(ProductIds.removeAds),
           // A lapsed subscription is no longer listed, so premium follows the store.
           premium: ids.any(ProductIds.subscriptions.contains),
+          // Themes are non-consumables too.
+          themes: {...current.themes, ...ids.map(ProductIds.themeKeyOf).nonNulls},
         ));
     for (final p in owned) {
       await _verify(p);
@@ -122,7 +126,9 @@ class PurchaseController extends Notifier<StoreState> {
     final e = ref.read(entitlementsProvider);
     state = state.copyWith(
       busy: () => null,
-      message: () => e.premium || e.removeAds ? 'Your purchases are restored.' : 'No purchases were found for this account.',
+      message: () => e.premium || e.removeAds || e.themes.isNotEmpty
+          ? 'Your purchases are restored.'
+          : 'No purchases were found for this account.',
     );
   }
 }

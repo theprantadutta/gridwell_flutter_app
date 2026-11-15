@@ -77,6 +77,8 @@ void main() {
     'complete': () => '/complete',
     'plate': () => '/plate/${set.puzzles.first.id}',
     'store': () => '/store',
+    'themes': () => '/themes',
+    'theme-preview': () => '/themes/preview/midnight',
     'privacy': () => '/privacy',
     'about': () => '/about',
     'legal': () => '/legal/terms',

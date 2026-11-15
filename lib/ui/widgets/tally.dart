@@ -900,7 +900,9 @@ class _TallyToastState extends State<_TallyToast> with SingleTickerProviderState
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   child: Text(widget.action!.label.toUpperCase(),
-                                      style: TallyType.overline(p.lime).copyWith(fontSize: 13)),
+                                      // The toast is drawn in --ink: a light slab on dark
+                                      // pages, where the signal color would not read.
+                                      style: TallyType.overline(p.isDark ? p.bg : p.lime).copyWith(fontSize: 13)),
                                 ),
                               ),
                           ]),

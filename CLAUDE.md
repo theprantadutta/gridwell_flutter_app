@@ -59,7 +59,8 @@ violation fixtures in `test/layering/fixtures/` prove that the check catches eac
   notification at 19:00 local time, skipped if today's daily is solved. Server push is for re-engagement and announcements only.
 - **Monetization**: rewarded video (hints, reveal line, missed dailies); between puzzles an optional rewarded interstitial (bonus hint, skippable intro) or an interstitial, only after completion,
   frequency-capped, never early, never on restart or resume; **no banners**. $1.99 one-time Remove Ads
-  (interstitials only). Premium subscription $2.99/mo and $14.99/yr with trials on both, unlocking everything.
+  (interstitials only). Paid themes at $0.99 each or $2.99 for the All themes bundle (one-time).
+  Premium subscription $2.99/mo and $14.99/yr with trials on both, unlocking everything, every theme included.
   Store products are created only after store approval; until then use placeholder IDs and test products.
 - **Audio**: ambient / mix-with-others on both platforms. Never pauses other audio, honors the iOS silent switch.
 - **Layout**: phones portrait-only; tablets adaptive, both orientations; iPad first-class. 20x20 on narrow
@@ -77,7 +78,15 @@ wordmark keeps its lime-dot ı.
 Typeface: **Schibsted Grotesk only** (bundled static weights 500/700/800/900 in `assets/fonts/`), tabular
 figures for every number. Tokens: `lib/ui/theme/palette.dart` (dark, light, high contrast); type:
 `lib/ui/theme/typography.dart`; shared components: `lib/ui/widgets/tally.dart`.
-The theme follows the system by default (System / Light / Dark in Settings). The three cell states differ
+The theme follows the system by default (System / Light / Dark in Settings).
+**Themes** (`lib/state/themes.dart`, palettes in `palette.dart`): Gridwell (the standard light/dark
+look) and Paper are free; Midnight, Blossom, Ink, Sky, Ember and Violet are one fixed look each, sold as
+one-time products (`theme_<key>`, plus `theme_bundle` for all of them, now and later) and included with
+Premium. Every theme is the same Tally layout with its own colors in the same roles (`lime` is the
+theme's signal color). Settings > Look > Theme lists them in their own colors; a locked theme opens a
+preview where it can be bought, and a theme bought there switches on by itself. The pick is stored as
+`theme_id` (synced). Without the entitlement (Premium lapsed, a refund) the standard theme is shown
+and the pick is kept. A new theme must pass `test/legibility/` (it loops over every palette). The three cell states differ
 by shape (solid square / short dash / empty), never by color alone. The CVD + legibility harness in
 `test/legibility/` must pass before palette changes are committed.
 The kit's copy is British in places ("colour"); the app is always US English.

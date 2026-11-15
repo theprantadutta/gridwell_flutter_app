@@ -12,6 +12,7 @@ import 'services.dart';
 class Settings {
   const Settings({
     this.themeMode = ThemeMode.system,
+    this.themeId = 'standard',
     this.sound = true,
     this.haptics = true,
     this.showProvenMistakes = true,
@@ -30,6 +31,12 @@ class Settings {
   });
 
   final ThemeMode themeMode;
+
+  /// The picked theme (`lib/state/themes.dart`). [themeMode] only applies to
+  /// the standard theme; the others are one fixed look each. A Premium theme
+  /// stays picked when Premium lapses, but the standard one is shown.
+  final String themeId;
+
   final bool sound;
   final bool haptics;
   final bool showProvenMistakes;
@@ -63,6 +70,7 @@ class Settings {
 
   Settings copyWith({
     ThemeMode? themeMode,
+    String? themeId,
     bool? sound,
     bool? haptics,
     bool? showProvenMistakes,
@@ -80,6 +88,7 @@ class Settings {
     bool? confirmExit,
   }) => Settings(
     themeMode: themeMode ?? this.themeMode,
+    themeId: themeId ?? this.themeId,
     sound: sound ?? this.sound,
     haptics: haptics ?? this.haptics,
     showProvenMistakes: showProvenMistakes ?? this.showProvenMistakes,
@@ -99,6 +108,7 @@ class Settings {
 
   Map<String, String> toMap() => {
     'theme_mode': themeMode.name,
+    'theme_id': themeId,
     'sound': '$sound',
     'haptics': '$haptics',
     'show_proven_mistakes': '$showProvenMistakes',
@@ -123,6 +133,7 @@ class Settings {
         (t) => t.name == m['theme_mode'],
         orElse: () => ThemeMode.system,
       ),
+      themeId: m['theme_id'] ?? 'standard',
       sound: b('sound', true),
       haptics: b('haptics', true),
       showProvenMistakes: b('show_proven_mistakes', true),
@@ -148,6 +159,7 @@ class Settings {
 /// Internal flags such as `review_asked_ms` or `board_tour_done` are left out.
 const playerSettingKeys = [
   'theme_mode',
+  'theme_id',
   'sound',
   'haptics',
   'show_proven_mistakes',
@@ -213,6 +225,7 @@ class SettingsNotifier extends Notifier<Settings> {
 /// permission, onboarding and analytics consent are per device.
 const syncedSettingKeys = [
   'theme_mode',
+  'theme_id',
   'sound',
   'haptics',
   'show_proven_mistakes',

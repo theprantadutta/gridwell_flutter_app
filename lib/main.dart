@@ -28,6 +28,7 @@ import 'state/reminders.dart';
 import 'state/providers.dart';
 import 'state/services.dart';
 import 'state/settings.dart';
+import 'state/themes.dart';
 import 'ui/app.dart';
 
 Future<void> main() async {
@@ -96,7 +97,7 @@ Future<void> main() async {
   final notifications = NotificationService();
   await notifications.initialize();
   // Store and ads connect in the background: they must never delay launch.
-  final store = StoreService();
+  final store = StoreService(themeKeys: paidThemeKeys);
   unawaited(store.initialize());
   final ads = GoogleAdService(
     onUnavailableGrant: (placement) =>

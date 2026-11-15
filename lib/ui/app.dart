@@ -11,6 +11,7 @@ import '../state/reminders.dart';
 import '../state/settings.dart';
 import '../state/store_prompts.dart';
 import '../state/telemetry.dart';
+import '../state/themes.dart';
 import 'router.dart';
 import 'theme/gridwell_theme.dart';
 import 'theme/palette.dart';
@@ -73,6 +74,16 @@ class _GridwellAppState extends ConsumerState<GridwellApp> {
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
+    final theme = ref.watch(activeThemeProvider);
+    // The standard theme follows System / Light / Dark. Any other theme is one
+    // fixed look, so it fills both slots and the mode is pinned to its own
+    // brightness (which keeps the system bar icons right).
+    final fixed = GridwellPalette.themes[theme.id];
+    final themeMode = fixed == null
+        ? settings.themeMode
+        : (fixed.isDark ? ThemeMode.dark : ThemeMode.light);
+    ThemeData data(Brightness b) => GridwellTheme.themeData(
+        GridwellPalette.forTheme(theme.id, b, highContrast: settings.highContrast));
     return MaterialApp.router(
       title: 'Gridwell',
       debugShowCheckedModeBanner: false,
@@ -88,11 +99,9 @@ class _GridwellAppState extends ConsumerState<GridwellApp> {
         // ignore: deprecated_member_use
         child: MaterialUiCompatibilityBridge(child: child ?? const SizedBox()),
       ),
-      themeMode: settings.themeMode,
-      theme: GridwellTheme.themeData(
-          GridwellPalette.of(Brightness.light, highContrast: settings.highContrast)),
-      darkTheme: GridwellTheme.themeData(
-          GridwellPalette.of(Brightness.dark, highContrast: settings.highContrast)),
+      themeMode: themeMode,
+      theme: data(Brightness.light),
+      darkTheme: data(Brightness.dark),
       // The app is on package:material_ui; its delegates cover Material and
       // widgets. Legacy packages are covered by the bridge in [builder].
       localizationsDelegates: GlobalMaterialLocalizations.delegates,

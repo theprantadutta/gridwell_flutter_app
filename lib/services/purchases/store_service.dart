@@ -26,6 +26,11 @@ class StorePurchase {
 /// [products] stays empty and the store screen says purchases are not
 /// available yet. Nothing here throws to callers.
 class StoreService {
+  /// [themeKeys]: the paid themes this build knows. Their products, and the
+  /// All themes bundle, are loaded with the one-time products.
+  StoreService({this.themeKeys = const []});
+
+  final List<String> themeKeys;
   final _iap = FlutterInappPurchase.instance;
   final _purchases = StreamController<StorePurchase>.broadcast();
   StreamSubscription<Purchase>? _sub;
@@ -65,7 +70,10 @@ class StoreService {
   Future<void> loadProducts() async {
     try {
       final oneTime = await _iap.fetchProducts<Product>(
-        skus: [ProductIds.removeAds],
+        skus: [
+          ProductIds.removeAds,
+          if (themeKeys.isNotEmpty) ...[for (final k in themeKeys) ProductIds.theme(k), ProductIds.themeBundle],
+        ],
         type: ProductQueryType.InApp,
       );
       final subs = await _iap.fetchProducts<ProductSubscription>(

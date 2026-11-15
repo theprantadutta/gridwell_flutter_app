@@ -15,6 +15,20 @@ abstract final class ProductIds {
   static String get premiumMonthly => _id('premium_monthly');
   static String get premiumYearly => _id('premium_yearly');
 
+  /// One-time purchase of one theme: `theme_<key>` (the API matches this
+  /// rule, so a new theme needs only a new store product).
+  static String theme(String key) => _id('theme_$key');
+
+  /// One-time purchase of every paid theme, now and later.
+  static String get themeBundle => theme(themeBundleKey);
+  static const themeBundleKey = 'bundle';
+
+  /// The theme key of a theme product id ("midnight", or "bundle"), or null.
+  static String? themeKeyOf(String productId) {
+    final m = RegExp(r'(?:^|\.)theme_([a-z0-9_]+)$').firstMatch(productId);
+    return m?.group(1);
+  }
+
   static List<String> get all => [removeAds, premiumMonthly, premiumYearly];
   static List<String> get subscriptions => [premiumMonthly, premiumYearly];
 }

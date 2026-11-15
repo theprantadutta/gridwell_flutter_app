@@ -72,6 +72,10 @@ void main() {
     'dark': GridwellPalette.dark,
     'light-hc': GridwellPalette.highContrast(GridwellPalette.light),
     'dark-hc': GridwellPalette.highContrast(GridwellPalette.dark),
+    for (final MapEntry(key: id, value: palette) in GridwellPalette.themes.entries) ...{
+      'theme-$id': palette,
+      'theme-$id-hc': GridwellPalette.highContrast(palette),
+    },
   };
 
   for (final MapEntry(key: name, value: palette) in variants.entries) {

@@ -13,6 +13,7 @@ import '../../state/reminders.dart';
 import '../../state/services.dart';
 import '../../state/settings.dart';
 import '../../state/store_prompts.dart';
+import '../../state/themes.dart';
 import '../theme/gridwell_theme.dart';
 import '../theme/typography.dart';
 import '../widgets/tally.dart';
@@ -28,6 +29,7 @@ class SettingsScreen extends ConsumerWidget {
     final version = ref.watch(appVersionProvider).value;
     final account = ref.watch(accountProvider).value ?? Account.guest;
     final ent = ref.watch(entitlementsProvider);
+    final activeTheme = ref.watch(activeThemeProvider);
     final removeAdsPrice = ref.watch(purchaseControllerProvider).prices[ProductIds.removeAds];
 
     void set(Settings Function(Settings) change) => notifier.update(change);
@@ -97,14 +99,26 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ]),
       SettingsGroup(title: 'Look', children: [
-        SettingsRow(
+        SettingsRow.link(
           label: 'Theme',
-          trailing: TallySegmented<ThemeMode>(
-            options: const [(ThemeMode.system, 'System'), (ThemeMode.light, 'Light'), (ThemeMode.dark, 'Dark')],
-            value: s.themeMode,
-            onChanged: (m) => set((x) => x.copyWith(themeMode: m)),
-          ),
+          detail: switch (appThemes.where((t) => !canUseTheme(t, ent)).length) {
+            0 => null,
+            1 => 'One more to unlock',
+            final n => '${_count(n)} more to unlock',
+          },
+          value: activeTheme.name,
+          onTap: () => context.push('/themes'),
         ),
+        // Light and dark belong to the standard theme; the others are one look.
+        if (activeTheme.id == standardThemeId)
+          SettingsRow(
+            label: 'Light or dark',
+            trailing: TallySegmented<ThemeMode>(
+              options: const [(ThemeMode.system, 'System'), (ThemeMode.light, 'Light'), (ThemeMode.dark, 'Dark')],
+              value: s.themeMode,
+              onChanged: (m) => set((x) => x.copyWith(themeMode: m)),
+            ),
+          ),
         SettingsRow.toggle(
           label: 'High contrast',
           value: s.highContrast,
@@ -378,3 +392,6 @@ class _SmoothMotionRowState extends ConsumerState<_SmoothMotionRow> {
     );
   }
 }
+
+/// Small counts in words, as the copy reads them ("Four more to unlock").
+String _count(int n) => const ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'].elementAtOrNull(n) ?? '$n';

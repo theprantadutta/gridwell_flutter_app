@@ -138,6 +138,13 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                   _Feature(title: 'One payment', detail: 'Restores on every device signed in to your store account.'),
                 ]),
               ),
+              SettingsGroup(title: 'Themes', children: [
+                SettingsRow.link(
+                  label: 'Themes',
+                  detail: 'Try one on, then buy it once, or get them all',
+                  onTap: () => context.push('/themes'),
+                ),
+              ]),
               SettingsGroup(title: 'Or go premium', children: [
                 plan(
                   id: ProductIds.premiumYearly,
@@ -153,8 +160,8 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(tallyMargin, 10, tallyMargin, 0),
                 child: Text(
-                  'Premium removes every ad, gives you unlimited hints, opens missed dailies for free, '
-                  'and brings new collections to you first.',
+                  'Premium removes every ad, gives you unlimited hints, unlocks every theme, opens missed dailies '
+                  'for free, and brings new collections to you first.',
                   style: TallyType.prose(p.ink2, size: 13),
                 ),
               ),

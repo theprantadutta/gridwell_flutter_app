@@ -63,7 +63,7 @@ A NEW DAILY PUZZLE
 A fresh puzzle every day, the same one for everyone, with a daily leaderboard, a streak to keep and a month calendar of the days you solved. You appear under a pen name, never your real name. Missed a day? Open it with a short video. Turn on a gentle evening reminder if you like one.
 
 BUILT FOR FOCUS
-• A bold, clean design in light and dark, with a high-contrast option
+• A bold, clean design in light and dark, with a high-contrast option and themes to make it yours
 • Filled, crossed and empty squares differ by shape, not by color alone
 • Smooth motion on high refresh rate screens (90 Hz and 120 Hz)
 • Drag to fill or cross a whole run in one stroke
@@ -79,7 +79,8 @@ Open the app and start solving. To keep your progress on another device, sign in
 FREE TO PLAY
 Gridwell is a free logic puzzle game supported by ads. There are no banner ads: you may see an ad between puzzles, and you can choose to watch a short video for an extra hint. Optional purchases:
 • Remove Ads: a one-time purchase that turns off the ads between puzzles
-• Gridwell Premium, monthly or yearly, each with a free trial: unlimited hints, no ads, missed dailies unlocked for free, and early access to new collections
+• Themes: change the colors of the whole game. Gridwell and Paper are free; six more (Midnight, Blossom, Ink, Sky, Ember and Violet) are yours to keep for a one-time price, alone or all together
+• Gridwell Premium, monthly or yearly, each with a free trial: unlimited hints, no ads, every theme, missed dailies unlocked for free, and early access to new collections
 
 Subscriptions renew automatically unless canceled at least 24 hours before the end of the current period. Manage or cancel them any time in your Google Play subscriptions.
 ```
@@ -168,7 +169,8 @@ Open the app and start solving. If you want your progress on another device, you
 FREE TO PLAY
 Gridwell is free to play and supported by ads. There are no banner ads: you may see an ad between puzzles, and you can choose to watch a short video for an extra hint. Optional purchases:
 • Remove Ads: a one-time purchase that turns off the ads between puzzles
-• Gridwell Premium, monthly or yearly, each with a free trial: unlimited hints, no ads, missed dailies unlocked for free, and early access to new collections
+• Themes: change the colors of the whole game. Gridwell and Paper are free; six more (Midnight, Blossom, Ink, Sky, Ember and Violet) are yours to keep for a one-time price, alone or all together
+• Gridwell Premium, monthly or yearly, each with a free trial: unlimited hints, no ads, every theme, missed dailies unlocked for free, and early access to new collections
 
 Payment is charged to your Apple Account when you confirm the purchase, or when a free trial ends. Subscriptions renew automatically unless canceled at least 24 hours before the end of the current period. Manage or cancel them in your Apple Account settings.
 

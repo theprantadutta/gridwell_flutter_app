@@ -56,6 +56,10 @@ List<_Check> _checks(bool highContrast) => [
       _Check('clue number on the band', (p) => p.ink, (p) => _hl(p, p.bg), 7),
       _Check('filled vs empty, both on the band', (p) => _hl(p, p.ink), (p) => _hl(p, p.cell), 4.5),
       _Check('dash on a banded cell (drawn in --ink-2)', (p) => p.ink2, (p) => _hl(p, p.cell), 3),
+      // The toast is an --ink slab with --bg text; its action is the signal
+      // color on light pages and --bg on dark ones (tally.dart).
+      _Check('toast text', (p) => p.bg, (p) => p.ink, 4.5),
+      _Check('toast action', (p) => p.isDark ? p.bg : p.lime, (p) => p.ink, 4.5),
     ];
 
 void main() {
@@ -64,6 +68,11 @@ void main() {
     'dark': GridwellPalette.dark,
     'light high contrast': GridwellPalette.highContrast(GridwellPalette.light),
     'dark high contrast': GridwellPalette.highContrast(GridwellPalette.dark),
+    // Every theme meets the same floors, plain and with high contrast on.
+    for (final MapEntry(key: id, value: palette) in GridwellPalette.themes.entries) ...{
+      'theme $id': palette,
+      'theme $id high contrast': GridwellPalette.highContrast(palette),
+    },
   };
 
   final report = StringBuffer('palette contrast (worst case across visions):\n');

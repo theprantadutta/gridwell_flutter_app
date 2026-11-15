@@ -18,6 +18,7 @@ import 'screens/privacy_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/store_screen.dart';
+import 'screens/themes_screen.dart';
 
 GoRouter buildRouter({required bool onboardingDone}) => GoRouter(
       // The splash decides where to go next (contents, or onboarding first time).
@@ -50,6 +51,11 @@ GoRouter buildRouter({required bool onboardingDone}) => GoRouter(
         GoRoute(
           path: '/store',
           builder: (_, state) => StoreScreen(restoreOnOpen: state.uri.queryParameters['restore'] == '1'),
+        ),
+        GoRoute(path: '/themes', builder: (_, _) => const ThemesScreen()),
+        GoRoute(
+          path: '/themes/preview/:id',
+          builder: (_, state) => ThemePreviewScreen(themeId: state.pathParameters['id']!),
         ),
         GoRoute(path: '/privacy', builder: (_, _) => const PrivacyScreen()),
         GoRoute(path: '/about', builder: (_, _) => const AboutScreen()),

@@ -59,6 +59,32 @@ These go in two places:
 For subscriptions on Google Play, also note the **base plan id** for each plan (for example
 `monthly`, `yearly`): `______________` / `______________`
 
+### Themes (one-time, non-consumable)
+
+Paid themes are sold one by one and as an All themes bundle; Premium also unlocks every theme. The
+free looks (Gridwell and Paper) have no products. Create each as a **one-time product** on Google
+Play and a **non-consumable** in App Store Connect.
+
+| Product | Price | Play product id | App Store product id |
+|---|---|---|---|
+| Theme: Midnight | $0.99 | `theme_midnight` | `com.pranta.gridwell.theme_midnight` |
+| Theme: Blossom | $0.99 | `theme_blossom` | `com.pranta.gridwell.theme_blossom` |
+| Theme: Ink | $0.99 | `theme_ink` | `com.pranta.gridwell.theme_ink` |
+| Theme: Sky | $0.99 | `theme_sky` | `com.pranta.gridwell.theme_sky` |
+| Theme: Ember | $0.99 | `theme_ember` | `com.pranta.gridwell.theme_ember` |
+| Theme: Violet | $0.99 | `theme_violet` | `com.pranta.gridwell.theme_violet` |
+| All themes (every paid theme, now and later) | $2.99 | `theme_bundle` | `com.pranta.gridwell.theme_bundle` |
+
+Theme ids follow one rule, `theme_<key>` (bundle-prefixed on iOS), and both the app
+(`ProductIds.theme`) and the API (`ThemeProducts`) match it, so a new theme needs only its palette
+in `lib/ui/theme/palette.dart`, its entry in `lib/state/themes.dart` and a new store product. No API
+configuration or `.env` change.
+
+Display names and descriptions for the store listings of these products:
+- Name: `Midnight theme` (and so on); description: `Deep navy and aqua for the board, clues and
+  pictures. Yours to keep.`
+- Bundle name: `All themes`; description: `Every Gridwell theme, including future ones. Yours to keep.`
+
 ## 4. Backend store credentials (API `.env` only, never in the app)
 
 | Value | Format | Status |

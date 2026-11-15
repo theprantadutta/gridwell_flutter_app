@@ -120,9 +120,14 @@ class OnlineSession {
 
   void applyEntitlements(Map<String, Object?> e) {
     final premium = (e['premium'] as Map<String, Object?>?)?['active'] == true;
+    final current = _ref.read(entitlementsProvider);
+    final themes = e['themes'];
     _ref.read(entitlementsProvider.notifier).set(Entitlements(
           removeAds: e['remove_ads'] == true,
           premium: premium,
+          // The server's list is the truth (it sees refunds). An older server
+          // that does not send one leaves the device's list alone.
+          themes: themes is List ? themes.whereType<String>().toSet() : current.themes,
         ));
   }
 
