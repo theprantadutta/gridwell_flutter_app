@@ -1,0 +1,13 @@
+{"segments": [
+  {"src": "rec1.mp4", "a": 0.5,   "b": 4.5,   "chip": "NONOGRAMS",       "color": "lime", "title": "Picture logic puzzles", "sub": "Fill the right squares and a pixel picture appears."},
+  {"src": "rec1.mp4", "a": 12.0,  "b": 16.0,  "chip": "150 PUZZLES",     "color": "lime", "title": "Four collections", "sub": "Coastline, Botanica, Bestiary and Small Hours. All open."},
+  {"src": "rec1.mp4", "a": 18.0,  "b": 27.5,  "chip": "DRAG TO FILL",    "color": "lime", "title": "Solve by the numbers", "sub": "The clues tell you each run. Drag to fill it in one stroke."},
+  {"src": "rec1.mp4", "a": 29.0,  "b": 35.0,  "chip": "HINTS",           "color": "ink",  "title": "Hints that show their working", "sub": "Which square, what it is, and why."},
+  {"src": "rec1.mp4", "a": 54.0,  "b": 60.8,  "chip": "NO GUESSING",     "color": "lime", "title": "Pure logic, every time", "sub": "Every puzzle has exactly one solution you can reason out."},
+  {"src": "rec1.mp4", "a": 60.8,  "b": 66.3,  "chip": "SOLVED",          "color": "lime", "title": "A picture appears", "sub": "A bee, a lighthouse, a teacup by lamplight."},
+  {"src": "rec1.mp4", "a": 141.0, "b": 148.5, "chip": "GALLERY",         "color": "ink",  "title": "Keep every picture", "sub": "Your solves in full color, with your best times."},
+  {"src": "rec2.mp4", "a": 24.5,  "b": 36.0,  "chip": "DAILY",           "color": "lime", "title": "A new puzzle every day", "sub": "The same one for everyone, inside the app."},
+  {"src": "rec2.mp4", "a": 53.0,  "b": 59.0,  "chip": "LEADERBOARD",     "color": "ink",  "title": "See how you stack up", "sub": "Daily times under a pen name, never your real name."},
+  {"src": "rec2.mp4", "a": 63.5,  "b": 69.5,  "chip": "STREAKS",         "color": "lime", "title": "Keep your streak", "sub": "A month calendar of the days you solved."},
+  {"src": "rec2.mp4", "a": 77.5,  "b": 85.0,  "chip": "OFFLINE",         "color": "ink",  "title": "Plays anywhere", "sub": "Fully offline. No sign-up needed. Light, dark and high contrast."}
+]}

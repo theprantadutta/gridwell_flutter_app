@@ -1,0 +1,9 @@
+# raw screen recordings and render intermediates
+tools/rec*.mp4
+tools/lcap*.png
+tools/lstage.png
+tools/lmask.png
+tools/lintro.png
+tools/loutro.png
+tools/preview*.png
+tools/__pycache__/
