@@ -134,7 +134,8 @@ picture (text art in `content/plates/`) → clue derivation → line-solvability
   `screen_view` per route (also the `screen` and `puzzle_id` crash keys). Never send the email.
 - Firebase client config (`google-services.json`, `GoogleService-Info.plist`, `firebase_options.dart`,
   `firebase.json`) is gitignored. Regenerate with `flutterfire configure`.
-- iOS builds and `GoogleService-Info.plist` live on the Mac. Mac-side checklist: `docs/MAC_CHECKLIST.md`.
+- iOS builds and `GoogleService-Info.plist` live on the Mac. Mac-side checklist: `docs/MAC_CHECKLIST.md`
+  (step 8: local StoreKit file with every product; step 13: creating the theme products in App Store Connect).
 - Smooth motion (`refresh_rate` 2.x): Settings > Look, on by default, stored per device (`high_refresh_rate`,
   not synced). `lib/state/display.dart` requests the max rate after the first frame, on every change and on
   resume (Android can drop it in the background); "off" hands the choice back to the system, never forces

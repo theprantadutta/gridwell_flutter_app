@@ -223,27 +223,34 @@ and Apple has to be built and tested here, because it needs a real Apple device 
 
 ## 8. StoreKit configuration file for local IAP testing
 
-Lets you buy the three products in Xcode runs without App Store Connect products existing (they are
+Lets you buy every product in Xcode runs without App Store Connect products existing (they are
 created only after approval).
 
 - [ ] Xcode > File > New > File > **StoreKit Configuration File**, name `Gridwell.storekit`, save in
   `ios/` and add to the Runner project (not to the app target's resources). Leave "Sync this file with an
   app in App Store Connect" unticked.
-- [ ] Add, using the product IDs currently in `lib/services/purchases/product_ids.dart`
-  (`remove_ads`, `premium_monthly`, `premium_yearly` as of today; if real IDs from `MONETIZATION_IDS.md` are
-  in that file by now, use those):
-  - [ ] **Non-Consumable** `remove_ads`, reference name "Remove Ads", price **1.99**.
+- [ ] Add, using the iOS product IDs from `lib/services/purchases/product_ids.dart` (on iOS every id is
+  prefixed with the bundle id, `com.pranta.gridwell.`; the full table is in `MONETIZATION_IDS.md`):
+  - [ ] **Non-Consumable** `com.pranta.gridwell.remove_ads`, reference name "Remove Ads", price **1.99**.
+  - [ ] **Non-Consumable**, price **0.99** each: `com.pranta.gridwell.theme_midnight`, `..._theme_blossom`,
+    `..._theme_ink`, `..._theme_sky`, `..._theme_ember`, `..._theme_violet` (reference names "Theme:
+    Midnight" and so on).
+  - [ ] **Non-Consumable** `com.pranta.gridwell.theme_bundle`, "All themes", price **2.99**.
   - [ ] A **subscription group** "Gridwell Premium" containing:
-    - [ ] **Auto-Renewable** `premium_monthly`, "Premium monthly", price **2.99**, duration **1 month**,
+    - [ ] **Auto-Renewable** `com.pranta.gridwell.premium_monthly`, "Premium monthly", price **2.99**, duration **1 month**,
       introductory offer **Free**, duration = the trial length from `MONETIZATION_IDS.md`
       **[CONFIRM: trial length]**.
-    - [ ] **Auto-Renewable** `premium_yearly`, "Premium yearly", price **14.99**, duration **1 year**,
+    - [ ] **Auto-Renewable** `com.pranta.gridwell.premium_yearly`, "Premium yearly", price **14.99**, duration **1 year**,
       introductory offer **Free**, same trial question.
 - [ ] Product > Scheme > Edit Scheme > **Run** > Options > **StoreKit Configuration** = `Gridwell.storekit`.
 - [ ] Run from **Xcode** (the StoreKit file applies to Xcode-launched runs, not `flutter run` from a
   terminal). Test: buy each product, restore purchases, cancel and expire a subscription in
   Debug > StoreKit > Manage Transactions, refund, and the trial-to-paid transition (speed up renewal in
   Editor > Time Rate).
+- [ ] Themes: Settings > Look > Theme shows a price on each locked theme. Tap one: the preview's
+  **Buy** slab buys it and the theme switches on by itself; **All themes** unlocks every paid theme; with
+  a Premium subscription active every theme is open. Refund a theme in Manage Transactions, then
+  relaunch: the standard theme comes back and the pick returns if bought again.
 - [ ] Expected: the app unlocks locally. **Server verification fails** for these transactions, because they
   are signed by Xcode's local certificate, not Apple's. That is normal. End-to-end verification against
   `https://gridwell.pranta.dev` needs Sandbox testers (App Store Connect > Users and Access > Sandbox) and
@@ -323,3 +330,44 @@ From `docs/PERFORMANCE.md`. Profile mode needs a physical device.
   solve; a push sent from the admin dashboard arrives; the 7 pm local reminder fires (temporarily set the
   device clock if needed); account deletion works.
 - [ ] For external testers, submit the build for **Beta App Review** with a short "What to test" note.
+
+## 13. App Store Connect: theme products
+
+Gridwell sells six themes ($0.99 each) and an All themes bundle ($2.99), all one-time. Premium also
+unlocks every theme. Create them alongside Remove Ads, before submitting the version that includes
+them (the first in-app purchases must be submitted with an app version). The ids, prices and names are
+in `MONETIZATION_IDS.md` (section 3, "Themes"); the app (`ProductIds.theme`) and the API
+(`ThemeProducts`) both expect exactly these ids, so do not rename them.
+
+- [ ] App Store Connect > Apps > Gridwell > Monetization > **In-App Purchases** > **+** > **Non-Consumable**,
+  once per row:
+
+  | Reference name | Product ID | Price | Display name | Description |
+  |---|---|---|---|---|
+  | Theme: Midnight | `com.pranta.gridwell.theme_midnight` | $0.99 | Midnight theme | Deep navy and aqua for the board, clues and pictures. Yours to keep. |
+  | Theme: Blossom | `com.pranta.gridwell.theme_blossom` | $0.99 | Blossom theme | Soft pink and plum for the board, clues and pictures. Yours to keep. |
+  | Theme: Ink | `com.pranta.gridwell.theme_ink` | $0.99 | Ink theme | True black, white and yellow for the board, clues and pictures. Yours to keep. |
+  | Theme: Sky | `com.pranta.gridwell.theme_sky` | $0.99 | Sky theme | Pale sky and bright blue for the board, clues and pictures. Yours to keep. |
+  | Theme: Ember | `com.pranta.gridwell.theme_ember` | $0.99 | Ember theme | Warm charcoal and orange for the board, clues and pictures. Yours to keep. |
+  | Theme: Violet | `com.pranta.gridwell.theme_violet` | $0.99 | Violet theme | Deep violet and lavender for the board, clues and pictures. Yours to keep. |
+  | All themes | `com.pranta.gridwell.theme_bundle` | $2.99 | All themes | Every Gridwell theme, including future ones. Yours to keep. |
+
+  Display names must fit 30 characters and descriptions 45 on the App Store; trim the description to
+  the colors ("Deep navy and aqua. Yours to keep.") if App Store Connect rejects the length.
+- [ ] Price: pick the $0.99 / $2.99 price point with **United States** as the base country and let Apple
+  set the other countries. Availability: all countries where Gridwell is sold.
+- [ ] Family Sharing: set it the same way as Remove Ads for every theme product (one choice for all
+  one-time purchases). **[CONFIRM with the owner]**
+- [ ] Review information for each product:
+  - Screenshot: the theme's preview screen on an iPhone (Settings > Look > Theme > tap the theme). The
+    same screenshot taken in the simulator with the StoreKit file from step 8 is fine.
+  - Review notes: "Settings > Look > Theme. Tap a locked theme to preview it, then Buy (one theme) or All
+    themes. Gridwell Premium also unlocks every theme. Bought themes are restored with Restore purchase
+    on the Remove ads screen."
+- [ ] When submitting the version, add all seven under **In-App Purchases and Subscriptions** on the version
+  page, with Remove Ads and the Premium subscriptions.
+- [ ] Sandbox check (after the products are **Ready to Submit**): sign in with a Sandbox tester, buy one
+  theme and the bundle on a device build pointed at production, and confirm the API returns them in
+  `entitlements.themes` (in the `POST /api/v1/purchases/verify` response).
+- [ ] The API must have migration `AddThemeEntitlements` applied before its theme code is deployed (see
+  the API repo's CLAUDE.md, "Theme products").
